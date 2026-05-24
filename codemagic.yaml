@@ -1,4 +1,4 @@
-workflows:
+ workflows:
     ios-app-store:
       name: Mnemo App Store Build
       max_build_duration: 60
@@ -17,7 +17,12 @@ workflows:
               -k "$KEYCHAIN" \
               -P "$CM_CERTIFICATE_PASSWORD" \
               -T /usr/bin/codesign \
-              -T /usr/bin/security
+              -T /usr/bin/security \
+              -A
+            security set-key-partition-list \
+              -S apple-tool:,apple: \
+              -s -k "" "$KEYCHAIN" \
+              || true
             DECODED=$(
               echo "$APP_STORE_CONNECT_PRIVATE_KEY" \
               | base64 --decode
