@@ -10,6 +10,10 @@ workflows:
         - name: Set up signing
           script: |
             keychain initialize
+            echo "$CM_CERTIFICATE" | base64 --decode > /tmp/cert.p12
+            keychain add-certificates \
+              --certificate /tmp/cert.p12 \
+              --certificate-password "$CM_CERTIFICATE_PASSWORD"
             DECODED=$(
               echo "$APP_STORE_CONNECT_PRIVATE_KEY" \
               | base64 --decode
@@ -21,7 +25,6 @@ workflows:
               --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
               --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
               --create
-            keychain add-certificates
         - name: Build IPA
           script: |
             xcode-project use-profiles
