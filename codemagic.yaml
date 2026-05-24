@@ -2,38 +2,24 @@
     ios-app-store:
       name: Mnemo App Store Build
       max_build_duration: 60
+      integrations:
+        app_store_connect: Codemagic Manager
       environment:
-        groups:
-          - app-store
+        ios_signing:
+          distribution_type: app_store
+          bundle_identifier: com.jirifilipec.mnemoapp
         xcode: latest
       scripts:
-        - name: Set up signing
+        - name: Set up keychain
+          script: keychain initialize
+        - name: Fetch signing files
           script: |
-            keychain initialize
-            echo "$CM_CERTIFICATE" \
-              | base64 --decode > /tmp/cert.p12
-            KEYCHAIN=$(security default-keychain | xargs)
-            security import /tmp/cert.p12 \
-              -k "$KEYCHAIN" \
-              -P "$CM_CERTIFICATE_PASSWORD" \
-              -T /usr/bin/codesign \
-              -T /usr/bin/security \
-              -A
-            security set-key-partition-list \
-              -S apple-tool:,apple: \
-              -s -k "" "$KEYCHAIN" \
-              || true
-            DECODED=$(
-              echo "$APP_STORE_CONNECT_PRIVATE_KEY" \
-              | base64 --decode
-            )
             app-store-connect fetch-signing-files \
               com.jirifilipec.mnemoapp \
               --type IOS_APP_STORE \
-              --private-key "$DECODED" \
-              --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
-              --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
               --create
+        - name: Add certificates
+          script: keychain add-certificates
         - name: Build IPA
           script: |
             xcode-project use-profiles
@@ -44,7 +30,4 @@
         - build/ios/ipa/*.ipa
       publishing:
         app_store_connect:
-          api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-          key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-          issuer_id: $APP_STORE_CONNECT_ISSUER_ID
           submit_to_testflight: true
