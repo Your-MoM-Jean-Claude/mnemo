@@ -1,23 +1,26 @@
-workflows:
+ workflows:
     ios-app-store:
       name: Mnemo App Store Build
       max_build_duration: 60
       environment:
         groups:
           - app-store
-        app_store_connect:
-          api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-          key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-          issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         xcode: latest
       scripts:
         - name: Set up keychain
           script: keychain initialize
         - name: Fetch signing files
           script: |
+            DECODED=$(
+              echo "$APP_STORE_CONNECT_PRIVATE_KEY" \
+              | base64 --decode
+            )
             app-store-connect fetch-signing-files \
               com.jirifilipec.mnemoapp \
               --type IOS_APP_STORE \
+              --private-key "$DECODED" \
+              --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
+              --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
               --create
         - name: Add certificates to keychain
           script: keychain add-certificates
