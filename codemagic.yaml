@@ -1,4 +1,4 @@
- workflows:
+workflows:
     ios-app-store:
       name: Mnemo App Store Build
       max_build_duration: 60
@@ -7,10 +7,9 @@
           - app-store
         xcode: latest
       scripts:
-        - name: Set up keychain
-          script: keychain initialize
-        - name: Fetch signing files
+        - name: Set up signing
           script: |
+            keychain initialize
             DECODED=$(
               echo "$APP_STORE_CONNECT_PRIVATE_KEY" \
               | base64 --decode
@@ -22,8 +21,7 @@
               --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
               --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
               --create
-        - name: Add certificates to keychain
-          script: keychain add-certificates
+            keychain add-certificates
         - name: Build IPA
           script: |
             xcode-project use-profiles
