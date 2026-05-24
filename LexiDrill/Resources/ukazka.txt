@@ -1,0 +1,17 @@
+# Angličtina - Čeština, základní slovíčka
+
+apple - jablko
+house - dům
+dog - pes
+cat - kočka
+to run - běžet
+beautiful - krásný
+water - voda
+tree - strom
+book - kniha
+friend - přítel
+to eat - jíst
+happy - šťastný
+sun - slunce
+moon - měsíc
+sky - obloha

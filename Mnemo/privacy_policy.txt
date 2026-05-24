@@ -1,0 +1,69 @@
+================================================================
+MNEMO — PRIVACY POLICY
+================================================================
+
+Tento text vlož na veřejnou webovou stránku (GitHub Pages, Notion, atd.)
+a URL pak zadej do App Store Connect.
+
+----------------------------------------------------------------
+ENGLISH
+----------------------------------------------------------------
+
+Privacy Policy for Mnemo
+Last updated: May 2026
+
+Mnemo does not collect, transmit, or share any personal data.
+
+All data (word lists, statistics, settings) is stored exclusively
+on your device using iOS standard storage (UserDefaults and local
+app storage). Nothing is sent to any server.
+
+The app requests permission to send local notifications solely to
+deliver your optional daily study reminder. No notification data
+is shared with third parties.
+
+We do not use analytics, advertising SDKs, or any third-party
+tracking.
+
+Contact: jir.filipec@gmail.com
+
+----------------------------------------------------------------
+CZECH
+----------------------------------------------------------------
+
+Zásady ochrany osobních údajů aplikace Mnemo
+Poslední aktualizace: květen 2026
+
+Aplikace Mnemo neshromažďuje, nepřenáší ani nesdílí žádné osobní
+údaje.
+
+Veškerá data (seznamy slov, statistiky, nastavení) jsou uložena
+výhradně na vašem zařízení pomocí standardního iOS úložiště.
+Žádná data nejsou odesílána na server.
+
+Aplikace vyžaduje oprávnění k odesílání lokálních notifikací
+výhradně za účelem volitelné denní připomínky ke studiu. Žádná
+data o notifikacích nejsou sdílena s třetími stranami.
+
+Nepoužíváme analytiku, reklamní SDK ani žádné sledování třetích
+stran.
+
+Kontakt: jir.filipec@gmail.com
+
+================================================================
+POZNÁMKA K PUBLIKACI:
+
+Nejjednodušší způsob jak vytvořit veřejnou URL pro privacy policy:
+
+1. Jdi na notion.so → vytvoř novou stránku
+2. Vlož sem anglický text
+3. Klikni Share → "Share to web" → zapni
+4. Zkopíruj URL a vlož do App Store Connect
+
+Nebo GitHub Pages:
+1. Vytvoř repo na github.com
+2. Přidej soubor privacy.md s textem
+3. Aktivuj GitHub Pages v Settings
+4. URL bude: https://[tvoje-jmeno].github.io/[repo]/privacy
+
+================================================================

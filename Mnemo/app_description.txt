@@ -1,0 +1,74 @@
+================================================================
+MNEMO — APP STORE DESCRIPTION
+================================================================
+
+----------------------------------------------------------------
+ENGLISH (primary — App Store default)
+----------------------------------------------------------------
+
+NAME: Mnemo
+
+SUBTITLE (30 chars max):
+Train any pair. Remember more.
+
+DESCRIPTION:
+Mnemo is the flashcard app built for anyone who learns in pairs — not just vocabulary, but anything with two sides: a question and an answer.
+
+Study foreign words, chemical formulas, mathematical equations, historical dates, country capitals, legal definitions, grammar rules, or custom phrases. If it has a counterpart, Mnemo can drill it.
+
+FEATURES:
+• Three study modes — Typing, Flashcards, and Multiple Choice
+• Smart card sequencing — missed cards reappear later in the session, not immediately
+• Wrong-word review — at the end of each session, review only the cards you missed
+• Per-word statistics — track accuracy and review timing for every single card
+• Spaced repetition hints — see which words are due for review
+• Daily study goal — set a target in minutes and get a reminder
+• Achievement overlay — celebrate when you hit your daily goal
+• Multiple answer variants — separate answers with / (e.g. "big / large") and any variant is accepted
+• Full offline support — no account, no internet required
+• Three languages — Czech, English, Spanish interface
+
+KEYWORDS (100 chars max):
+flashcards,vocabulary,learning,formulas,study,quiz,memory,spaced repetition,words,education
+
+CATEGORY: Education
+
+CONTENT RATING: 4+ (no objectionable content)
+
+PRICE: Free (or your chosen price)
+
+SUPPORT URL: (doplň svůj web nebo GitHub)
+PRIVACY POLICY URL: (doplň odkaz — viz privacy_policy.txt)
+
+----------------------------------------------------------------
+CZECH (pro případný lokalizovaný záznam)
+----------------------------------------------------------------
+
+NÁZEV: Mnemo
+
+PODTITULEK (30 znaků max):
+Uč se v párech. Zapamatuj více.
+
+POPIS:
+Mnemo je aplikace pro procvičování párů — nejen slovíček, ale čehokoliv, co má dvě strany: otázku a odpověď.
+
+Procvičuj cizí slova, chemické vzorce, matematické rovnice, historická data, hlavní města, právní definice, gramatická pravidla nebo vlastní fráze. Pokud to má protipól, Mnemo to natrénuje.
+
+FUNKCE:
+• Tři režimy — Psaní, Kartičky a Kvíz
+• Chytrá sekvence karet — chybně zodpovězené kartičky se vrátí za chvíli, ne hned
+• Procvičení chybných — po každém sezení si zopakuj jen to, co ti nešlo
+• Statistiky na slovíčko — sleduj přesnost a datum dalšího opakování pro každou kartu
+• Spaced repetition — vidíš, která slovíčka jsou ke zkoušení
+• Denní studijní cíl — nastav si cíl v minutách a dostávej připomínku
+• Ocenění za splnění cíle — oslavuj každý den kdy cíl dosáhneš
+• Více variant odpovědi — odděl odpovědi lomítkem / (např. "velký / obrovský") a stačí napsat kteroukoli
+• Plně offline — bez účtu, bez internetu
+• Tři jazyky rozhraní — čeština, angličtina, španělština
+
+KLÍČOVÁ SLOVA:
+kartičky,slovíčka,učení,vzorce,kvíz,paměť,spaced repetition,vzdělávání,fráze,opakování
+
+KATEGORIE: Vzdělávání
+
+================================================================

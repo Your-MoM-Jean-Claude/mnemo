@@ -1,0 +1,53 @@
+================================================================
+MNEMO — KEYWORDS & ASO (App Store Optimization)
+================================================================
+
+App Store ti dá 100 znaků na keywords (oddělené čárkou, bez mezer).
+Název a podtitulek se také indexují — nepřidávej do keywords slova
+která jsou už v názvu nebo podtitulku.
+
+----------------------------------------------------------------
+DOPORUČENÉ KEYWORDS (EN) — 99 znaků:
+----------------------------------------------------------------
+
+flashcards,vocabulary,formulas,quiz,spaced repetition,study,memory,learn,chemistry,math
+
+----------------------------------------------------------------
+ALTERNATIVY podle zaměření:
+----------------------------------------------------------------
+
+Pokud cílíš víc na jazyky:
+flashcards,vocabulary,language,words,quiz,study,memory,learn,translation,practice
+
+Pokud cílíš víc na studenty (vzorce, škola):
+flashcards,study,formulas,chemistry,math,quiz,memory,school,learning,spaced repetition
+
+Pokud cílíš víc na obecné učení:
+flashcards,quiz,memory,study,learn,pairs,formulas,vocabulary,practice,review
+
+----------------------------------------------------------------
+KONKURENTI (pro inspiraci/odlišení):
+----------------------------------------------------------------
+
+Anki — komplexní, ale složité UI
+Quizlet — dominantní, ale online/freemium
+Brainscape — spaced repetition focus
+Tinycards — zanikl
+
+Mnemo výhoda oproti konkurenci:
+- Plně offline, bez účtu
+- Podpora čehokoli párového (nejen slova)
+- Čisté dark UI
+- Podpora více variant odpovědi přes /
+- Čeština v UI (Quizlet nemá)
+
+----------------------------------------------------------------
+NÁZEV CHECK:
+----------------------------------------------------------------
+
+Před submitem ověř na App Store že "Mnemo" není obsazený:
+→ Otevři App Store na iPhonu → hledej "Mnemo"
+→ Pokud existuje přesná shoda, přemýšlej o "Mnemo – Flashcard Drill"
+   nebo "Mnemo: Learn Anything"
+
+================================================================
