@@ -1,4 +1,4 @@
-workflows:
+  workflows:
     ios-app-store:
       name: Mnemo App Store Build
       max_build_duration: 60
@@ -11,8 +11,13 @@ workflows:
           script: keychain initialize
         - name: Fetch signing files
           script: |
+            echo $APP_STORE_CONNECT_PRIVATE_KEY | base64 --decode >
+  /tmp/private_key.p8
             app-store-connect fetch-signing-files com.jirifilipec.mnemoapp \
               --type IOS_APP_STORE \
+              --private-key @file:/tmp/private_key.p8 \
+              --key-id $APP_STORE_CONNECT_KEY_IDENTIFIER \
+              --issuer-id $APP_STORE_CONNECT_ISSUER_ID \
               --create
         - name: Add certificates to keychain
           script: keychain add-certificates
