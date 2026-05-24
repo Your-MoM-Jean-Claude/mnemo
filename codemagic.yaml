@@ -1,8 +1,10 @@
-  workflows:
+ workflows:
     ios-app-store:
       name: Mnemo App Store Build
       max_build_duration: 60
       environment:
+        groups:
+          - app-store
         xcode: latest
         ios_signing:
           distribution_type: app_store
@@ -20,5 +22,5 @@
         app_store_connect:
           api_key: $APP_STORE_CONNECT_PRIVATE_KEY
           key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-          issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+          issuer_id: $ISSUER_ID
           submit_to_testflight: true
