@@ -17,6 +17,7 @@
             app-store-connect fetch-signing-files \
               com.jirifilipec.mnemoapp \
               --type IOS_APP_STORE \
+              --create
         - name: Add certificates
           script: keychain add-certificates
         - name: Build IPA
