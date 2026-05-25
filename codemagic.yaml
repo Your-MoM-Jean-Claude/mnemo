@@ -1,43 +1,90 @@
-workflows:
-    ios-app-store:
-      name: Mnemo App Store Build
-      max_build_duration: 60
-      environment:
-        groups:
-          - app-store
-        xcode: latest
-      scripts:
-        - name: Set up signing
-          script: |
-            keychain initialize
-            echo "$CM_CERTIFICATE" \
-              | base64 --decode > /tmp/cert.p12
-            KEYCHAIN=$(security default-keychain | xargs)
-            security import /tmp/cert.p12 \
-              -k "$KEYCHAIN" \
-              -P "$CM_CERTIFICATE_PASSWORD" \
-              -T /usr/bin/codesign \
-              -T /usr/bin/security \
-              -A
-            PROFILES_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
-            mkdir -p "$PROFILES_DIR"
-            echo "$PROVISIONING_PROFILE" \
-              | base64 --decode \
-              > "$PROFILES_DIR/mnemo.mobileprovision"
-            echo "--- Profile check ---"
-            ls -la "$PROFILES_DIR/"
-            wc -c "$PROFILES_DIR/mnemo.mobileprovision"
-        - name: Build IPA
-          script: |
-            xcode-project use-profiles
-            xcode-project build-ipa \
-              --project "LexiDrill.xcodeproj" \
-              --scheme "LexiDrill"
-      artifacts:
-        - build/ios/ipa/*.ipa
-      publishing:
-        app_store_connect:
-          api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-          key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-          issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-          submit_to_testflight: true
+name: Mnemo App Store Build
+       4      max_build_duration: 60
+       5      environment:
+       6 +      groups:
+       7 +        - app-store
+       8        xcode: latest
+       7 -      cocoapods: default
+       9      scripts:
+      10 +      - name: Set up signing
+      11 +        script: |
+      12 +          keychain initialize
+      13 +
+      14 +          echo "$CM_CERTIFICATE" \
+      15 +            | base64 --decode > /tmp/cert.p12
+      16 +
+      17 +          KEYCHAIN=$(security default-keychain | xargs)
+      18 +          security import /tmp/cert.p12 \
+      19 +            -k "$KEYCHAIN" \
+      20 +            -P "$CM_CERTIFICATE_PASSWORD" \
+      21 +            -T /usr/bin/codesign \
+      22 +            -A
+      23 +
+      24 +          PROFILES_DIR="$HOME/Library/MobileDevice/Provisioning Profi
+         +les"
+      25 +          mkdir -p "$PROFILES_DIR"
+      26 +          echo "$PROVISIONING_PROFILE" \
+      27 +            | base64 --decode \
+      28 +            > "$PROFILES_DIR/mnemo.mobileprovision"
+      29 +
+      30 +          PROFILE_UUID=$(security cms -D \
+      31 +            -i "$PROFILES_DIR/mnemo.mobileprovision" \
+      32 +            2>/dev/null \
+      33 +            | plutil -extract UUID raw -)
+      34 +          echo "Profile UUID: $PROFILE_UUID"
+      35 +
+      36 +          cat > /tmp/export.plist << EOF
+      37 +          <?xml version="1.0" encoding="UTF-8"?>
+      38 +          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http:
+         +//www.apple.com/DTDs/PropertyList-1.0.dtd">
+      39 +          <plist version="1.0">
+      40 +          <dict>
+      41 +            <key>method</key>
+      42 +            <string>app-store</string>
+      43 +            <key>teamID</key>
+      44 +            <string>4SK4LT94PV</string>
+      45 +            <key>signingStyle</key>
+      46 +            <string>manual</string>
+      47 +            <key>signingCertificate</key>
+      48 +            <string>Apple Distribution</string>
+      49 +            <key>provisioningProfiles</key>
+      50 +            <dict>
+      51 +              <key>com.jirifilipec.mnemoapp</key>
+      52 +              <string>$PROFILE_UUID</string>
+      53 +            </dict>
+      54 +          </dict>
+      55 +          </plist>
+      56 +          EOF
+      57 +
+      58        - name: Build IPA
+      59          script: |
+      11 -          xcode-project use-profiles
+      12 -          xcode-project build-ipa \
+      13 -            --workspace "LexiDrill/LexiDrill.xcodeproj" \
+      14 -            --scheme "LexiDrill"
+      60 +          PROFILES_DIR="$HOME/Library/MobileDevice/Provisioning Profi
+         +les"
+      61 +          PROFILE_UUID=$(security cms -D \
+      62 +            -i "$PROFILES_DIR/mnemo.mobileprovision" \
+      63 +            2>/dev/null \
+      64 +            | plutil -extract UUID raw -)
+      65 +
+      66 +          xcodebuild archive \
+      67 +            -project "LexiDrill/LexiDrill.xcodeproj" \
+      68 +            -scheme "LexiDrill" \
+      69 +            -configuration Release \
+      70 +            -archivePath /tmp/LexiDrill.xcarchive \
+      71 +            CODE_SIGN_STYLE=Manual \
+      72 +            CODE_SIGN_IDENTITY="Apple Distribution" \
+      73 +            PROVISIONING_PROFILE="$PROFILE_UUID" \
+      74 +            DEVELOPMENT_TEAM=4SK4LT94PV
+      75 +
+      76 +          mkdir -p build/ios/ipa
+      77 +          xcodebuild -exportArchive \
+      78 +            -archivePath /tmp/LexiDrill.xcarchive \
+      79 +            -exportPath build/ios/ipa/ \
+      80 +            -exportOptionsPlist /tmp/export.plist
+      81 +
+      82      artifacts:
+      83        - build/ios/ipa/*.ipa
+      84        - /tmp/xcodebuild_logs/*.log
