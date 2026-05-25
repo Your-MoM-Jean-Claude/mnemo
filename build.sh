@@ -16,6 +16,7 @@
   /usr/libexec/PlistBuddy \
     -c "Add :provisioningProfiles:$BUNDLE string $PROFILE_UUID" \
     /tmp/export.plist
+  agvtool new-version -all $PROJECT_BUILD_NUMBER
   xcodebuild archive \
     -project "LexiDrill.xcodeproj" \
     -scheme "LexiDrill" \
