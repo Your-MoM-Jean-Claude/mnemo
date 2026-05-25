@@ -1,4 +1,4 @@
- workflows:
+workflows:
     ios-app-store:
       name: Mnemo App Store Build
       max_build_duration: 60
@@ -10,73 +10,44 @@
         - name: Set up signing
           script: |
             keychain initialize
-
-            echo "$CM_CERTIFICATE" \
-              | base64 --decode > /tmp/cert.p12
-
+            echo "$CM_CERTIFICATE" | base64 --decode > /tmp/cert.p12
             KEYCHAIN=$(security default-keychain | xargs)
-            security import /tmp/cert.p12 \
-              -k "$KEYCHAIN" \
-              -P "$CM_CERTIFICATE_PASSWORD" \
-              -T /usr/bin/codesign \
-              -A
-
+            security import /tmp/cert.p12 -k "$KEYCHAIN" -P "$CM_CERTIFICATE_PASSWORD"
+   -T /usr/bin/codesign -A
             PROFILES_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
             mkdir -p "$PROFILES_DIR"
-            echo "$PROVISIONING_PROFILE" \
-              | base64 --decode \
-              > "$PROFILES_DIR/mnemo.mobileprovision"
-
-            PROFILE_UUID=$(security cms -D \
-              -i "$PROFILES_DIR/mnemo.mobileprovision" \
-              2>/dev/null \
-              | plutil -extract UUID raw -)
+            echo "$PROVISIONING_PROFILE" | base64 --decode >
+  "$PROFILES_DIR/mnemo.mobileprovision"
+            PROFILE_UUID=$(security cms -D -i "$PROFILES_DIR/mnemo.mobileprovision"
+  2>/dev/null | plutil -extract UUID raw -)
             echo "Profile UUID: $PROFILE_UUID"
 
         - name: Build IPA
           script: |
             PROFILES_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
-            PROFILE_UUID=$(security cms -D \
-              -i "$PROFILES_DIR/mnemo.mobileprovision" \
-              2>/dev/null \
-              | plutil -extract UUID raw -)
-
+            PROFILE_UUID=$(security cms -D -i "$PROFILES_DIR/mnemo.mobileprovision"
+  2>/dev/null | plutil -extract UUID raw -)
             rm -f /tmp/export.plist
-            /usr/libexec/PlistBuddy \
-              -c "Add :method string app-store" \
-              /tmp/export.plist
-            /usr/libexec/PlistBuddy \
-              -c "Add :teamID string 4SK4LT94PV" \
-              /tmp/export.plist
-            /usr/libexec/PlistBuddy \
-              -c "Add :signingStyle string manual" \
-              /tmp/export.plist
-            /usr/libexec/PlistBuddy \
-              -c "Add :signingCertificate string Apple Distribution" \
-              /tmp/export.plist
-            /usr/libexec/PlistBuddy \
-              -c "Add :provisioningProfiles dict" \
-              /tmp/export.plist
-            /usr/libexec/PlistBuddy \
-              -c "Add :provisioningProfiles:com.jirifilipec.mnemoapp string
-  $PROFILE_UUID" \
-              /tmp/export.plist
-
-            xcodebuild archive \
-              -project "LexiDrill/LexiDrill.xcodeproj" \
-              -scheme "LexiDrill" \
-              -configuration Release \
-              -archivePath /tmp/LexiDrill.xcarchive \
-              CODE_SIGN_STYLE=Manual \
-              CODE_SIGN_IDENTITY="Apple Distribution" \
-              PROVISIONING_PROFILE="$PROFILE_UUID" \
-              DEVELOPMENT_TEAM=4SK4LT94PV
-
+            /usr/libexec/PlistBuddy -c "Add :method string app-store"
+  /tmp/export.plist
+            /usr/libexec/PlistBuddy -c "Add :teamID string 4SK4LT94PV"
+  /tmp/export.plist
+            /usr/libexec/PlistBuddy -c "Add :signingStyle string manual"
+  /tmp/export.plist
+            /usr/libexec/PlistBuddy -c "Add :signingCertificate string Apple
+  Distribution" /tmp/export.plist
+            /usr/libexec/PlistBuddy -c "Add :provisioningProfiles dict"
+  /tmp/export.plist
+            /usr/libexec/PlistBuddy -c "Add
+  :provisioningProfiles:com.jirifilipec.mnemoapp string $PROFILE_UUID"
+  /tmp/export.plist
+            xcodebuild archive -project "LexiDrill/LexiDrill.xcodeproj" -scheme
+  "LexiDrill" -configuration Release -archivePath /tmp/LexiDrill.xcarchive
+  CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="Apple Distribution"
+  PROVISIONING_PROFILE="$PROFILE_UUID" DEVELOPMENT_TEAM=4SK4LT94PV
             mkdir -p build/ios/ipa
-            xcodebuild -exportArchive \
-              -archivePath /tmp/LexiDrill.xcarchive \
-              -exportPath build/ios/ipa/ \
-              -exportOptionsPlist /tmp/export.plist
+            xcodebuild -exportArchive -archivePath /tmp/LexiDrill.xcarchive
+  -exportPath build/ios/ipa/ -exportOptionsPlist /tmp/export.plist
 
       artifacts:
         - build/ios/ipa/*.ipa
