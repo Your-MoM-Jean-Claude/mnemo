@@ -1,4 +1,4 @@
-workflows:
+ workflows:
     ios-app-store:
       name: Mnemo App Store Build
       max_build_duration: 60
@@ -33,22 +33,6 @@ workflows:
               | plutil -extract UUID raw -)
             echo "Profile UUID: $PROFILE_UUID"
 
-            python3 -c "
-  import plistlib
-  data = {
-      'method': 'app-store',
-      'teamID': '4SK4LT94PV',
-      'signingStyle': 'manual',
-      'signingCertificate': 'Apple Distribution',
-      'provisioningProfiles': {
-          'com.jirifilipec.mnemoapp': '$PROFILE_UUID'
-      }
-  }
-  with open('/tmp/export.plist', 'wb') as f:
-      plistlib.dump(data, f)
-  print('export.plist created')
-  "
-
         - name: Build IPA
           script: |
             PROFILES_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
@@ -56,6 +40,27 @@ workflows:
               -i "$PROFILES_DIR/mnemo.mobileprovision" \
               2>/dev/null \
               | plutil -extract UUID raw -)
+
+            rm -f /tmp/export.plist
+            /usr/libexec/PlistBuddy \
+              -c "Add :method string app-store" \
+              /tmp/export.plist
+            /usr/libexec/PlistBuddy \
+              -c "Add :teamID string 4SK4LT94PV" \
+              /tmp/export.plist
+            /usr/libexec/PlistBuddy \
+              -c "Add :signingStyle string manual" \
+              /tmp/export.plist
+            /usr/libexec/PlistBuddy \
+              -c "Add :signingCertificate string Apple Distribution" \
+              /tmp/export.plist
+            /usr/libexec/PlistBuddy \
+              -c "Add :provisioningProfiles dict" \
+              /tmp/export.plist
+            /usr/libexec/PlistBuddy \
+              -c "Add :provisioningProfiles:com.jirifilipec.mnemoapp string
+  $PROFILE_UUID" \
+              /tmp/export.plist
 
             xcodebuild archive \
               -project "LexiDrill/LexiDrill.xcodeproj" \
