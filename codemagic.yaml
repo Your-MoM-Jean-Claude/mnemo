@@ -33,7 +33,6 @@ workflows:
               --private-key "$DECODED" \
               --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
               --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
-              --create
         - name: Build IPA
           script: |
             xcode-project use-profiles
