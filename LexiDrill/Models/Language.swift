@@ -1,39 +1,39 @@
 import Foundation
-import Combine
+  import Combine
 
-// MARK: - Language
+  // MARK: - Language
 
-enum Language: String, CaseIterable, Codable, Identifiable {
-    case czech   = "cs"
-    case english = "en"
-    case spanish = "es"
+  enum Language: String, CaseIterable, Codable, Identifiable {
+      case czech   = "cs"
+      case english = "en"
+      case spanish = "es"
 
-    var id: String { rawValue }
+      var id: String { rawValue }
 
-    var displayName: String {
-        switch self {
-        case .czech:   return "CZ"
-        case .english: return "EN"
-        case .spanish: return "SP"
-        }
-    }
-}
+      var displayName: String {
+          switch self {
+          case .czech:   return "CZ"
+          case .english: return "EN"
+          case .spanish: return "SP"
+          }
+      }
+  }
 
-// MARK: - Manager
+  // MARK: - Manager
 
-class LanguageManager: ObservableObject {
-    @Published var language: Language {
-        didSet { UserDefaults.standard.set(language.rawValue, forKey: "appLanguage") }
-    }
+  class LanguageManager: ObservableObject {
+      @Published var language: Language {
+          didSet { UserDefaults.standard.set(language.rawValue, forKey: "appLanguage")
+   }
+      }
 
-    init() {
-        let saved = UserDefaults.standard.string(forKey: "appLanguage") ?? "cs"
-        language = Language(rawValue: saved) ?? .czech
-    }
+      init() {
+          let saved = UserDefaults.standard.string(forKey: "appLanguage") ?? "en"
+          language = Language(rawValue: saved) ?? .english
+      }
 
-    var s: AppStrings { AppStrings(lang: language) }
-}
-
+      var s: AppStrings { AppStrings(lang: language) }
+  }
 // MARK: - Strings
 
 struct AppStrings {
