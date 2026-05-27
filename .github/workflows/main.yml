@@ -5,7 +5,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: macos-15
+    runs-on: macos-26
     env:
       CERT_B64: ${{ secrets.DISTRIBUTION_CERTIFICATE_BASE64 }}
       CERT_PASS: ${{ secrets.CERTIFICATE_PASSWORD }}
@@ -49,7 +49,7 @@ jobs:
 
       - name: Build archive
         run: |
-          XCODE=$(ls /Applications | grep "Xcode_16" | sort -V | tail -1)
+          XCODE=$(ls /Applications | grep "Xcode_" | sort -V | tail -1)
           if [ -n "$XCODE" ]; then
             sudo xcode-select -s "/Applications/$XCODE"
           fi
