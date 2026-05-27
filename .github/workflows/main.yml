@@ -34,9 +34,15 @@ jobs:
           PROF_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
           mkdir -p "$PROF_DIR"
           echo "$PROFILE_B64" | base64 --decode > /tmp/mnemo.mobileprovision
-          PROF_UUID=$(grep -a -A1 '<key>UUID</key>' /tmp/mnemo.mobileprovision \
-            | grep -Eo '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
+          echo "Decoded size: $(wc -c < /tmp/mnemo.mobileprovision)"
+          PROF_UUID=$(python3 -c "
+import re
+data = open('/tmp/mnemo.mobileprovision','rb').read().decode('latin-1')
+m = re.search(r'<key>UUID</key>\s*<string>([^<]+)</string>', data)
+print(m.group(1) if m else '')
+")
           echo "Profile UUID: $PROF_UUID"
+          if [ -z "$PROF_UUID" ]; then echo "ERROR: UUID not found"; exit 1; fi
           cp /tmp/mnemo.mobileprovision "$PROF_DIR/$PROF_UUID.mobileprovision"
           rm /tmp/mnemo.mobileprovision
           echo "PROF_UUID=$PROF_UUID" >> "$GITHUB_ENV"
