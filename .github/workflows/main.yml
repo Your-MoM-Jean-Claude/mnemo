@@ -34,11 +34,11 @@ jobs:
           PROF_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
           mkdir -p "$PROF_DIR"
           echo "$PROFILE_B64" | base64 --decode > /tmp/mnemo.mobileprovision
-          security cms -D -i /tmp/mnemo.mobileprovision 2>/dev/null > /tmp/mnemo.plist
-          PROF_UUID=$(/usr/libexec/PlistBuddy -c "Print :UUID" /tmp/mnemo.plist)
+          PROF_UUID=$(grep -a -A1 '<key>UUID</key>' /tmp/mnemo.mobileprovision \
+            | grep -Eo '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
           echo "Profile UUID: $PROF_UUID"
           cp /tmp/mnemo.mobileprovision "$PROF_DIR/$PROF_UUID.mobileprovision"
-          rm /tmp/mnemo.mobileprovision /tmp/mnemo.plist
+          rm /tmp/mnemo.mobileprovision
           echo "PROF_UUID=$PROF_UUID" >> "$GITHUB_ENV"
 
       - name: Install ASC key
