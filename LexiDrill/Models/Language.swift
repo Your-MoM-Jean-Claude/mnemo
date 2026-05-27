@@ -1,7 +1,5 @@
- import Foundation
+import Foundation
   import Combine
-
-  // MARK: - Language
 
   enum Language: String, CaseIterable, Codable, Identifiable {
       case czech   = "cs"
@@ -19,12 +17,11 @@
       }
   }
 
-  // MARK: - Manager
-
   class LanguageManager: ObservableObject {
       @Published var language: Language {
-          didSet { UserDefaults.standard.set(language.rawValue, forKey: "appLanguage")
-   }
+          didSet {
+              UserDefaults.standard.set(language.rawValue, forKey: "appLanguage")
+          }
       }
 
       init() {
@@ -34,8 +31,6 @@
 
       var s: AppStrings { AppStrings(lang: language) }
   }
-
-  // MARK: - Strings
 
   struct AppStrings {
       let lang: Language
@@ -48,32 +43,22 @@
           }
       }
 
-      // MARK: Tabs
-      var libraryTab: String {
-          t("Knihovna", "Library", "Biblioteca")
-      }
-      var statsTab: String {
-          t("Statistiky", "Statistics", "Estadísticas")
-      }
+      var libraryTab: String { t("Knihovna", "Library", "Biblioteca") }
+      var statsTab: String { t("Statistiky", "Statistics", "Estadísticas") }
 
-      // MARK: Library
       var importFile: String {
-          t("Importovat soubor (.txt)", "Import file (.txt)", "Importar archivo
-  (.txt)")
+          t("Importovat soubor (.txt)",
+            "Import file (.txt)",
+            "Importar archivo (.txt)")
       }
-      var pasteText: String {
-          t("Vložit text", "Paste text", "Pegar texto")
-      }
-      var noLists: String {
-          t("Žádné seznamy", "No lists", "Sin listas")
-      }
+      var pasteText: String { t("Vložit text", "Paste text", "Pegar texto") }
+      var noLists: String { t("Žádné seznamy", "No lists", "Sin listas") }
       var emptyStateDesc: String {
-          t(
-              "Importuj .txt soubor nebo vlož text\nve formátu:\nslovo - překlad",
-              "Import a .txt file or paste text\nin the format:\nword - translation",
-              "Importa un archivo .txt o pega texto\nen el formato:\npalabra -
-  traducción"
-          )
+          switch lang {
+          case .czech:   return "Importuj .txt nebo vlož text: slovo - překlad"
+          case .english: return "Import .txt or paste text: word - translation"
+          case .spanish: return "Importa .txt o pega texto: palabra - traducción"
+          }
       }
       var importFileButton: String {
           t("Importovat soubor", "Import file", "Importar archivo")
@@ -81,36 +66,19 @@
       var importError: String {
           t("Chyba importu", "Import error", "Error de importación")
       }
-      var rename: String {
-          t("Přejmenovat", "Rename", "Renombrar")
-      }
-      var delete: String {
-          t("Smazat", "Delete", "Eliminar")
-      }
-      var editBtn: String {
-          t("Upravit", "Edit", "Editar")
-      }
+      var rename: String { t("Přejmenovat", "Rename", "Renombrar") }
+      var delete: String { t("Smazat", "Delete", "Eliminar") }
+      var editBtn: String { t("Upravit", "Edit", "Editar") }
       var searchLists: String {
           t("Hledat seznamy…", "Search lists…", "Buscar listas…")
       }
-      var completed: String {
-          t("Dokončeno", "Completed", "Completado")
-      }
-      var noResults: String {
-          t("Žádné výsledky", "No results", "Sin resultados")
-      }
+      var completed: String { t("Dokončeno", "Completed", "Completado") }
+      var noResults: String { t("Žádné výsledky", "No results", "Sin resultados") }
       var ok: String { "OK" }
-      var pairs: String {
-          t("páry", "pairs", "pares")
-      }
-      var accuracyLabel: String {
-          t("úspěšnost", "accuracy", "precisión")
-      }
+      var pairs: String { t("páry", "pairs", "pares") }
+      var accuracyLabel: String { t("úspěšnost", "accuracy", "precisión") }
 
-      // MARK: Settings
-      var settingsTitle: String {
-          t("Nastavení", "Settings", "Configuración")
-      }
+      var settingsTitle: String { t("Nastavení", "Settings", "Configuración") }
       var quizDirection: String {
           t("Směr zkoušení", "Quiz direction", "Dirección del quiz")
       }
@@ -124,11 +92,14 @@
           t("Správně za sebou", "Correct in a row", "Correctas seguidas")
       }
       var correctInRowHint: String {
-          t(
-              "Kolikrát musíš odpovědět správně, než přejdeš k další sérii.",
-              "How many times you need to answer correctly before advancing.",
-              "Cuántas veces debes responder correctamente antes de avanzar."
-          )
+          switch lang {
+          case .czech:
+              return "Kolikrát musíš odpovědět správně, než postoupíš dál."
+          case .english:
+              return "How many correct answers before advancing."
+          case .spanish:
+              return "Cuántas respuestas correctas antes de avanzar."
+          }
       }
       var roundSettings: String {
           t("Nastavení série", "Round settings", "Configuración de ronda")
@@ -136,27 +107,17 @@
       var shuffleOrder: String {
           t("Zamíchat pořadí", "Shuffle order", "Mezclar orden")
       }
-      var other: String {
-          t("Další", "Other", "Otro")
-      }
-      var cancel: String {
-          t("Zrušit", "Cancel", "Cancelar")
-      }
-      var start: String {
-          t("Začít", "Start", "Empezar")
-      }
-      var statistics: String {
-          t("Statistiky", "Statistics", "Estadísticas")
-      }
+      var other: String { t("Další", "Other", "Otro") }
+      var cancel: String { t("Zrušit", "Cancel", "Cancelar") }
+      var start: String { t("Začít", "Start", "Empezar") }
+      var statistics: String { t("Statistiky", "Statistics", "Estadísticas") }
       var totalSessions: String {
           t("Celkem sezení", "Total sessions", "Sesiones totales")
       }
       var totalAnswers: String {
           t("Celkem odpovědí", "Total answers", "Respuestas totales")
       }
-      var correctLabel: String {
-          t("Správně", "Correct", "Correctas")
-      }
+      var correctLabel: String { t("Správně", "Correct", "Correctas") }
       var bestStreakLabel: String {
           t("Nejlepší série", "Best streak", "Mejor racha")
       }
@@ -164,34 +125,19 @@
           t("slovních párů", "word pairs", "pares de palabras")
       }
 
-      // MARK: Quiz
-      var hintBtn: String {
-          t("Napovědět", "Show hint", "Mostrar pista")
-      }
-      var translate: String {
-          t("Přelož:", "Translate:", "Traduce:")
-      }
+      var hintBtn: String { t("Napovědět", "Show hint", "Mostrar pista") }
+      var translate: String { t("Přelož:", "Translate:", "Traduce:") }
       var yourAnswer: String {
           t("Tvoje odpověď", "Your answer", "Tu respuesta")
       }
-      var check: String {
-          t("Zkontrolovat", "Check", "Comprobar")
-      }
-      var correctAnswer: String {
-          t("Správně!", "Correct!", "¡Correcto!")
-      }
-      var wrongAnswer: String {
-          t("Chyba", "Wrong", "Error")
-      }
+      var check: String { t("Zkontrolovat", "Check", "Comprobar") }
+      var correctAnswer: String { t("Správně!", "Correct!", "¡Correcto!") }
+      var wrongAnswer: String { t("Chyba", "Wrong", "Error") }
       var yourAnswerWas: String {
           t("Tvoje odpověď:", "Your answer:", "Tu respuesta:")
       }
-      var inRow: String {
-          t("× v řadě!", "× in a row!", "× seguidas!")
-      }
-      var continueBtn: String {
-          t("Pokračovat", "Continue", "Continuar")
-      }
+      var inRow: String { t("× v řadě!", "× in a row!", "× seguidas!") }
+      var continueBtn: String { t("Pokračovat", "Continue", "Continuar") }
       var showResults: String {
           t("Zobrazit výsledky", "Show results", "Ver resultados")
       }
@@ -201,47 +147,43 @@
       var excellent: String {
           t("Výborně! 🎉", "Excellent! 🎉", "¡Excelente! 🎉")
       }
-      var goodJob: String {
-          t("Dobře! 👍", "Good! 👍", "¡Bien! 👍")
-      }
+      var goodJob: String { t("Dobře! 👍", "Good! 👍", "¡Bien! 👍") }
       var tryAgain: String {
           t("Zkus to znovu 💪", "Try again 💪", "Inténtalo de nuevo 💪")
       }
       var sessionDone: String {
           t("Sezení dokončeno", "Session complete", "Sesión completada")
       }
-      var successRate: String {
-          t("Úspěšnost", "Accuracy", "Precisión")
-      }
+      var successRate: String { t("Úspěšnost", "Accuracy", "Precisión") }
       var backToLibrary: String {
           t("Zpět do knihovny", "Back to library", "Volver a la biblioteca")
       }
-      var quit: String {
-          t("Ukončit", "Quit", "Salir")
-      }
+      var quit: String { t("Ukončit", "Quit", "Salir") }
 
       func batchDone(_ n: Int) -> String {
-          t("Série \(n) hotova!", "Round \(n) done!", "¡Ronda \(n) terminada!")
+          t("Série \(n) hotova!",
+            "Round \(n) done!",
+            "¡Ronda \(n) terminada!")
       }
       func prepareForBatch(_ cur: Int, _ total: Int) -> String {
-          t(
-              "Připrav se na sérii \(cur) z \(total)",
-              "Get ready for round \(cur) of \(total)",
-              "Prepárate para la ronda \(cur) de \(total)"
-          )
+          t("Připrav se na sérii \(cur) z \(total)",
+            "Get ready for round \(cur) of \(total)",
+            "Prepárate para la ronda \(cur) de \(total)")
       }
       func batchProgress(_ cur: Int, _ total: Int) -> String {
-          t("Série \(cur) / \(total)", "Round \(cur) / \(total)", "Ronda \(cur) /
-  \(total)")
+          t("Série \(cur) / \(total)",
+            "Round \(cur) / \(total)",
+            "Ronda \(cur) / \(total)")
       }
       func previewCount(_ n: Int) -> String {
-          t("Náhled (\(n) párů)", "Preview (\(n) pairs)", "Vista previa (\(n) pares)")
+          t("Náhled (\(n) párů)",
+            "Preview (\(n) pairs)",
+            "Vista previa (\(n) pares)")
       }
       func andMore(_ n: Int) -> String {
           t("… a dalších \(n)", "… and \(n) more", "… y \(n) más")
       }
 
-      // MARK: Word editor
       var editWords: String {
           t("Upravit slovíčka", "Edit words", "Editar palabras")
       }
@@ -251,61 +193,44 @@
       var editWord: String {
           t("Upravit slovíčko", "Edit word", "Editar palabra")
       }
-      var frontSide: String {
-          t("Přední strana", "Front", "Anverso")
-      }
-      var backSide: String {
-          t("Zadní strana", "Back", "Reverso")
-      }
+      var frontSide: String { t("Přední strana", "Front", "Anverso") }
+      var backSide: String { t("Zadní strana", "Back", "Reverso") }
       var slashHint: String {
-          t(
-              "Tip: / odděluje více variant (např. \"big / large\") — správná je
-  kterákoliv z nich.",
-              "Tip: / separates multiple variants (e.g. \"big / large\") — any one is
-  accepted.",
-              "Tip: / separa variantes (p.ej. \"grande / largo\") — cualquiera es
-  válida."
-          )
+          switch lang {
+          case .czech:
+              return "Tip: / odděluje varianty (např. big / large)"
+          case .english:
+              return "Tip: / separates variants (e.g. big / large)"
+          case .spanish:
+              return "Tip: / separa variantes (p.ej. grande / largo)"
+          }
       }
-      var save: String {
-          t("Uložit", "Save", "Guardar")
-      }
-      var done: String {
-          t("Hotovo", "Done", "Listo")
-      }
+      var save: String { t("Uložit", "Save", "Guardar") }
+      var done: String { t("Hotovo", "Done", "Listo") }
 
-      // MARK: Paste Import
       var listName: String {
           t("Název seznamu", "List name", "Nombre de la lista")
       }
       var listNamePlaceholder: String {
-          t("např. Angličtina lekce 1", "e.g. English lesson 1", "p.ej. Inglés lección
-   1")
+          t("např. Angličtina lekce 1",
+            "e.g. English lesson 1",
+            "p.ej. Inglés lección 1")
       }
       var formatHint: String {
-          t(
-              "Formát: každý řádek = **slovo - překlad**\nŘádky začínající # jsou
-  komentáře.",
-              "Format: each line = **word - translation**\nLines starting with # are
-  comments.",
-              "Formato: cada línea = **palabra - traducción**\nLas líneas que empiezan
-   con # son comentarios."
-          )
+          switch lang {
+          case .czech:
+              return "Formát: slovo - překlad (jeden pár na řádek)"
+          case .english:
+              return "Format: word - translation (one pair per line)"
+          case .spanish:
+              return "Formato: palabra - traducción (un par por línea)"
+          }
       }
-      var help: String {
-          t("Nápověda", "Help", "Ayuda")
-      }
-      var wordText: String {
-          t("Text slovíček", "Word text", "Texto de palabras")
-      }
-      var importBtn: String {
-          t("Importovat", "Import", "Importar")
-      }
-      var newList: String {
-          t("Nový seznam", "New list", "Nueva lista")
-      }
+      var help: String { t("Nápověda", "Help", "Ayuda") }
+      var wordText: String { t("Text slovíček", "Word text", "Texto de palabras") }
+      var importBtn: String { t("Importovat", "Import", "Importar") }
+      var newList: String { t("Nový seznam", "New list", "Nueva lista") }
 
-      // MARK: Stats View
       var studyStreakLabel: String {
           t("Série dnů", "Study streak", "Racha de días")
       }
@@ -322,21 +247,20 @@
           t("Žádné statistiky", "No statistics yet", "Sin estadísticas aún")
       }
       var noStatsDesc: String {
-          t(
-              "Splň první cvičení a statistiky se začnou zobrazovat.",
-              "Complete your first quiz and statistics will appear here.",
-              "Completa tu primer quiz y aquí aparecerán las estadísticas."
-          )
+          switch lang {
+          case .czech:
+              return "Splň první cvičení a statistiky se zobrazí."
+          case .english:
+              return "Complete your first quiz to see statistics."
+          case .spanish:
+              return "Completa tu primer quiz para ver estadísticas."
+          }
       }
-      var attempts: String {
-          t("pokusů", "attempts", "intentos")
-      }
+      var attempts: String { t("pokusů", "attempts", "intentos") }
       var listsOverview: String {
           t("Přehled seznamů", "Lists overview", "Resumen de listas")
       }
-      var trend: String {
-          t("Trend", "Trend", "Tendencia")
-      }
+      var trend: String { t("Trend", "Trend", "Tendencia") }
 
       func streakDays(_ n: Int) -> String {
           switch lang {
@@ -352,22 +276,20 @@
       }
 
       var dataLoadError: String {
-          t(
-              "Uložená data se nepodařilo načíst. Některé seznamy mohly být
-  ztraceny.",
-              "Failed to load saved data. Some lists may have been lost.",
-              "No se pudieron cargar los datos. Algunas listas pueden haberse
-  perdido."
-          )
+          switch lang {
+          case .czech:
+              return "Nepodařilo se načíst data. Některé seznamy mohly být ztraceny."
+          case .english:
+              return "Failed to load saved data. Some lists may have been lost."
+          case .spanish:
+              return "No se pudieron cargar los datos. Algunas listas se perdieron."
+          }
       }
       var dataLoadErrorTitle: String {
           t("Chyba dat", "Data Error", "Error de datos")
       }
 
-      // MARK: Quiz Mode
-      var settingsTab: String {
-          t("Nastavení", "Settings", "Ajustes")
-      }
+      var settingsTab: String { t("Nastavení", "Settings", "Ajustes") }
       var dirFrontToBack: String {
           t("Přední → Zadní", "Front → Back", "Frente → Dorso")
       }
@@ -377,62 +299,39 @@
       var quizModeSection: String {
           t("Režim zkoušení", "Quiz mode", "Modo de quiz")
       }
-      var modeTyping: String {
-          t("Psaní", "Typing", "Escritura")
-      }
-      var modeFlashcard: String {
-          t("Kartičky", "Flashcards", "Tarjetas")
-      }
-      var modeMultipleChoice: String {
-          t("Kvíz", "Quiz", "Quiz")
-      }
+      var modeTyping: String { t("Psaní", "Typing", "Escritura") }
+      var modeFlashcard: String { t("Kartičky", "Flashcards", "Tarjetas") }
+      var modeMultipleChoice: String { t("Kvíz", "Quiz", "Quiz") }
       var flashcardRevealBtn: String {
           t("Zobrazit odpověď", "Reveal answer", "Mostrar respuesta")
       }
-      var flashcardKnow: String {
-          t("Umím ✓", "Got it ✓", "Lo sé ✓")
-      }
-      var flashcardDontKnow: String {
-          t("Neumím ✗", "Not yet ✗", "No sé ✗")
-      }
+      var flashcardKnow: String { t("Umím ✓", "Got it ✓", "Lo sé ✓") }
+      var flashcardDontKnow: String { t("Neumím ✗", "Not yet ✗", "No sé ✗") }
 
-      // MARK: SRS
       var studyModeSection: String {
           t("Režim učení", "Study mode", "Modo de estudio")
       }
-      var studyModeClassic: String {
-          t("Klasický", "Classic", "Clásico")
-      }
+      var studyModeClassic: String { t("Klasický", "Classic", "Clásico") }
       var studyModeSRS: String {
           t("Spaced Repetition", "Spaced Repetition", "Repetición espaciada")
       }
-      var srsAgain: String {
-          t("Znovu", "Again", "De nuevo")
-      }
-      var srsHard: String {
-          t("Těžké", "Hard", "Difícil")
-      }
-      var srsGood: String {
-          t("Dobře", "Good", "Bien")
-      }
-      var srsEasy: String {
-          t("Lehké", "Easy", "Fácil")
-      }
+      var srsAgain: String { t("Znovu", "Again", "De nuevo") }
+      var srsHard: String { t("Těžké", "Hard", "Difícil") }
+      var srsGood: String { t("Dobře", "Good", "Bien") }
+      var srsEasy: String { t("Lehké", "Easy", "Fácil") }
       func srsDueToday(_ n: Int) -> String {
-          t(
-              "\(n) slovíček ke zkoušení dnes",
-              "\(n) card\(n == 1 ? "" : "s") due today",
-              "\(n) tarjeta\(n == 1 ? "" : "s") pendiente\(n == 1 ? "" : "s")"
-          )
+          switch lang {
+          case .czech:
+              return "\(n) slovíček ke zkoušení dnes"
+          case .english:
+              return "\(n) card\(n == 1 ? "" : "s") due today"
+          case .spanish:
+              return "\(n) tarjeta\(n == 1 ? "" : "s") pendiente\(n == 1 ? "" : "s")"
+          }
       }
 
-      // MARK: Review timing
-      var lastStudiedToday: String {
-          t("Dnes", "Today", "Hoy")
-      }
-      var lastStudiedYesterday: String {
-          t("Včera", "Yesterday", "Ayer")
-      }
+      var lastStudiedToday: String { t("Dnes", "Today", "Hoy") }
+      var lastStudiedYesterday: String { t("Včera", "Yesterday", "Ayer") }
       func lastStudiedDaysAgo(_ n: Int) -> String {
           t("Před \(n) dny", "\(n)d ago", "Hace \(n)d")
       }
@@ -450,46 +349,42 @@
           }
       }
 
-      // MARK: Study goal & notifications
       var studyGoalSection: String {
           t("Studijní cíl", "Study goal", "Meta de estudio")
       }
       var studyGoalLabel: String {
           t("Denní cíl", "Daily goal", "Meta diaria")
       }
-      var noGoal: String {
-          t("Bez cíle", "No goal", "Sin meta")
-      }
+      var noGoal: String { t("Bez cíle", "No goal", "Sin meta") }
       var reminderEnabled: String {
           t("Denní připomínka", "Daily reminder", "Recordatorio diario")
       }
       var reminderTime: String {
           t("Čas připomínky", "Reminder time", "Hora del recordatorio")
       }
-      var minutes: String {
-          t("min", "min", "min")
-      }
+      var minutes: String { t("min", "min", "min") }
       var notificationBody: String {
-          t(
-              "Čas na slovíčka! Procvič svůj seznam.",
-              "Time to study! Review your word list.",
-              "¡Hora de estudiar! Repasa tu lista."
-          )
+          switch lang {
+          case .czech:   return "Čas na slovíčka! Procvič svůj seznam."
+          case .english: return "Time to study! Review your word list."
+          case .spanish: return "¡Hora de estudiar! Repasa tu lista."
+          }
       }
 
-      // MARK: Daily goal achievement
       var goalMetTitle: String {
           t("Denní cíl splněn!", "Daily Goal Complete!", "¡Meta diaria cumplida!")
       }
       func goalMetBody(_ minutes: Int) -> String {
-          t(
-              "Dnes jsi nastudoval/a \(minutes) min. Skvělá práce!",
-              "You studied \(minutes) min today. Great work!",
-              "Estudiaste \(minutes) min hoy. ¡Buen trabajo!"
-          )
+          switch lang {
+          case .czech:
+              return "Dnes jsi nastudoval/a \(minutes) min. Skvělá práce!"
+          case .english:
+              return "You studied \(minutes) min today. Great work!"
+          case .spanish:
+              return "Estudiaste \(minutes) min hoy. ¡Buen trabajo!"
+          }
       }
 
-      // MARK: Stats expandable sections
       var sessionHistoryTitle: String {
           t("Historie sezení", "Session History", "Historial de sesiones")
       }
@@ -497,19 +392,12 @@
           t("Přesnost dle knihoven", "Accuracy by List", "Precisión por lista")
       }
 
-      // MARK: Per-list statistics view
       var wordStatsTitle: String {
           t("Statistiky slov", "Word Statistics", "Estadísticas")
       }
-      var perWordSection: String {
-          t("Slovíčka", "Words", "Palabras")
-      }
-      var attemptsLabel: String {
-          t("pokusů", "attempts", "intentos")
-      }
-      var dueLabel: String {
-          t("ke zkoušení", "due now", "pendiente")
-      }
+      var perWordSection: String { t("Slovíčka", "Words", "Palabras") }
+      var attemptsLabel: String { t("pokusů", "attempts", "intentos") }
+      var dueLabel: String { t("ke zkoušení", "due now", "pendiente") }
       var notStudiedYet: String {
           t("Ještě nezkušeno", "Not studied yet", "Sin estudiar")
       }
@@ -520,24 +408,28 @@
           t("Vymazat statistiky?", "Clear Statistics?", "¿Borrar estadísticas?")
       }
       var deleteStatsDesc: String {
-          t(
-              "Tato akce smaže všechny výsledky pro tuto knihovnu. Nelze vrátit
-  zpět.",
-              "This will delete all results for this list. This cannot be undone.",
-              "Esto borrará todos los resultados de esta lista. No se puede deshacer."
-          )
+          switch lang {
+          case .czech:
+              return "Tato akce smaže všechny výsledky. Nelze vrátit zpět."
+          case .english:
+              return "This will delete all results. Cannot be undone."
+          case .spanish:
+              return "Esto borrará todos los resultados. No se puede deshacer."
+          }
       }
 
-      // MARK: Wrong words offer
       var wrongWordsOfferTitle: String {
           t("Chybná slovíčka", "Mistakes", "Palabras incorrectas")
       }
       func wrongWordsOfferBody(_ n: Int) -> String {
-          t(
-              "Udělal/a jsi chybu u \(n) slovíček. Chceš je procvičit?",
-              "You made \(n) mistake\(n == 1 ? "" : "s"). Review them?",
-              "Cometiste \(n) error\(n == 1 ? "" : "es"). ¿Repasarlos?"
-          )
+          switch lang {
+          case .czech:
+              return "Udělal/a jsi chybu u \(n) slovíček. Procvičit?"
+          case .english:
+              return "You made \(n) mistake\(n == 1 ? "" : "s"). Review them?"
+          case .spanish:
+              return "Cometiste \(n) error\(n == 1 ? "" : "es"). ¿Repasarlos?"
+          }
       }
       var reviewWrongBtn: String {
           t("Procvičit chybná", "Review mistakes", "Repasar errores")
@@ -546,12 +438,14 @@
           t("Zobrazit výsledky", "See results", "Ver resultados")
       }
 
-      // MARK: Welcome screen
       func welcomeGreeting(hour: Int) -> String {
           switch hour {
-          case 5..<12:  return t("Dobré ráno", "Good morning", "Buenos días")
-          case 12..<18: return t("Dobré odpoledne", "Good afternoon", "Buenas tardes")
-          default:      return t("Dobrý večer", "Good evening", "Buenas noches")
+          case 5..<12:
+              return t("Dobré ráno", "Good morning", "Buenos días")
+          case 12..<18:
+              return t("Dobré odpoledne", "Good afternoon", "Buenas tardes")
+          default:
+              return t("Dobrý večer", "Good evening", "Buenas noches")
           }
       }
       var welcomeLastSession: String {
@@ -564,31 +458,35 @@
           t("Klepnutím pokračujete", "Tap to continue", "Toca para continuar")
       }
 
-      // MARK: Errors
       func errorFor(_ error: ParseError) -> String {
           switch error {
           case .emptyFile:
-              return t("Soubor je prázdný.", "File is empty.", "El archivo está
-  vacío.")
+              switch lang {
+              case .czech:   return "Soubor je prázdný."
+              case .english: return "File is empty."
+              case .spanish: return "El archivo está vacío."
+              }
           case .noValidPairs:
-              return t(
-                  "Žádné platné páry nenalezeny. Používej formát: slovo - překlad",
-                  "No valid pairs found. Use the format: word - translation",
-                  "No se encontraron pares válidos. Usa el formato: palabra -
-  traducción"
-              )
+              switch lang {
+              case .czech:
+                  return "Žádné platné páry. Formát: slovo - překlad"
+              case .english:
+                  return "No valid pairs. Use: word - translation"
+              case .spanish:
+                  return "Sin pares válidos. Usa: palabra - traducción"
+              }
           case .invalidEncoding:
-              return t(
-                  "Nelze přečíst soubor — zkuste uložit jako UTF-8.",
-                  "Cannot read file — try saving as UTF-8.",
-                  "No se puede leer el archivo — guárdalo como UTF-8."
-              )
+              switch lang {
+              case .czech:   return "Nelze přečíst soubor. Ulož jako UTF-8."
+              case .english: return "Cannot read file. Try saving as UTF-8."
+              case .spanish: return "No se puede leer. Guárdalo como UTF-8."
+              }
           case .fileTooLarge:
-              return t(
-                  "Soubor je příliš velký (max 5 MB).",
-                  "File exceeds the 5 MB limit.",
-                  "El archivo supera el límite de 5 MB."
-              )
+              switch lang {
+              case .czech:   return "Soubor je příliš velký (max 5 MB)."
+              case .english: return "File exceeds the 5 MB limit."
+              case .spanish: return "El archivo supera el límite de 5 MB."
+              }
           }
       }
   }
