@@ -1,6 +1,6 @@
 name: Deploy LexiDrill to App Store
 
-  on:
+  "on":
     workflow_dispatch:
 
   jobs:
