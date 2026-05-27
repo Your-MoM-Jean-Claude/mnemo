@@ -11,14 +11,83 @@ jobs:
       CERT_PASS: ${{ secrets.CERTIFICATE_PASSWORD }}
       KC_PASS: ${{ secrets.KEYCHAIN_PASSWORD }}
       PROFILE_B64: ${{ secrets.PROVISIONING_PROFILE_BASE64 }}
-      PROFILE_NAME: ${{ secrets.PROVISIONING_PROFILE_NAME }}
       ASC_KEY_B64: ${{ secrets.ASC_API_KEY_BASE64 }}
       ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
       ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
       TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
     steps:
       - uses: actions/checkout@v4
-      - name: Sign
-        run: bash gh-sign.sh
-      - name: Build and upload
-        run: bash gh-build.sh
+
+      - name: Install certificate
+        run: |
+          security create-keychain -p "$KC_PASS" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KC_PASS" build.keychain
+          security set-keychain-settings -t 3600 -l build.keychain
+          echo "$CERT_B64" | base64 --decode > cert.p12
+          security import cert.p12 -k build.keychain -P "$CERT_PASS" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KC_PASS" build.keychain
+          rm cert.p12
+
+      - name: Install provisioning profile
+        run: |
+          PROF_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$PROF_DIR"
+          echo "$PROFILE_B64" | base64 --decode > /tmp/mnemo.mobileprovision
+          security cms -D -i /tmp/mnemo.mobileprovision 2>/dev/null > /tmp/mnemo.plist
+          PROF_UUID=$(/usr/libexec/PlistBuddy -c "Print :UUID" /tmp/mnemo.plist)
+          echo "Profile UUID: $PROF_UUID"
+          cp /tmp/mnemo.mobileprovision "$PROF_DIR/$PROF_UUID.mobileprovision"
+          rm /tmp/mnemo.mobileprovision /tmp/mnemo.plist
+          echo "PROF_UUID=$PROF_UUID" >> "$GITHUB_ENV"
+
+      - name: Install ASC key
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "$ASC_KEY_B64" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8
+
+      - name: Build archive
+        run: |
+          XCODE=$(ls /Applications | grep "Xcode_16" | sort -V | tail -1)
+          if [ -n "$XCODE" ]; then
+            sudo xcode-select -s "/Applications/$XCODE"
+          fi
+          xcodebuild -version
+          xcodebuild archive \
+            -project LexiDrill.xcodeproj \
+            -scheme LexiDrill \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath LexiDrill.xcarchive \
+            CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE="$PROF_UUID" \
+            CODE_SIGN_IDENTITY="iPhone Distribution"
+
+      - name: Export IPA
+        run: |
+          PLIST=ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :method string app-store" $PLIST
+          /usr/libexec/PlistBuddy -c "Add :teamID string $TEAM_ID" $PLIST
+          /usr/libexec/PlistBuddy -c "Add :uploadSymbols bool true" $PLIST
+          /usr/libexec/PlistBuddy -c "Add :compileBitcode bool false" $PLIST
+          /usr/libexec/PlistBuddy -c "Add :provisioningProfiles dict" $PLIST
+          /usr/libexec/PlistBuddy -c "Add :provisioningProfiles:com.jirifilipec.mnemoapp string $PROF_UUID" $PLIST
+          xcodebuild -exportArchive \
+            -archivePath LexiDrill.xcarchive \
+            -exportPath Export \
+            -exportOptionsPlist ExportOptions.plist
+
+      - name: Upload to App Store
+        run: |
+          xcrun altool --upload-app \
+            -f Export/LexiDrill.ipa \
+            -t ios \
+            --apiKey "$ASC_KEY_ID" \
+            --apiIssuer "$ASC_ISSUER_ID" \
+            --verbose
+
+      - name: Cleanup
+        if: always()
+        run: |
+          security delete-keychain build.keychain || true
+          rm -f ~/.appstoreconnect/private_keys/AuthKey_*.p8
