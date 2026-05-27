@@ -371,19 +371,19 @@ import SwiftUI
               SRSRatingButton(
                   label: lm.s.srsAgain,
                   color: Color.appError
-              ) { vm.rateSRS(.again) }
+              ) { vm.rateSRS(rating: .again) }
               SRSRatingButton(
                   label: lm.s.srsHard,
                   color: .orange
-              ) { vm.rateSRS(.hard) }
+              ) { vm.rateSRS(rating: .hard) }
               SRSRatingButton(
                   label: lm.s.srsGood,
                   color: Color.appSuccess
-              ) { vm.rateSRS(.good) }
+              ) { vm.rateSRS(rating: .good) }
               SRSRatingButton(
                   label: lm.s.srsEasy,
                   color: .blue
-              ) { vm.rateSRS(.easy) }
+              ) { vm.rateSRS(rating: .easy) }
           }
           .padding(.horizontal, 20)
           .padding(.bottom, 24)
