@@ -8,7 +8,7 @@ fi
 xcodebuild -version
 
 xcodebuild archive \
-  -project LexiDrill/LexiDrill.xcodeproj \
+  -project LexiDrill.xcodeproj \
   -scheme LexiDrill \
   -configuration Release \
   -destination 'generic/platform=iOS' \
