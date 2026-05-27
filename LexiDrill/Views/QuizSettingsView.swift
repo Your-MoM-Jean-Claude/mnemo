@@ -24,10 +24,9 @@ import SwiftUI
       }
       private var dueCount: Int {
           let ws = listStats.wordStats
-          return wordList.pairs.filter { ws[$0.id]?.isDue ?? true }.count
-      }
-      private func accColor(_ a: Double) -> Color {
-          a >= 0.8 ? Color.appSuccess : a >= 0.5 ? .orange : Color.appError
+          return wordList.pairs.filter {
+              ws[$0.id]?.isDue ?? true
+          }.count
       }
 
       var body: some View {
@@ -82,6 +81,12 @@ import SwiftUI
           }
       }
 
+      // MARK: - Sections
+
+      private func accColor(_ a: Double) -> Color {
+          a >= 0.8 ? Color.appSuccess : a >= 0.5 ? .orange : Color.appError
+      }
+
       private var summarySection: some View {
           Section {
               HStack(spacing: 14) {
@@ -103,13 +108,12 @@ import SwiftUI
                   }
                   Spacer()
                   if listStats.totalSessions > 0 {
+                      let acc = listStats.accuracy
                       VStack(alignment: .trailing, spacing: 2) {
-                          Text("\(Int(listStats.accuracy * 100))%")
+                          Text("\(Int(acc * 100))%")
                               .font(.system(.title3))
                               .fontWeight(.bold)
-                              .foregroundStyle(
-                                  accColor(listStats.accuracy)
-                              )
+                              .foregroundStyle(accColor(acc))
                           Text(lm.s.accuracyLabel)
                               .font(.caption2)
                               .foregroundStyle(.secondary)
@@ -142,7 +146,8 @@ import SwiftUI
               Picker("", selection: $quizMode) {
                   Text(lm.s.modeTyping).tag(QuizMode.typing)
                   Text(lm.s.modeFlashcard).tag(QuizMode.flashcard)
-                  Text(lm.s.modeMultipleChoice).tag(QuizMode.multipleChoice)
+                  Text(lm.s.modeMultipleChoice)
+                      .tag(QuizMode.multipleChoice)
               }
               .pickerStyle(.segmented)
               .padding(.vertical, 4)
@@ -153,9 +158,11 @@ import SwiftUI
           Section(lm.s.quizDirection) {
               if let pair = wordList.pairs.first {
                   Picker("", selection: $direction) {
-                      Label("\(pair.front)  →  ?", systemImage: "arrow.right")
+                      Label("\(pair.front)  →  ?",
+                            systemImage: "arrow.right")
                           .tag(QuizDirection.frontToBack)
-                      Label("\(pair.back)  →  ?", systemImage: "arrow.left")
+                      Label("\(pair.back)  →  ?",
+                            systemImage: "arrow.left")
                           .tag(QuizDirection.backToFront)
                       Label(lm.s.randomDir,
                             systemImage: "arrow.left.arrow.right")
@@ -171,7 +178,8 @@ import SwiftUI
           Section(lm.s.roundSettings) {
               VStack(alignment: .leading, spacing: 8) {
                   HStack {
-                      Text(lm.s.wordsPerBatch).foregroundStyle(.primary)
+                      Text(lm.s.wordsPerBatch)
+                          .foregroundStyle(.primary)
                       Spacer()
                       Text("\(Int(batchSize))")
                           .font(.system(.body))
@@ -186,7 +194,8 @@ import SwiftUI
 
               VStack(alignment: .leading, spacing: 8) {
                   HStack {
-                      Text(lm.s.correctInRow).foregroundStyle(.primary)
+                      Text(lm.s.correctInRow)
+                          .foregroundStyle(.primary)
                       Spacer()
                       Text("\(Int(requiredCorrect))×")
                           .font(.system(.body))
@@ -220,7 +229,8 @@ import SwiftUI
               NavigationLink(
                   destination: ListStatsView(listID: wordList.id)
               ) {
-                  Label(lm.s.wordStatsTitle, systemImage: "chart.bar.fill")
+                  Label(lm.s.wordStatsTitle,
+                        systemImage: "chart.bar.fill")
               }
           }
       }
@@ -229,6 +239,8 @@ import SwiftUI
       private var statsSection: some View {
           if listStats.totalSessions > 0 {
               Section(lm.s.statistics) {
+                  let pct = Int(listStats.accuracy * 100)
+                  let cv = listStats.totalCorrect
                   StatRow(
                       label: lm.s.totalSessions,
                       value: "\(listStats.totalSessions)"
@@ -239,8 +251,7 @@ import SwiftUI
                   )
                   StatRow(
                       label: lm.s.correctLabel,
-                      value: "\(listStats.totalCorrect) (\(Int(listStats.accuracy *
-  100))%)"
+                      value: "\(cv) (\(pct)%)"
                   )
                   StatRow(
                       label: lm.s.bestStreakLabel,
@@ -306,9 +317,11 @@ import SwiftUI
                   }
               }
           }
-          .confirmationDialog(lm.s.deleteStatsConfirm,
-                              isPresented: $showDeleteConfirm,
-                              titleVisibility: .visible) {
+          .confirmationDialog(
+              lm.s.deleteStatsConfirm,
+              isPresented: $showDeleteConfirm,
+              titleVisibility: .visible
+          ) {
               Button(lm.s.deleteStatsBtn, role: .destructive) {
                   vm.deleteStats(for: listID)
               }
@@ -331,10 +344,10 @@ import SwiftUI
                       WordStatRow(pair: pair, stats: ws[pair.id])
                           .listRowBackground(Color.clear)
                           .listRowSeparator(.hidden)
-                          .listRowInsets(
-                              EdgeInsets(top: 4, leading: 16,
-                                         bottom: 4, trailing: 16)
-                          )
+                          .listRowInsets(EdgeInsets(
+                              top: 4, leading: 16,
+                              bottom: 4, trailing: 16
+                          ))
                   }
               }
           }
@@ -359,19 +372,27 @@ import SwiftUI
       }
 
       private var summaryRow: some View {
-          HStack(spacing: 10) {
-              StatPill(icon: "percent",
-                       color: accuracyColor(listStats.accuracy),
-                       label: lm.s.accuracyLabel,
-                       value: "\(Int(listStats.accuracy * 100))%")
-              StatPill(icon: "calendar",
-                       color: Color.khaki,
-                       label: lm.s.totalSessions,
-                       value: "\(listStats.totalSessions)")
-              StatPill(icon: "flame.fill",
-                       color: .orange,
-                       label: lm.s.bestStreakLabel,
-                       value: "\(listStats.bestStreak)×")
+          let acc = listStats.accuracy
+          let pct = Int(acc * 100)
+          return HStack(spacing: 10) {
+              StatPill(
+                  icon: "percent",
+                  color: accuracyColor(acc),
+                  label: lm.s.accuracyLabel,
+                  value: "\(pct)%"
+              )
+              StatPill(
+                  icon: "calendar",
+                  color: Color.khaki,
+                  label: lm.s.totalSessions,
+                  value: "\(listStats.totalSessions)"
+              )
+              StatPill(
+                  icon: "flame.fill",
+                  color: .orange,
+                  label: lm.s.bestStreakLabel,
+                  value: "\(listStats.bestStreak)×"
+              )
           }
           .padding(.vertical, 4)
       }
@@ -459,9 +480,10 @@ import SwiftUI
               if let s = stats, s.attempts > 0 {
                   Circle()
                       .trim(from: 0, to: CGFloat(s.accuracy))
-                      .stroke(ringColor(s.accuracy),
-                              style: StrokeStyle(lineWidth: 2.5,
-                                                 lineCap: .round))
+                      .stroke(
+                          ringColor(s.accuracy),
+                          style: StrokeStyle(lineWidth: 2.5, lineCap: .round)
+                      )
                       .rotationEffect(.degrees(-90))
                   Text("\(Int(s.accuracy * 100))%")
                       .font(.system(size: 9, weight: .bold))
@@ -478,24 +500,33 @@ import SwiftUI
           if let s = stats, s.attempts > 0 {
               HStack(spacing: 6) {
                   Text("\(s.attempts) \(lm.s.attemptsLabel)")
-                      .font(.caption).foregroundStyle(.secondary)
+                      .font(.caption)
+                      .foregroundStyle(.secondary)
                   if s.isDue {
-                      Circle().fill(Color.orange).frame(width: 3, height: 3)
+                      Circle()
+                          .fill(Color.orange)
+                          .frame(width: 3, height: 3)
                       Text(lm.s.dueLabel)
-                          .font(.caption).foregroundStyle(.orange)
+                          .font(.caption)
+                          .foregroundStyle(.orange)
                   } else if let due = s.dueDate {
-                      let days = max(1, Calendar.current.dateComponents(
-                          [.day], from: Date(), to: due).day ?? 1)
+                      let cal = Calendar.current
+                      let comps = cal.dateComponents(
+                          [.day], from: Date(), to: due
+                      )
+                      let days = max(1, comps.day ?? 1)
                       Circle()
                           .fill(Color.secondary.opacity(0.4))
                           .frame(width: 3, height: 3)
                       Text(lm.s.nextReviewIn(days))
-                          .font(.caption).foregroundStyle(.secondary)
+                          .font(.caption)
+                          .foregroundStyle(.secondary)
                   }
               }
           } else {
               Text(lm.s.notStudiedYet)
-                  .font(.caption).foregroundStyle(.secondary)
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
           }
       }
 
