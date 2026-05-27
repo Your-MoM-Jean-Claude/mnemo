@@ -35,12 +35,7 @@ jobs:
           mkdir -p "$PROF_DIR"
           echo "$PROFILE_B64" | base64 --decode > /tmp/mnemo.mobileprovision
           echo "Decoded size: $(wc -c < /tmp/mnemo.mobileprovision)"
-          PROF_UUID=$(python3 -c "
-import re
-data = open('/tmp/mnemo.mobileprovision','rb').read().decode('latin-1')
-m = re.search(r'<key>UUID</key>\s*<string>([^<]+)</string>', data)
-print(m.group(1) if m else '')
-")
+          PROF_UUID=$(python3 -c "import re; d=open('/tmp/mnemo.mobileprovision','rb').read().decode('latin-1'); m=re.search(r'UUID</key>\s*<string>([^<]+)</string>',d); print(m.group(1).strip() if m else '')")
           echo "Profile UUID: $PROF_UUID"
           if [ -z "$PROF_UUID" ]; then echo "ERROR: UUID not found"; exit 1; fi
           cp /tmp/mnemo.mobileprovision "$PROF_DIR/$PROF_UUID.mobileprovision"
