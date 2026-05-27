@@ -7,20 +7,27 @@ import SwiftUI
       @EnvironmentObject private var lm: LanguageManager
       @Environment(\.dismiss) private var dismiss
 
-      @State private var quizMode: QuizMode       = .typing
-      @State private var direction: QuizDirection  = .frontToBack
-      @State private var batchSize: Double         = 10
-      @State private var requiredCorrect: Double   = 2
-      @State private var shuffle: Bool             = true
-      @State private var studyMode: StudyMode      = .classic
-      @State private var startQuiz                 = false
+      @State private var quizMode: QuizMode      = .typing
+      @State private var direction: QuizDirection = .frontToBack
+      @State private var batchSize: Double        = 10
+      @State private var requiredCorrect: Double  = 2
+      @State private var shuffle: Bool            = true
+      @State private var studyMode: StudyMode     = .classic
+      @State private var startQuiz                = false
       @State private var settings: QuizSettings?
 
-      private var maxBatch: Double { Double(min(wordList.pairs.count, 50)) }
-      private var listStats: ListStatistics { library.stats(for: wordList.id) }
+      private var maxBatch: Double {
+          Double(min(wordList.pairs.count, 50))
+      }
+      private var listStats: ListStatistics {
+          library.stats(for: wordList.id)
+      }
       private var dueCount: Int {
           let ws = listStats.wordStats
           return wordList.pairs.filter { ws[$0.id]?.isDue ?? true }.count
+      }
+      private func accColor(_ a: Double) -> Color {
+          a >= 0.8 ? Color.appSuccess : a >= 0.5 ? .orange : Color.appError
       }
 
       var body: some View {
@@ -62,9 +69,11 @@ import SwiftUI
               .navigationDestination(isPresented: $startQuiz) {
                   if let s = settings {
                       QuizView(
-                          vm: QuizViewModel(wordList: wordList, settings: s,
-                                            wordStats: library.wordStats(for:
-  wordList.id)),
+                          vm: QuizViewModel(
+                              wordList: wordList,
+                              settings: s,
+                              wordStats: library.wordStats(for: wordList.id)
+                          ),
                           library: library,
                           onDismiss: { dismiss() }
                       )
@@ -72,8 +81,6 @@ import SwiftUI
               }
           }
       }
-
-      // MARK: - Sections
 
       private var summarySection: some View {
           Section {
@@ -100,8 +107,9 @@ import SwiftUI
                           Text("\(Int(listStats.accuracy * 100))%")
                               .font(.system(.title3))
                               .fontWeight(.bold)
-                              .foregroundStyle(listStats.accuracy >= 0.8 ?
-  Color.appSuccess : listStats.accuracy >= 0.5 ? .orange : Color.appError)
+                              .foregroundStyle(
+                                  accColor(listStats.accuracy)
+                              )
                           Text(lm.s.accuracyLabel)
                               .font(.caption2)
                               .foregroundStyle(.secondary)
@@ -149,7 +157,8 @@ import SwiftUI
                           .tag(QuizDirection.frontToBack)
                       Label("\(pair.back)  →  ?", systemImage: "arrow.left")
                           .tag(QuizDirection.backToFront)
-                      Label(lm.s.randomDir, systemImage: "arrow.left.arrow.right")
+                      Label(lm.s.randomDir,
+                            systemImage: "arrow.left.arrow.right")
                           .tag(QuizDirection.random)
                   }
                   .pickerStyle(.inline)
@@ -203,10 +212,14 @@ import SwiftUI
 
       private var editSection: some View {
           Section {
-              NavigationLink(destination: WordListEditorView(listID: wordList.id)) {
+              NavigationLink(
+                  destination: WordListEditorView(listID: wordList.id)
+              ) {
                   Label(lm.s.editWords, systemImage: "square.and.pencil")
               }
-              NavigationLink(destination: ListStatsView(listID: wordList.id)) {
+              NavigationLink(
+                  destination: ListStatsView(listID: wordList.id)
+              ) {
                   Label(lm.s.wordStatsTitle, systemImage: "chart.bar.fill")
               }
           }
@@ -216,18 +229,26 @@ import SwiftUI
       private var statsSection: some View {
           if listStats.totalSessions > 0 {
               Section(lm.s.statistics) {
-                  StatRow(label: lm.s.totalSessions,  value:
-  "\(listStats.totalSessions)")
-                  StatRow(label: lm.s.totalAnswers,   value:
-  "\(listStats.totalAnswers)")
-                  StatRow(label: lm.s.correctLabel,   value:
-  "\(listStats.totalCorrect) (\(Int(listStats.accuracy * 100))%)")
-                  StatRow(label: lm.s.bestStreakLabel, value:
-  "\(listStats.bestStreak)×")
+                  StatRow(
+                      label: lm.s.totalSessions,
+                      value: "\(listStats.totalSessions)"
+                  )
+                  StatRow(
+                      label: lm.s.totalAnswers,
+                      value: "\(listStats.totalAnswers)"
+                  )
+                  StatRow(
+                      label: lm.s.correctLabel,
+                      value: "\(listStats.totalCorrect) (\(Int(listStats.accuracy *
+  100))%)"
+                  )
+                  StatRow(
+                      label: lm.s.bestStreakLabel,
+                      value: "\(listStats.bestStreak)×"
+                  )
               }
           }
       }
-
   }
 
   struct StatRow: View {
@@ -253,9 +274,15 @@ import SwiftUI
 
       @State private var showDeleteConfirm = false
 
-      private var list: WordList? { vm.wordLists.first { $0.id == listID } }
-      private var ws: [UUID: WordStats] { vm.wordStats(for: listID) }
-      private var listStats: ListStatistics { vm.stats(for: listID) }
+      private var list: WordList? {
+          vm.wordLists.first { $0.id == listID }
+      }
+      private var ws: [UUID: WordStats] {
+          vm.wordStats(for: listID)
+      }
+      private var listStats: ListStatistics {
+          vm.stats(for: listID)
+      }
 
       var body: some View {
           ZStack {
@@ -304,8 +331,10 @@ import SwiftUI
                       WordStatRow(pair: pair, stats: ws[pair.id])
                           .listRowBackground(Color.clear)
                           .listRowSeparator(.hidden)
-                          .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4,
-  trailing: 16))
+                          .listRowInsets(
+                              EdgeInsets(top: 4, leading: 16,
+                                         bottom: 4, trailing: 16)
+                          )
                   }
               }
           }
@@ -331,15 +360,18 @@ import SwiftUI
 
       private var summaryRow: some View {
           HStack(spacing: 10) {
-              StatPill(icon: "percent",    color: accuracyColor(listStats.accuracy),
-                       label: lm.s.accuracyLabel,   value: "\(Int(listStats.accuracy *
-   100))%")
-              StatPill(icon: "calendar",   color: Color.khaki,
-                       label: lm.s.totalSessions,   value:
-  "\(listStats.totalSessions)")
-              StatPill(icon: "flame.fill", color: .orange,
-                       label: lm.s.bestStreakLabel,  value:
-  "\(listStats.bestStreak)×")
+              StatPill(icon: "percent",
+                       color: accuracyColor(listStats.accuracy),
+                       label: lm.s.accuracyLabel,
+                       value: "\(Int(listStats.accuracy * 100))%")
+              StatPill(icon: "calendar",
+                       color: Color.khaki,
+                       label: lm.s.totalSessions,
+                       value: "\(listStats.totalSessions)")
+              StatPill(icon: "flame.fill",
+                       color: .orange,
+                       label: lm.s.bestStreakLabel,
+                       value: "\(listStats.bestStreak)×")
           }
           .padding(.vertical, 4)
       }
@@ -361,14 +393,24 @@ import SwiftUI
   }
 
   private struct StatPill: View {
-      let icon: String; let color: Color; let label: String; let value: String
+      let icon: String
+      let color: Color
+      let label: String
+      let value: String
 
       var body: some View {
           VStack(spacing: 6) {
-              Image(systemName: icon).font(.system(size: 15)).foregroundStyle(color)
-              Text(value).font(.system(.body)).fontWeight(.bold).monospacedDigit()
-              Text(label).font(.caption2).foregroundStyle(.secondary).multilineTextAli
-  gnment(.center)
+              Image(systemName: icon)
+                  .font(.system(size: 15))
+                  .foregroundStyle(color)
+              Text(value)
+                  .font(.system(.body))
+                  .fontWeight(.bold)
+                  .monospacedDigit()
+              Text(label)
+                  .font(.caption2)
+                  .foregroundStyle(.secondary)
+                  .multilineTextAlignment(.center)
           }
           .frame(maxWidth: .infinity)
           .padding(.vertical, 14)
@@ -388,14 +430,16 @@ import SwiftUI
               VStack(alignment: .leading, spacing: 4) {
                   HStack(spacing: 5) {
                       Text(pair.front)
-
-  .font(.system(.subheadline)).fontWeight(.medium).lineLimit(1)
+                          .font(.system(.subheadline))
+                          .fontWeight(.medium)
+                          .lineLimit(1)
                       Image(systemName: "arrow.right")
-                          .font(.system(size:
-  9)).foregroundStyle(Color.khaki.opacity(0.5))
+                          .font(.system(size: 9))
+                          .foregroundStyle(Color.khaki.opacity(0.5))
                       Text(pair.back)
-
-  .font(.system(.subheadline)).foregroundStyle(Color.khaki).lineLimit(1)
+                          .font(.system(.subheadline))
+                          .foregroundStyle(Color.khaki)
+                          .lineLimit(1)
                   }
                   subtitleText
               }
@@ -410,12 +454,14 @@ import SwiftUI
       @ViewBuilder
       private var accuracyRing: some View {
           ZStack {
-              Circle().stroke(Color.khakiBorder.opacity(0.35), lineWidth: 2.5)
+              Circle()
+                  .stroke(Color.khakiBorder.opacity(0.35), lineWidth: 2.5)
               if let s = stats, s.attempts > 0 {
                   Circle()
                       .trim(from: 0, to: CGFloat(s.accuracy))
                       .stroke(ringColor(s.accuracy),
-                              style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                              style: StrokeStyle(lineWidth: 2.5,
+                                                 lineCap: .round))
                       .rotationEffect(.degrees(-90))
                   Text("\(Int(s.accuracy * 100))%")
                       .font(.system(size: 9, weight: .bold))
@@ -435,18 +481,21 @@ import SwiftUI
                       .font(.caption).foregroundStyle(.secondary)
                   if s.isDue {
                       Circle().fill(Color.orange).frame(width: 3, height: 3)
-                      Text(lm.s.dueLabel).font(.caption).foregroundStyle(.orange)
+                      Text(lm.s.dueLabel)
+                          .font(.caption).foregroundStyle(.orange)
                   } else if let due = s.dueDate {
-                      let days = max(1, Calendar.current.dateComponents([.day], from:
-  Date(), to: due).day ?? 1)
-                      Circle().fill(Color.secondary.opacity(0.4)).frame(width: 3,
-  height: 3)
-
-  Text(lm.s.nextReviewIn(days)).font(.caption).foregroundStyle(.secondary)
+                      let days = max(1, Calendar.current.dateComponents(
+                          [.day], from: Date(), to: due).day ?? 1)
+                      Circle()
+                          .fill(Color.secondary.opacity(0.4))
+                          .frame(width: 3, height: 3)
+                      Text(lm.s.nextReviewIn(days))
+                          .font(.caption).foregroundStyle(.secondary)
                   }
               }
           } else {
-              Text(lm.s.notStudiedYet).font(.caption).foregroundStyle(.secondary)
+              Text(lm.s.notStudiedYet)
+                  .font(.caption).foregroundStyle(.secondary)
           }
       }
 
