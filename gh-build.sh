@@ -14,7 +14,7 @@ xcodebuild archive \
   -destination 'generic/platform=iOS' \
   -archivePath LexiDrill.xcarchive \
   CODE_SIGN_STYLE=Manual \
-  PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
+  PROVISIONING_PROFILE="$PROF_UUID" \
   CODE_SIGN_IDENTITY="iPhone Distribution"
 
 PLIST=ExportOptions.plist
@@ -22,6 +22,10 @@ PLIST=ExportOptions.plist
 /usr/libexec/PlistBuddy -c "Add :teamID string $TEAM_ID" $PLIST
 /usr/libexec/PlistBuddy -c "Add :uploadSymbols bool true" $PLIST
 /usr/libexec/PlistBuddy -c "Add :compileBitcode bool false" $PLIST
+/usr/libexec/PlistBuddy -c "Add :provisioningProfiles dict" $PLIST
+/usr/libexec/PlistBuddy \
+  -c "Add :provisioningProfiles:com.jirifilipec.mnemoapp string $PROF_UUID" \
+  $PLIST
 
 xcodebuild -exportArchive \
   -archivePath LexiDrill.xcarchive \

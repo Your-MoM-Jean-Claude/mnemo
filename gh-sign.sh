@@ -18,8 +18,13 @@ rm cert.p12
 
 PROF_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
 mkdir -p "$PROF_DIR"
-echo "$PROFILE_B64" | base64 --decode \
-  > "$PROF_DIR/LexiDrill.mobileprovision"
+echo "$PROFILE_B64" | base64 --decode > /tmp/mnemo.mobileprovision
+security cms -D -i /tmp/mnemo.mobileprovision 2>/dev/null > /tmp/mnemo.plist
+PROF_UUID=$(/usr/libexec/PlistBuddy -c "Print :UUID" /tmp/mnemo.plist)
+echo "Profile UUID: $PROF_UUID"
+cp /tmp/mnemo.mobileprovision "$PROF_DIR/$PROF_UUID.mobileprovision"
+rm /tmp/mnemo.mobileprovision /tmp/mnemo.plist
+echo "PROF_UUID=$PROF_UUID" >> "$GITHUB_ENV"
 
 mkdir -p ~/.appstoreconnect/private_keys
 echo "$ASC_KEY_B64" | base64 --decode \
