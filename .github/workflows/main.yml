@@ -6,100 +6,19 @@ name: Deploy LexiDrill to App Store
   jobs:
     deploy:
       runs-on: macos-15
-
+      env:
+        CERT_B64: ${{ secrets.DISTRIBUTION_CERTIFICATE_BASE64 }}
+        CERT_PASS: ${{ secrets.CERTIFICATE_PASSWORD }}
+        KC_PASS: ${{ secrets.KEYCHAIN_PASSWORD }}
+        PROFILE_B64: ${{ secrets.PROVISIONING_PROFILE_BASE64 }}
+        PROFILE_NAME: ${{ secrets.PROVISIONING_PROFILE_NAME }}
+        ASC_KEY_B64: ${{ secrets.ASC_API_KEY_BASE64 }}
+        ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+        ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
-
-        - name: Select Xcode 16
-          run: |
-            XCODE=$(ls /Applications | grep "Xcode_16" | sort -V | tail -1)
-            if [ -n "$XCODE" ]; then
-              sudo xcode-select -s "/Applications/$XCODE"
-            fi
-            xcodebuild -version
-
-        - name: Import distribution certificate
-          env:
-            CERTIFICATE_BASE64: ${{ secrets.DISTRIBUTION_CERTIFICATE_BASE64 }}
-            CERTIFICATE_PASSWORD: ${{ secrets.DISTRIBUTION_CERTIFICATE_PASSWORD }}
-            KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-          run: |
-            security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-            security default-keychain -s build.keychain
-            security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-            security set-keychain-settings -t 3600 -l build.keychain
-            echo "$CERTIFICATE_BASE64" | base64 --decode > certificate.p12
-            security import certificate.p12 \
-              -k build.keychain \
-              -P "$CERTIFICATE_PASSWORD" \
-              -T /usr/bin/codesign
-            security set-key-partition-list \
-              -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" build.keychain
-            rm certificate.p12
-
-        - name: Install provisioning profile
-          env:
-            PROVISIONING_PROFILE_BASE64: ${{ secrets.PROVISIONING_PROFILE_BASE64 }}
-          run: |
-            mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-            echo "$PROVISIONING_PROFILE_BASE64" | base64 --decode \
-              > ~/Library/MobileDevice/Provisioning\
-  Profiles/LexiDrill.mobileprovision
-
-        - name: Setup App Store Connect API key
-          env:
-            ASC_API_KEY_BASE64: ${{ secrets.ASC_API_KEY_BASE64 }}
-            ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          run: |
-            mkdir -p ~/.appstoreconnect/private_keys
-            echo "$ASC_API_KEY_BASE64" | base64 --decode \
-              > ~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8
-
-        - name: Archive
-          run: |
-            xcodebuild archive \
-              -project LexiDrill/LexiDrill.xcodeproj \
-              -scheme LexiDrill \
-              -configuration Release \
-              -destination 'generic/platform=iOS' \
-              -archivePath LexiDrill.xcarchive \
-              CODE_SIGN_STYLE=Manual \
-              PROVISIONING_PROFILE_SPECIFIER="${{ secrets.PROVISIONING_PROFILE_NAME
-  }}" \
-              CODE_SIGN_IDENTITY="iPhone Distribution"
-
-        - name: Export IPA
-          env:
-            APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          run: |
-            /usr/libexec/PlistBuddy -c "Add :method string app-store"
-  ExportOptions.plist
-            /usr/libexec/PlistBuddy -c "Add :teamID string $APPLE_TEAM_ID"
-  ExportOptions.plist
-            /usr/libexec/PlistBuddy -c "Add :uploadSymbols bool true"
-  ExportOptions.plist
-            /usr/libexec/PlistBuddy -c "Add :compileBitcode bool false"
-  ExportOptions.plist
-            xcodebuild -exportArchive \
-              -archivePath LexiDrill.xcarchive \
-              -exportPath Export \
-              -exportOptionsPlist ExportOptions.plist
-
-        - name: Upload to App Store Connect
-          env:
-            ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-            ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-          run: |
-            xcrun altool --upload-app \
-              -f Export/LexiDrill.ipa \
-              -t ios \
-              --apiKey "$ASC_KEY_ID" \
-              --apiIssuer "$ASC_ISSUER_ID" \
-              --verbose
-
-        - name: Cleanup
-          if: always()
-          run: |
-            security delete-keychain build.keychain || true
-            rm -f ~/.appstoreconnect/private_keys/AuthKey_*.p8
+        - uses: actions/checkout@v4
+        - name: Sign
+          run: bash gh-sign.sh
+        - name: Build and upload
+          run: bash gh-build.sh
