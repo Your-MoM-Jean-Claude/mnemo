@@ -1,24 +1,24 @@
 name: Deploy LexiDrill to App Store
 
-  "on":
-    workflow_dispatch:
+on:
+  workflow_dispatch:
 
-  jobs:
-    deploy:
-      runs-on: macos-15
-      env:
-        CERT_B64: ${{ secrets.DISTRIBUTION_CERTIFICATE_BASE64 }}
-        CERT_PASS: ${{ secrets.CERTIFICATE_PASSWORD }}
-        KC_PASS: ${{ secrets.KEYCHAIN_PASSWORD }}
-        PROFILE_B64: ${{ secrets.PROVISIONING_PROFILE_BASE64 }}
-        PROFILE_NAME: ${{ secrets.PROVISIONING_PROFILE_NAME }}
-        ASC_KEY_B64: ${{ secrets.ASC_API_KEY_BASE64 }}
-        ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-        ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-        TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-      steps:
-        - uses: actions/checkout@v4
-        - name: Sign
-          run: bash gh-sign.sh
-        - name: Build and upload
-          run: bash gh-build.sh
+jobs:
+  deploy:
+    runs-on: macos-15
+    env:
+      CERT_B64: ${{ secrets.DISTRIBUTION_CERTIFICATE_BASE64 }}
+      CERT_PASS: ${{ secrets.CERTIFICATE_PASSWORD }}
+      KC_PASS: ${{ secrets.KEYCHAIN_PASSWORD }}
+      PROFILE_B64: ${{ secrets.PROVISIONING_PROFILE_BASE64 }}
+      PROFILE_NAME: ${{ secrets.PROVISIONING_PROFILE_NAME }}
+      ASC_KEY_B64: ${{ secrets.ASC_API_KEY_BASE64 }}
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sign
+        run: bash gh-sign.sh
+      - name: Build and upload
+        run: bash gh-build.sh
