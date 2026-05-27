@@ -12,19 +12,27 @@ import SwiftUI
       @State private var batchSize: Double         = 10
       @State private var requiredCorrect: Double   = 2
       @State private var shuffle: Bool             = true
+      @State private var studyMode: StudyMode      = .classic
       @State private var startQuiz                 = false
       @State private var settings: QuizSettings?
 
       private var maxBatch: Double { Double(min(wordList.pairs.count, 50)) }
       private var listStats: ListStatistics { library.stats(for: wordList.id) }
+      private var dueCount: Int {
+          let ws = listStats.wordStats
+          return wordList.pairs.filter { ws[$0.id]?.isDue ?? true }.count
+      }
 
       var body: some View {
           NavigationStack {
               Form {
                   summarySection
-                  modeSection
+                  studyModeSection
+                  if studyMode == .classic {
+                      modeSection
+                      roundSection
+                  }
                   directionSection
-                  roundSection
                   otherSection
                   editSection
                   statsSection
@@ -42,7 +50,8 @@ import SwiftUI
                               requiredCorrect: Int(requiredCorrect),
                               direction: direction,
                               shuffleOrder: shuffle,
-                              mode: quizMode
+                              mode: quizMode,
+                              studyMode: studyMode
                           )
                           startQuiz = true
                       } label: {
@@ -63,6 +72,8 @@ import SwiftUI
               }
           }
       }
+
+      // MARK: - Sections
 
       private var summarySection: some View {
           Section {
@@ -98,6 +109,23 @@ import SwiftUI
                   }
               }
               .padding(.vertical, 4)
+          }
+      }
+
+      private var studyModeSection: some View {
+          Section(lm.s.studyModeSection) {
+              Picker("", selection: $studyMode) {
+                  Text(lm.s.studyModeClassic).tag(StudyMode.classic)
+                  Text(lm.s.studyModeSRS).tag(StudyMode.srs)
+              }
+              .pickerStyle(.segmented)
+              .padding(.vertical, 4)
+
+              if studyMode == .srs {
+                  Text(lm.s.srsDueToday(dueCount))
+                      .font(.caption)
+                      .foregroundStyle(Color.khaki)
+              }
           }
       }
 
@@ -199,6 +227,7 @@ import SwiftUI
               }
           }
       }
+
   }
 
   struct StatRow: View {
