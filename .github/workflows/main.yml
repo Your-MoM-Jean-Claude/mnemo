@@ -67,6 +67,7 @@ jobs:
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath LexiDrill.xcarchive \
+            -quiet \
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE="$PROF_UUID" \
             CODE_SIGN_IDENTITY="iPhone Distribution"
@@ -83,7 +84,8 @@ jobs:
           xcodebuild -exportArchive \
             -archivePath LexiDrill.xcarchive \
             -exportPath Export \
-            -exportOptionsPlist ExportOptions.plist
+            -exportOptionsPlist ExportOptions.plist \
+            -quiet
 
       - name: Upload to App Store
         run: |
