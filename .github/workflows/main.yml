@@ -18,6 +18,10 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Fix icon size
+        run: |
+          sips --resampleHeightWidth 1024 1024 LexiDrill/Assets.xcassets/AppIcon.appiconset/imgmnemo.png
+
       - name: Install certificate
         run: |
           security create-keychain -p "$KC_PASS" build.keychain
