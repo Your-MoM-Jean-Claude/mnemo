@@ -13,9 +13,12 @@ struct LibraryView: View {
     @State private var renameTarget: WordList?
     @State private var renameText        = ""
 
-    // Direct quiz navigation
-    @State private var showQuiz      = false
+    // Quiz navigation
+    @State private var showSettings      = false  // → QuizSettingsView (regular tap)
+    @State private var showQuiz          = false  // → QuizView directly (SRS button)
+    @State private var showMistakesQuiz  = false
     @State private var selectedList: WordList?
+    @State private var selectedStudyMode: StudyMode = .classic
 
     // Secondary sheets
     @State private var editorTarget: LibraryListTarget?
@@ -50,18 +53,43 @@ struct LibraryView: View {
             .navigationBarTitleDisplayMode(.large)
             .searchable(text: $searchText, prompt: lm.s.searchLists)
             .environment(\.editMode, $editMode)
+            .sheet(isPresented: $showSettings) {
+                if let list = selectedList {
+                    QuizSettingsView(wordList: list, library: vm)
+                        .environmentObject(lm)
+                        .environmentObject(vm)
+                }
+            }
             .navigationDestination(isPresented: $showQuiz) {
                 if let list = selectedList {
                     QuizView(
                         vm: QuizViewModel(
                             wordList: list,
-                            settings: buildSettings(for: list),
+                            settings: buildSettings(for: list, studyMode: selectedStudyMode),
                             wordStats: vm.wordStats(for: list.id)
                         ),
                         library: vm,
                         onDismiss: { showQuiz = false }
                     )
                 }
+            }
+            .navigationDestination(isPresented: $showMistakesQuiz) {
+                QuizView(
+                    vm: QuizViewModel(
+                        wordList: vm.mistakesWordList,
+                        settings: QuizSettings(
+                            batchSize: min(vm.mistakes.count, 20),
+                            requiredCorrect: 2,
+                            direction: .frontToBack,
+                            shuffleOrder: true,
+                            mode: QuizMode(rawValue: quizModeRaw) ?? .typing,
+                            studyMode: .classic
+                        ),
+                        wordStats: [:]
+                    ),
+                    library: vm,
+                    onDismiss: { showMistakesQuiz = false }
+                )
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -139,6 +167,15 @@ struct LibraryView: View {
 
     private var listContent: some View {
         List {
+            if !vm.mistakes.isEmpty && searchText.isEmpty && editMode == .inactive {
+                MistakesCard(count: vm.mistakes.count) {
+                    showMistakesQuiz = true
+                }
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
+            }
+
             ForEach(displayedLists) { list in
                 WordListCard(
                     list: list,
@@ -146,13 +183,19 @@ struct LibraryView: View {
                     isImported: vm.isImported(list),
                     isComplete: vm.isComplete(list),
                     dueCount: vm.dueWordCount(for: list),
-                    nextReviewDate: vm.nextReviewDate(for: list)
+                    nextReviewDate: vm.nextReviewDate(for: list),
+                    onSRSTap: vm.dueWordCount(for: list) > 0 ? {
+                        guard editMode == .inactive else { return }
+                        selectedList = list
+                        selectedStudyMode = .srs
+                        showQuiz = true
+                    } : nil
                 )
                 .contentShape(Rectangle())
                 .onTapGesture {
                     guard editMode == .inactive else { return }
                     selectedList = list
-                    showQuiz = true
+                    showSettings = true
                 }
                 .contextMenu {
                     Button {
@@ -273,13 +316,14 @@ struct LibraryView: View {
 private struct LibraryListTarget: Identifiable { let id: UUID }
 
 extension LibraryView {
-    func buildSettings(for list: WordList) -> QuizSettings {
+    func buildSettings(for list: WordList, studyMode: StudyMode = .classic) -> QuizSettings {
         QuizSettings(
             batchSize: max(1, min(batchSize, list.pairs.count)),
             requiredCorrect: requiredCorrect,
             direction: QuizDirection(rawValue: directionRaw) ?? .frontToBack,
             shuffleOrder: shuffle,
-            mode: QuizMode(rawValue: quizModeRaw) ?? .typing
+            mode: QuizMode(rawValue: quizModeRaw) ?? .typing,
+            studyMode: studyMode
         )
     }
 }
@@ -317,6 +361,7 @@ private struct WordListCard: View {
     let isComplete: Bool
     let dueCount: Int
     let nextReviewDate: Date?
+    var onSRSTap: (() -> Void)? = nil
 
     private let iconColors: [Color] = [
         Color(red: 0.34, green: 0.52, blue: 0.24),
@@ -401,9 +446,25 @@ private struct WordListCard: View {
 
             Spacer()
 
-            Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(Color.khaki.opacity(0.5))
+            if let onSRSTap, dueCount > 0 {
+                Button(action: onSRSTap) {
+                    VStack(spacing: 3) {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 13, weight: .semibold))
+                        Text("\(dueCount)")
+                            .font(.system(size: 11, weight: .bold))
+                            .monospacedDigit()
+                    }
+                    .foregroundStyle(.white)
+                    .frame(width: 44, height: 44)
+                    .background(Color.orange.opacity(0.85), in: RoundedRectangle(cornerRadius: 10))
+                }
+                .buttonStyle(.plain)
+            } else {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Color.khaki.opacity(0.5))
+            }
         }
         .padding(14)
         .glassCard(cornerRadius: 18)
@@ -448,6 +509,65 @@ private struct WordListCard: View {
                     .foregroundStyle(.secondary)
             }
         }
+    }
+}
+
+// MARK: - Mistakes Card
+
+private struct MistakesCard: View {
+    @EnvironmentObject private var lm: LanguageManager
+    let count: Int
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: 14) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color.appError.opacity(0.85))
+                        .frame(width: 52, height: 52)
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.white)
+                        .font(.system(size: 20, weight: .semibold))
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(lm.s.mistakesListTitle)
+                        .font(.system(.body))
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+
+                    Text(lm.s.mistakesListSubtitle(count))
+                        .font(.caption)
+                        .foregroundStyle(Color.appError)
+
+                    Text(lm.s.mistakesListHint)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                Text(lm.s.mistakesListReviewBtn)
+                    .font(.caption)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(Color.appError, in: RoundedRectangle(cornerRadius: 8))
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 18)
+                    .fill(Color.appError.opacity(0.08))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(Color.appError.opacity(0.30), lineWidth: 1)
+            )
+            .shadow(color: Color.appError.opacity(0.20), radius: 10, x: 0, y: 4)
+        }
+        .buttonStyle(.plain)
     }
 }
 

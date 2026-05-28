@@ -2,8 +2,8 @@ import Foundation
   import Combine
 
   enum Language: String, CaseIterable, Codable, Identifiable {
-      case czech   = "cs"
       case english = "en"
+      case czech   = "cs"
       case spanish = "es"
 
       var id: String { rawValue }
@@ -456,6 +456,117 @@ import Foundation
       }
       var tapToContinue: String {
           t("Klepnutím pokračujete", "Tap to continue", "Toca para continuar")
+      }
+
+      // MARK: - Mistakes list
+
+      var mistakesListTitle: String {
+          t("Chybná slovíčka", "Mistake Words", "Palabras incorrectas")
+      }
+      var mistakesListReviewBtn: String {
+          t("Procvičit", "Review", "Repasar")
+      }
+      func mistakesListSubtitle(_ count: Int) -> String {
+          switch lang {
+          case .czech:
+              return count == 1 ? "1 slovíčko k procvičení"
+                   : count < 5  ? "\(count) slovíčka k procvičení"
+                   :              "\(count) slovíček k procvičení"
+          case .english:
+              return "\(count) word\(count == 1 ? "" : "s") to review"
+          case .spanish:
+              return "\(count) palabra\(count == 1 ? "" : "s") para repasar"
+          }
+      }
+      var mistakesListHint: String {
+          switch lang {
+          case .czech:   return "Odpověz 2× správně — slovo zmizí"
+          case .english: return "Answer correctly 2× — word disappears"
+          case .spanish: return "Responde 2× correctamente — desaparece"
+          }
+      }
+
+      // MARK: - Paywall
+
+      var paywallSubtitle: String {
+          switch lang {
+          case .czech:   return "Odemkni plný přístup k Mnemu"
+          case .english: return "Unlock full access to Mnemo"
+          case .spanish: return "Desbloquea el acceso completo a Mnemo"
+          }
+      }
+      var paywallFeatures: [String] {
+          switch lang {
+          case .czech:
+              return [
+                  "Chytré opakování (Spaced Repetition)",
+                  "Neomezené seznamy slovíček",
+                  "Psaní, kartičky i kvíz",
+                  "Přehledné statistiky pro každé slovo",
+                  "Jedno zaplacení, navždy"
+              ]
+          case .english:
+              return [
+                  "Smart review (Spaced Repetition)",
+                  "Unlimited word lists",
+                  "Typing, flashcards & multiple choice",
+                  "Detailed stats for every word",
+                  "One-time purchase, forever"
+              ]
+          case .spanish:
+              return [
+                  "Repaso inteligente (Repetición espaciada)",
+                  "Listas de palabras ilimitadas",
+                  "Escritura, tarjetas y opción múltiple",
+                  "Estadísticas detalladas por palabra",
+                  "Pago único, para siempre"
+              ]
+          }
+      }
+      var paywallPurchaseBtn: String {
+          switch lang {
+          case .czech:   return "Získat Mnemo Pro"
+          case .english: return "Get Mnemo Pro"
+          case .spanish: return "Obtener Mnemo Pro"
+          }
+      }
+      var paywallRestoreBtn: String {
+          t("Obnovit předplatné", "Restore subscription", "Restaurar suscripción")
+      }
+      var paywallTrialEndedTitle: String {
+          switch lang {
+          case .czech:   return "Zkušební doba skončila"
+          case .english: return "Trial ended"
+          case .spanish: return "Período de prueba terminado"
+          }
+      }
+      var paywallMonthly: String {
+          t("Měsíční", "Monthly", "Mensual")
+      }
+      var paywallYearly: String {
+          t("Roční", "Yearly", "Anual")
+      }
+      var paywallBestValue: String {
+          t("Nejlepší hodnota", "Best value", "Mejor valor")
+      }
+      var paywallPerMonth: String {
+          t("/ měsíc", "/ month", "/ mes")
+      }
+      var paywallPerYear: String {
+          t("/ rok", "/ rok", "/ año")
+      }
+      var paywallSaveLabel: String {
+          t("ušetříš 50 %", "save 50%", "ahorra 50%")
+      }
+      var paywallSubscribeBtn: String {
+          t("Předplatit", "Subscribe", "Suscribirse")
+      }
+      var paywallCancelAnytime: String {
+          switch lang {
+          case .czech:   return "Zruš kdykoliv v nastavení Apple"
+          case .english: return "Cancel anytime in Apple settings"
+          case .spanish: return "Cancela cuando quieras en ajustes de Apple"
+          }
       }
 
       func errorFor(_ error: ParseError) -> String {

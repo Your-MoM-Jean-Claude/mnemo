@@ -11,6 +11,7 @@ struct HardWord: Identifiable {
 class LibraryViewModel: ObservableObject {
     @Published var wordLists: [WordList]              = []
     @Published var statistics: [UUID: ListStatistics] = [:]
+    @Published var mistakes: [MistakeWord]            = []
     @Published var errorMessage: String?
     @Published var showError: Bool      = false
     @Published var dataLoadFailed: Bool = false
@@ -18,6 +19,16 @@ class LibraryViewModel: ObservableObject {
     private let listsKey    = "savedWordLists"
     private let statsKey    = "wordListStats"
     private let importedKey = "importedListIDs"
+    private let mistakesKey = "mistakeWords"
+
+    // Fixed UUID that identifies the virtual mistakes list
+    static let mistakesListID = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")!
+
+    var mistakesWordList: WordList {
+        WordList(id: Self.mistakesListID,
+                 name: "Mistakes",
+                 pairs: mistakes.map { $0.pair })
+    }
 
     private(set) var importedListIDs: Set<UUID> = []
 
@@ -95,6 +106,12 @@ class LibraryViewModel: ObservableObject {
     // MARK: - Statistics
 
     func recordSession(result: QuizResult) {
+        if result.listID == Self.mistakesListID {
+            mistakes.removeAll { (result.wordStats[$0.pair.id]?.correct ?? 0) >= 2 }
+            save()
+            return
+        }
+
         var stat = statistics[result.listID] ?? ListStatistics()
         stat.apply(result)
         statistics[result.listID] = stat
@@ -102,7 +119,20 @@ class LibraryViewModel: ObservableObject {
         if let idx = wordLists.firstIndex(where: { $0.id == result.listID }) {
             wordLists[idx].lastStudied = result.date
         }
+
+        addMistakes(wrongPairIDs: result.wrongPairIDs, listID: result.listID)
         save()
+    }
+
+    private func addMistakes(wrongPairIDs: Set<UUID>, listID: UUID) {
+        guard !wrongPairIDs.isEmpty,
+              let list = wordLists.first(where: { $0.id == listID }) else { return }
+        for pair in list.pairs where wrongPairIDs.contains(pair.id) {
+            guard !mistakes.contains(where: { $0.pair.id == pair.id }) else { continue }
+            mistakes.append(MistakeWord(pair: pair,
+                                        sourceListID: listID,
+                                        sourceListName: list.name))
+        }
     }
 
     func stats(for listID: UUID) -> ListStatistics {
@@ -263,6 +293,9 @@ class LibraryViewModel: ObservableObject {
         if let data = try? JSONEncoder().encode(Array(importedListIDs)) {
             UserDefaults.standard.set(data, forKey: importedKey)
         }
+        if let data = try? JSONEncoder().encode(mistakes) {
+            UserDefaults.standard.set(data, forKey: mistakesKey)
+        }
     }
 
     private func load() {
@@ -280,6 +313,10 @@ class LibraryViewModel: ObservableObject {
         if let data = UserDefaults.standard.data(forKey: importedKey),
            let ids = try? JSONDecoder().decode([UUID].self, from: data) {
             importedListIDs = Set(ids)
+        }
+        if let data = UserDefaults.standard.data(forKey: mistakesKey),
+           let saved = try? JSONDecoder().decode([MistakeWord].self, from: data) {
+            mistakes = saved
         }
     }
 }

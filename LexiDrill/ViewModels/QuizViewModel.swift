@@ -279,14 +279,18 @@ import Foundation
 
           var ws = sessionWordStats[card.id] ?? WordStats()
           ws.attempts += 1
-          if isCorrect {
-              ws.correct += 1
-              let prev = historicalWordStats[card.id]?.interval ?? 0
-              ws.interval = min(30, prev == 0 ? 1 : prev * 2)
-          } else {
-              ws.interval = 0
-          }
-          ws.lastSeen = Date()
+          if isCorrect { ws.correct += 1 }
+          let prev = historicalWordStats[card.id]
+          let srsResult = SRSEngine.next(
+              repetitions: prev?.srsRepetitions ?? 0,
+              easeFactor:  prev?.srsEaseFactor  ?? 2.5,
+              interval:    max(1, prev?.interval ?? 1),
+              rating:      isCorrect ? .good : .again
+          )
+          ws.interval       = srsResult.interval
+          ws.srsRepetitions = srsResult.repetitions
+          ws.srsEaseFactor  = srsResult.easeFactor
+          ws.lastSeen       = Date()
           sessionWordStats[card.id] = ws
 
           sessionTotal += 1
@@ -335,13 +339,14 @@ import Foundation
 
       func buildResult() -> QuizResult {
           QuizResult(
-              listID:     wordList.id,
-              correct:    sessionCorrect,
-              total:      sessionTotal,
-              bestStreak: bestStreak,
-              wordStats:  sessionWordStats,
-              date:       Date(),
-              duration:   Date().timeIntervalSince(sessionStartTime)
+              listID:       wordList.id,
+              correct:      sessionCorrect,
+              total:        sessionTotal,
+              bestStreak:   bestStreak,
+              wordStats:    sessionWordStats,
+              date:         Date(),
+              duration:     Date().timeIntervalSince(sessionStartTime),
+              wrongPairIDs: wrongCardIDs
           )
       }
 

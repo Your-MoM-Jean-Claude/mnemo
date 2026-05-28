@@ -12,7 +12,6 @@ import SwiftUI
       @State private var batchSize: Double        = 10
       @State private var requiredCorrect: Double  = 2
       @State private var shuffle: Bool            = true
-      @State private var studyMode: StudyMode     = .classic
       @State private var startQuiz                = false
       @State private var settings: QuizSettings?
 
@@ -33,12 +32,9 @@ import SwiftUI
           NavigationStack {
               Form {
                   summarySection
-                  studyModeSection
-                  if studyMode == .classic {
-                      modeSection
-                      roundSection
-                  }
+                  modeSection
                   directionSection
+                  roundSection
                   otherSection
                   editSection
                   statsSection
@@ -57,7 +53,7 @@ import SwiftUI
                               direction: direction,
                               shuffleOrder: shuffle,
                               mode: quizMode,
-                              studyMode: studyMode
+                              studyMode: .classic
                           )
                           startQuiz = true
                       } label: {
@@ -121,23 +117,6 @@ import SwiftUI
                   }
               }
               .padding(.vertical, 4)
-          }
-      }
-
-      private var studyModeSection: some View {
-          Section(lm.s.studyModeSection) {
-              Picker("", selection: $studyMode) {
-                  Text(lm.s.studyModeClassic).tag(StudyMode.classic)
-                  Text(lm.s.studyModeSRS).tag(StudyMode.srs)
-              }
-              .pickerStyle(.segmented)
-              .padding(.vertical, 4)
-
-              if studyMode == .srs {
-                  Text(lm.s.srsDueToday(dueCount))
-                      .font(.caption)
-                      .foregroundStyle(Color.khaki)
-              }
           }
       }
 

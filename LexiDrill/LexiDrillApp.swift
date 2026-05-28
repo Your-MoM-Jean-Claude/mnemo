@@ -3,9 +3,10 @@ import SwiftUI
 
   @main
   struct LexiDrillApp: App {
-      @StateObject private var langManager = LanguageManager()
-      @StateObject private var library     = LibraryViewModel()
-      @State private var showWelcome       = true
+      @StateObject private var langManager   = LanguageManager()
+      @StateObject private var library       = LibraryViewModel()
+      @StateObject private var paywallManager = PaywallManager()
+      @State private var showWelcome         = true
 
       var body: some Scene {
           WindowGroup {
@@ -39,8 +40,13 @@ import SwiftUI
               }
               .environmentObject(langManager)
               .environmentObject(library)
+              .environmentObject(paywallManager)
               .preferredColorScheme(.dark)
               .tint(Color.khaki)
+              .fullScreenCover(isPresented: .constant(!paywallManager.isTrialActive)) {
+                  PaywallView(paywall: paywallManager)
+                      .environmentObject(langManager)
+              }
           }
       }
   }

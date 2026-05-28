@@ -70,6 +70,15 @@ import Foundation
       var accuracy: Double { total > 0 ? Double(correct) / Double(total) : 0 }
   }
 
+  // MARK: - Mistake Word (persisted across sessions)
+
+  struct MistakeWord: Codable, Identifiable {
+      var id: UUID = UUID()
+      let pair: WordPair
+      let sourceListID: UUID
+      let sourceListName: String
+  }
+
   // MARK: - Quiz Result (transient — passed from QuizViewModel to LibraryViewModel)
 
   struct QuizResult {
@@ -80,6 +89,7 @@ import Foundation
       let wordStats: [UUID: WordStats]
       let date: Date
       let duration: TimeInterval
+      var wrongPairIDs: Set<UUID> = []
   }
 
   // MARK: - List Statistics
