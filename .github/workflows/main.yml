@@ -91,8 +91,7 @@ jobs:
             -f Export/LexiDrill.ipa \
             -t ios \
             --apiKey "$ASC_KEY_ID" \
-            --apiIssuer "$ASC_ISSUER_ID" \
-            --verbose
+            --apiIssuer "$ASC_ISSUER_ID"
 
       - name: Cleanup
         if: always()
