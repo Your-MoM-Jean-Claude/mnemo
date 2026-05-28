@@ -71,6 +71,11 @@ jobs:
             PROVISIONING_PROFILE="$PROF_UUID" \
             CODE_SIGN_IDENTITY="iPhone Distribution"
 
+      - name: Set encryption compliance
+        run: |
+          /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" \
+            LexiDrill.xcarchive/Products/Applications/LexiDrill.app/Info.plist
+
       - name: Export IPA
         run: |
           PLIST=ExportOptions.plist
