@@ -20,6 +20,9 @@
 		AA000011 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100011 /* Language.swift */; };
 		AA000012 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100012 /* StatsView.swift */; };
 		AA000013 /* WordListEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100013 /* WordListEditorView.swift */; };
+		AA000014 /* PaywallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100014 /* PaywallManager.swift */; };
+		AA000015 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100015 /* PaywallView.swift */; };
+		AA000016 /* BundledLists.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100016 /* BundledLists.swift */; };
 		D0BF19912FC2801500C8E890 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D0BF19902FC2801500C8E890 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -37,6 +40,9 @@
 		AA100011 /* Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
 		AA100012 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
 		AA100013 /* WordListEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordListEditorView.swift; sourceTree = "<group>"; };
+		AA100014 /* PaywallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallManager.swift; sourceTree = "<group>"; };
+		AA100015 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		AA100016 /* BundledLists.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundledLists.swift; sourceTree = "<group>"; };
 		AAPROD001 /* LexiDrill.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LexiDrill.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0BF19902FC2801500C8E890 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -79,6 +85,8 @@
 				AA100003 /* QuizSession.swift */,
 				AA100004 /* FileParser.swift */,
 				AA100011 /* Language.swift */,
+				AA100014 /* PaywallManager.swift */,
+				AA100016 /* BundledLists.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -101,6 +109,7 @@
 				AA100010 /* PasteImportView.swift */,
 				AA100012 /* StatsView.swift */,
 				AA100013 /* WordListEditorView.swift */,
+				AA100015 /* PaywallView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -196,6 +205,9 @@
 				AA000011 /* Language.swift in Sources */,
 				AA000012 /* StatsView.swift in Sources */,
 				AA000013 /* WordListEditorView.swift in Sources */,
+				AA000014 /* PaywallManager.swift in Sources */,
+				AA000015 /* PaywallView.swift in Sources */,
+				AA000016 /* BundledLists.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
