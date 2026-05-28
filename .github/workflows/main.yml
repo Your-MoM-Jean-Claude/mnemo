@@ -18,9 +18,12 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Fix icon size
+      - name: Fix icon (remove alpha, resize to 1024x1024)
         run: |
-          sips --resampleHeightWidth 1024 1024 LexiDrill/Assets.xcassets/AppIcon.appiconset/imgmnemo.png
+          ICON=LexiDrill/Assets.xcassets/AppIcon.appiconset/imgmnemo.png
+          sips --resampleHeightWidth 1024 1024 -s format bmp "$ICON" --out /tmp/icon.bmp
+          sips -s format png /tmp/icon.bmp --out "$ICON"
+          rm /tmp/icon.bmp
 
       - name: Install certificate
         run: |
