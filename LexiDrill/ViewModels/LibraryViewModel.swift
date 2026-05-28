@@ -32,7 +32,17 @@ class LibraryViewModel: ObservableObject {
 
     private(set) var importedListIDs: Set<UUID> = []
 
-    init() { load() }
+    init() {
+        load()
+        addSampleListsIfNeeded()
+    }
+
+    private func addSampleListsIfNeeded() {
+        guard !UserDefaults.standard.bool(forKey: "sampleListsAdded") else { return }
+        wordLists = BundledLists.all() + wordLists
+        UserDefaults.standard.set(true, forKey: "sampleListsAdded")
+        save()
+    }
 
     // MARK: - Import
 
