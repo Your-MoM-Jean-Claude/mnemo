@@ -258,11 +258,18 @@ struct FolderSection: View {
 
             if isExpanded {
                 ForEach(decks) { deck in
-                    DeckCardView(deck: deck, lang: lang,
-                                 onTap: { onTapDeck(deck) },
-                                 onEdit: { onEdit(deck) },
-                                 onDelete: { onDelete(deck.id) })
-                        .padding(.leading, 12)
+                    VStack(spacing: 6) {
+                        DeckCardView(deck: deck, lang: lang,
+                                     onTap: { onTapDeck(deck) },
+                                     onEdit: { onEdit(deck) },
+                                     onDelete: { onDelete(deck.id) })
+
+                        if let temp = library.decks.first(where: { $0.parentDeckID == deck.id && $0.isTemporary }) {
+                            TempDeckCard(deck: temp, lang: lang, onTap: { onTapDeck(temp) })
+                                .padding(.leading, 24)
+                        }
+                    }
+                    .padding(.leading, 12)
                 }
             }
         }
