@@ -11,6 +11,7 @@ struct StudyView: View {
     @StateObject private var vm: StudyViewModel
     @State private var typingInput = ""
     @State private var showResults = false
+    @FocusState private var inputFocused: Bool
 
     var lang: AppLanguage { settings.language }
 
@@ -80,6 +81,9 @@ struct StudyView: View {
         .onChange(of: vm.isSessionFinished) { finished in
             if finished { showResults = true }
         }
+        .onAppear {
+            if config.mode == .typing { inputFocused = true }
+        }
         .fullScreenCover(isPresented: $showResults) {
             ResultsView(result: vm.buildResult(), deckName: deck.name)
                 .onDisappear {
@@ -117,6 +121,7 @@ struct StudyView: View {
                 .multilineTextAlignment(.center)
                 .submitLabel(.done)
                 .onSubmit { checkTyping() }
+                .focused($inputFocused)
                 .padding(.horizontal, 32)
 
             PrimaryButton(title: lang.studyCheck) { checkTyping() }
@@ -206,5 +211,6 @@ struct StudyView: View {
 
     private func advance() {
         vm.advanceAfterResult()
+        if config.mode == .typing { inputFocused = true }
     }
 }

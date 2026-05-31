@@ -106,26 +106,34 @@ struct AnswerFeedbackOverlay: View {
     var correctText: String
     var lang: AppLanguage
 
+    private var feedbackColor: Color {
+        isCorrect
+            ? Color(red: 0.15, green: 0.85, blue: 0.45)
+            : Color(red: 1.0,  green: 0.25, blue: 0.25)
+    }
+
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 12) {
             Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
-                .font(.system(size: 44))
-                .foregroundStyle(isCorrect ? Color.mnemoGreen : .red)
+                .font(.system(size: 72))
+                .foregroundStyle(feedbackColor)
             Text(isCorrect ? lang.studyCorrect : lang.studyWrong)
-                .font(.headline).bold()
-                .foregroundStyle(isCorrect ? Color.mnemoGreen : .red)
+                .font(.title2).bold()
+                .foregroundStyle(feedbackColor)
             if !isCorrect {
-                VStack(spacing: 2) {
+                VStack(spacing: 6) {
                     Text(lang.studyCorrectAnswer)
-                        .font(.caption).foregroundStyle(.secondary)
+                        .font(.subheadline).foregroundStyle(.secondary)
                     Text(correctText)
-                        .font(.body).bold()
+                        .font(.title3).bold()
+                        .foregroundStyle(.white)
                         .multilineTextAlignment(.center)
                 }
             }
         }
-        .padding(24)
-        .glassCard()
+        .padding(32)
+        .background(feedbackColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 20))
+        .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(feedbackColor.opacity(0.5), lineWidth: 1.5))
         .transition(.scale(scale: 0.85).combined(with: .opacity))
     }
 }
