@@ -20,19 +20,15 @@ struct FileParser {
         guard !lines.isEmpty else { throw ParseError.emptyFile }
 
         var cards: [Card] = []
-        for (i, raw) in lines.enumerated() {
+        for (_, raw) in lines.enumerated() {
             let line = raw.trimmingCharacters(in: .whitespaces)
             if line.isEmpty || line.hasPrefix("#") { continue }
-            guard let range = line.range(of: " - ") else {
-                throw ParseError.invalidFormat(line: i + 1)
-            }
+            guard let range = line.range(of: " - ") else { continue }
             let front = String(line[line.startIndex..<range.lowerBound])
                 .trimmingCharacters(in: .whitespaces)
             let back  = String(line[range.upperBound...])
                 .trimmingCharacters(in: .whitespaces)
-            guard !front.isEmpty, !back.isEmpty else {
-                throw ParseError.invalidFormat(line: i + 1)
-            }
+            guard !front.isEmpty, !back.isEmpty else { continue }
             cards.append(Card(front: front, back: back))
         }
         if cards.isEmpty { throw ParseError.noValidPairs }
@@ -40,7 +36,13 @@ struct FileParser {
     }
 
     static func parse(url: URL) throws -> [Card] {
-        let text = try String(contentsOf: url, encoding: .utf8)
+        let accessed = url.startAccessingSecurityScopedResource()
+        defer { if accessed { url.stopAccessingSecurityScopedResource() } }
+        let data = try Data(contentsOf: url)
+        let text = String(data: data, encoding: .utf8)
+            ?? String(data: data, encoding: .isoLatin1)
+            ?? String(data: data, encoding: .windowsCP1252)
+            ?? { throw ParseError.emptyFile }()
         return try parse(text: text)
     }
 
