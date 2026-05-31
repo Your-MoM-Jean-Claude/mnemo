@@ -12,17 +12,15 @@ extension Color {
 struct AppBg: View {
     var opacity: Double = 0.13
     var body: some View {
-        ZStack {
-            Color.mnemoBg
-            Image("MnemoLogo")
-                .resizable()
-                .scaledToFill()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .clipped()
-                .opacity(opacity)
-                .allowsHitTesting(false)
-        }
-        .ignoresSafeArea()
+        Color.mnemoBg
+            .ignoresSafeArea()
+            .overlay(
+                Image("MnemoLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .opacity(opacity)
+                    .allowsHitTesting(false)
+            )
     }
 }
 
