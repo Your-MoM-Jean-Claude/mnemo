@@ -60,7 +60,10 @@ struct StatisticsView: View {
                                     icon: "flame.fill",
                                     color: .orange)
 
-                                Button { showAccuracyDetail.toggle() } label: {
+                                Button {
+                                    showAccuracyDetail.toggle()
+                                    showSessionsDetail = false
+                                } label: {
                                     headlineStat(
                                         value: "\(Int(library.overallAccuracy * 100))%",
                                         sublabel: nil,
@@ -69,7 +72,10 @@ struct StatisticsView: View {
                                         color: .mnemoGreen)
                                 }
 
-                                Button { showSessionsDetail.toggle() } label: {
+                                Button {
+                                    showSessionsDetail.toggle()
+                                    showAccuracyDetail = false
+                                } label: {
                                     headlineStat(
                                         value: "\(library.totalSessions)",
                                         sublabel: nil,
@@ -80,15 +86,18 @@ struct StatisticsView: View {
                             }
                             .padding(.horizontal)
 
-                            // Per-deck accuracy (expandable)
+                            // Per-deck accuracy (expandable) — only studied decks
                             if showAccuracyDetail {
+                                let studiedDecks = library.decks.filter {
+                                    !$0.isTemporary && (library.deckStats[$0.id]?.totalSessions ?? 0) > 0
+                                }
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text(lang.statsAllDecks)
                                         .font(.subheadline).fontWeight(.semibold)
                                         .foregroundStyle(.secondary)
                                         .padding(.horizontal)
 
-                                    ForEach(library.decks.filter { !$0.isTemporary }) { deck in
+                                    ForEach(studiedDecks) { deck in
                                         let acc = library.stats(for: deck.id).overallAccuracy
                                         HStack {
                                             ProgressRing(progress: acc, size: 32, lineWidth: 3)
