@@ -10,9 +10,7 @@ struct LibraryView: View {
     @State private var showNewFolder     = false
     @State private var showImport        = false
     @State private var selectedDeck: Deck?
-    @State private var showStudySettings = false
     @State private var editingDeck: Deck?
-    @State private var showDeckEditor    = false
     @State private var newFolderName     = ""
     @State private var editMode: EditMode = .inactive
 
@@ -41,7 +39,7 @@ struct LibraryView: View {
                         ForEach(library.folders) { folder in
                             FolderSection(folder: folder, lang: lang,
                                           onTapDeck: tapDeck,
-                                          onEdit: { editingDeck = $0; showDeckEditor = true },
+                                          onEdit: { editingDeck = $0 },
                                           onDelete: { library.deleteDeck(id: $0) },
                                           onDeleteFolder: { library.deleteFolder(id: $0) })
                         }
@@ -72,20 +70,16 @@ struct LibraryView: View {
                 }
             }
             // Study settings sheet
-            .sheet(isPresented: $showStudySettings) {
-                if let deck = selectedDeck {
-                    StudySettingsView(deck: deck)
-                }
+            .sheet(item: $selectedDeck) { deck in
+                StudySettingsView(deck: deck)
             }
             // New deck editor
             .sheet(isPresented: $showNewDeck) {
                 DeckEditorView(deck: nil)
             }
             // Edit deck
-            .sheet(isPresented: $showDeckEditor) {
-                if let deck = editingDeck {
-                    DeckEditorView(deck: deck)
-                }
+            .sheet(item: $editingDeck) { deck in
+                DeckEditorView(deck: deck)
             }
             // Import
             .sheet(isPresented: $showImport) {
@@ -117,7 +111,7 @@ struct LibraryView: View {
         VStack(spacing: 6) {
             DeckCardView(deck: deck, lang: lang,
                          onTap: { tapDeck(deck) },
-                         onEdit: { editingDeck = deck; showDeckEditor = true },
+                         onEdit: { editingDeck = deck },
                          onDelete: { library.deleteDeck(id: deck.id) })
 
             // Temp deck attached below
@@ -129,8 +123,7 @@ struct LibraryView: View {
     }
 
     private func tapDeck(_ deck: Deck) {
-        selectedDeck     = deck
-        showStudySettings = true
+        selectedDeck = deck
     }
 }
 
@@ -221,7 +214,7 @@ struct FolderSection: View {
     var onDeleteFolder: (UUID) -> Void
 
     @EnvironmentObject var library: LibraryViewModel
-    @State private var isExpanded = true
+    @State private var isExpanded = false
 
     var decks: [Deck] { library.decks.filter { $0.folderID == folder.id && !$0.isTemporary } }
 

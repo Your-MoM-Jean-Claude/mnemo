@@ -13,7 +13,7 @@ struct StudySettingsView: View {
     @State private var sectionSize: Int      = 10
     @State private var requiredCorrect: Int  = 2
     @State private var showStudy             = false
-    @State private var studyConfig: StudyConfig?
+    @State private var studyConfig           = StudyConfig()
 
     var lang: AppLanguage { settings.language }
 
@@ -66,10 +66,11 @@ struct StudySettingsView: View {
                         }
 
                         settingsSection(title: "\(lang.settingsSectionSize): \(sectionSize)") {
+                            let maxSection = max(2.0, min(20.0, Double(deck.cards.count)))
                             Slider(value: Binding(
                                 get: { Double(sectionSize) },
                                 set: { sectionSize = Int($0) }),
-                                   in: 2...min(20, Double(deck.cards.count)), step: 1)
+                                   in: 2...maxSection, step: 1)
                                 .tint(.mnemoGreen)
                         }
 
@@ -94,7 +95,7 @@ struct StudySettingsView: View {
                         PrimaryButton(title: lang.settingsStart) {
                             studyConfig = StudyConfig(
                                 mode: mode, direction: direction, order: order,
-                                sectionSize: min(sectionSize, deck.cards.count),
+                                sectionSize: max(1, min(sectionSize, deck.cards.count)),
                                 requiredCorrect: requiredCorrect)
                             showStudy = true
                         }
@@ -113,13 +114,11 @@ struct StudySettingsView: View {
                 }
             }
             .fullScreenCover(isPresented: $showStudy) {
-                if let config = studyConfig {
-                    StudyView(deck: deck, config: config)
-                }
+                StudyView(deck: deck, config: studyConfig)
             }
         }
         .onAppear {
-            sectionSize = min(10, deck.cards.count)
+            sectionSize = max(2, min(10, deck.cards.count))
         }
     }
 
