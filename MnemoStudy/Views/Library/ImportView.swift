@@ -60,7 +60,7 @@ struct ImportView: View {
                 }
             }
             .fileImporter(isPresented: $showFilePicker,
-                          allowedContentTypes: [UTType.plainText],
+                          allowedContentTypes: [UTType.plainText, UTType.text, UTType.utf8PlainText, UTType.data],
                           allowsMultipleSelection: false) { result in
                 switch result {
                 case .success(let urls):

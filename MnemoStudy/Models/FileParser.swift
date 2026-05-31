@@ -38,12 +38,28 @@ struct FileParser {
     static func parse(url: URL) throws -> [Card] {
         let accessed = url.startAccessingSecurityScopedResource()
         defer { if accessed { url.stopAccessingSecurityScopedResource() } }
-        let data = try Data(contentsOf: url)
-        let text = String(data: data, encoding: .utf8)
-            ?? String(data: data, encoding: .isoLatin1)
-            ?? String(data: data, encoding: .windowsCP1252)
-            ?? { throw ParseError.emptyFile }()
-        return try parse(text: text)
+
+        var coordinatorError: NSError?
+        var parseResult: Result<[Card], Error> = .failure(ParseError.emptyFile)
+
+        NSFileCoordinator().coordinate(readingItemAt: url, options: .withoutChanges, error: &coordinatorError) { coordURL in
+            do {
+                let data = try Data(contentsOf: coordURL)
+                let text = String(data: data, encoding: .utf8)
+                    ?? String(data: data, encoding: .isoLatin1)
+                    ?? String(data: data, encoding: .windowsCP1252)
+                    ?? ""
+                parseResult = .success(try parse(text: text))
+            } catch {
+                parseResult = .failure(error)
+            }
+        }
+
+        if let e = coordinatorError { throw e }
+        switch parseResult {
+        case .success(let cards): return cards
+        case .failure(let error): throw error
+        }
     }
 
     static func export(deck: Deck) -> String {
