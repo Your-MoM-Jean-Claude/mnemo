@@ -68,6 +68,7 @@ struct StudyView: View {
                             Color.black.opacity(0.4).ignoresSafeArea()
                             AnswerFeedbackOverlay(
                                 isCorrect: vm.lastAnswerCorrect,
+                                questionText: vm.currentFront,
                                 correctText: vm.currentBack,
                                 lang: lang)
                             .onTapGesture { advance() }

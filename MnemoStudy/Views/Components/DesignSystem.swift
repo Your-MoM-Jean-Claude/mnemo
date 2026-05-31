@@ -103,13 +103,14 @@ struct PrimaryButton: View {
 // MARK: - Correct / wrong flash overlay
 struct AnswerFeedbackOverlay: View {
     var isCorrect: Bool
+    var questionText: String
     var correctText: String
     var lang: AppLanguage
 
     private var feedbackColor: Color {
         isCorrect
-            ? Color(red: 0.15, green: 0.85, blue: 0.45)
-            : Color(red: 1.0,  green: 0.25, blue: 0.25)
+            ? Color(red: 0.18, green: 0.48, blue: 0.32)
+            : Color(red: 0.58, green: 0.16, blue: 0.16)
     }
 
     var body: some View {
@@ -118,25 +119,38 @@ struct AnswerFeedbackOverlay: View {
                 .fill(feedbackColor)
                 .padding(16)
 
-            VStack(spacing: 24) {
-                Spacer()
-                Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
-                    .font(.system(size: 100))
-                    .foregroundStyle(.white)
-                Text(isCorrect ? lang.studyCorrect : lang.studyWrong)
-                    .font(.system(size: 42, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                if !isCorrect {
-                    VStack(spacing: 10) {
-                        Text(lang.studyCorrectAnswer)
-                            .font(.title3).foregroundStyle(.white.opacity(0.75))
-                        Text(correctText)
-                            .font(.title2).bold()
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding(.horizontal, 48)
+            VStack(spacing: 0) {
+                // Heading — upper area
+                VStack(spacing: 10) {
+                    Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
+                        .font(.system(size: 60))
+                        .foregroundStyle(.white.opacity(0.92))
+                    Text(isCorrect ? lang.studyCorrect : lang.studyWrong)
+                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
                 }
+                .padding(.top, 52)
+
+                Spacer()
+
+                // Word pair — center
+                VStack(spacing: 14) {
+                    Text(questionText)
+                        .font(.system(size: 20, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.75))
+                        .multilineTextAlignment(.center)
+
+                    Image(systemName: "arrow.down")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.45))
+
+                    Text(correctText)
+                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.horizontal, 36)
+
                 Spacer()
             }
         }
