@@ -15,10 +15,12 @@ class StudyViewModel: ObservableObject {
     private var pendingCards: [Card] = []
 
     private(set) var wrongCardIDs: Set<UUID> = []
+    private(set) var cardRatings: [UUID: SRSRating] = [:]
     private var totalAnswered: Int   = 0
     private var totalCorrect: Int    = 0
     private var startTime: Date      = Date()
     private var lastCardID: UUID?    = nil
+    private var cardAppearTime: Date = Date()
 
     // Quiz options for current card
     @Published var quizOptions: [String] = []
@@ -100,6 +102,11 @@ class StudyViewModel: ObservableObject {
         totalAnswered    += 1
         lastCardID        = item.card.id
 
+        // Behavioral SRS rating from response time
+        let elapsed  = Date().timeIntervalSince(cardAppearTime)
+        let wordLen  = max(item.card.front.count, item.card.back.count)
+        cardRatings[item.card.id] = SRSRating.from(correct: correct, elapsed: elapsed, wordLen: wordLen)
+
         guard let idx = queue.firstIndex(where: { $0.id == item.id }) else { return }
 
         if correct {
@@ -126,8 +133,9 @@ class StudyViewModel: ObservableObject {
     }
 
     func advanceAfterResult() {
-        showResult  = false
-        currentItem = nextItem()
+        showResult       = false
+        currentItem      = nextItem()
+        cardAppearTime   = Date()
         if config.mode == .quiz { buildQuizOptions() }
     }
 
@@ -151,12 +159,13 @@ class StudyViewModel: ObservableObject {
 
     func buildResult() -> SessionResult {
         SessionResult(
-            deckID:       deck.id,
-            duration:     Date().timeIntervalSince(startTime),
-            mode:         config.mode,
+            deckID:        deck.id,
+            duration:      Date().timeIntervalSince(startTime),
+            mode:          config.mode,
             totalAnswered: totalAnswered,
             totalCorrect:  totalCorrect,
-            wrongCardIDs:  wrongCardIDs
+            wrongCardIDs:  wrongCardIDs,
+            cardRatings:   cardRatings
         )
     }
 

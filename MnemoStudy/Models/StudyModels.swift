@@ -50,6 +50,7 @@ struct SessionResult {
     var totalAnswered: Int
     var totalCorrect: Int
     var wrongCardIDs: Set<UUID>
+    var cardRatings: [UUID: SRSRating] = [:]   // behavioral timing ratings
 
     var accuracy: Double {
         guard totalAnswered > 0 else { return 0 }

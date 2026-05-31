@@ -27,6 +27,19 @@ struct StudySettingsView: View {
                 ScrollView {
                     VStack(spacing: 16) {
 
+                        // Quick start presets
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Quick start")
+                                .font(.subheadline).fontWeight(.semibold).foregroundStyle(.secondary)
+                            HStack(spacing: 10) {
+                                presetButton("🎓", "Student",   .mnemoGold)   { applyPreset(mode: .typing, dir: .random,      sec: 20, req: 3) }
+                                presetButton("🌴", "Casual",    .mnemoGreen)  { applyPreset(mode: .show,   dir: .frontToBack,  sec: 10, req: 1) }
+                                presetButton("✈️", "Traveler",  .blue)        { applyPreset(mode: .show,   dir: .frontToBack,  sec: 5,  req: 1) }
+                                presetButton("🔥", "Intensive", .orange)      { applyPreset(mode: .typing, dir: .random,      sec: 20, req: 5) }
+                            }
+                        }
+                        .padding(16).glassCard().padding(.horizontal)
+
                         // Deck summary
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
@@ -117,6 +130,30 @@ struct StudySettingsView: View {
         }
         .onAppear {
             sectionSize = max(2, min(10, deck.cards.count))
+        }
+    }
+
+    private func applyPreset(mode: StudyMode, dir: StudyDirection, sec: Int, req: Int) {
+        withAnimation(.spring(duration: 0.3)) {
+            self.mode          = mode
+            self.direction     = dir
+            self.order         = .random
+            self.sectionSize   = max(2, min(sec, deck.cards.count))
+            self.requiredCorrect = req
+        }
+    }
+
+    @ViewBuilder
+    private func presetButton(_ icon: String, _ name: String, _ color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Text(icon).font(.title2)
+                Text(name).font(.caption2).fontWeight(.semibold).foregroundStyle(color)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+            .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(color.opacity(0.3), lineWidth: 1))
         }
     }
 

@@ -148,7 +148,7 @@ class LibraryViewModel: ObservableObject {
             }
             cs.lastAnswered = result.date
             if srsEnabled {
-                let rating: SRSRating = wasCorrect ? .good : .wrong
+                let rating = result.cardRatings[card.id] ?? (wasCorrect ? .good : .again)
                 cs = SRSEngine.update(cs, rating: rating)
             }
             stat.cardStats[card.id] = cs

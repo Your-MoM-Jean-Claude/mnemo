@@ -49,7 +49,20 @@ class SettingsViewModel: ObservableObject {
 
     // MARK: - Trial
 
+    private let iCloudStore = NSUbiquitousKeyValueStore.default
+    private let iCloudProKey = "mnemo_pro_unlocked"
+
+    var isProUnlocked: Bool {
+        get { iCloudStore.bool(forKey: iCloudProKey) }
+        set {
+            iCloudStore.set(newValue, forKey: iCloudProKey)
+            iCloudStore.synchronize()
+            if newValue { settings.trialStartDate = .distantPast }
+        }
+    }
+
     var isTrialActive: Bool {
+        if isProUnlocked { return true }
         let days = Calendar.current.dateComponents([.day],
             from: settings.trialStartDate, to: Date()).day ?? 0
         return days < AppSettings.trialDays

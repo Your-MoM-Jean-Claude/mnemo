@@ -13,7 +13,9 @@ struct StudyView: View {
     @State private var showResults   = false
     @State private var showingBack   = false
     @State private var sessionSaved  = false
-    @State private var finalResult: SessionResult? = nil on exit
+    @State private var finalResult: SessionResult? = nil
+
+    private let audio = AudioPlayer.shared on exit
 
     @FocusState private var inputFocused: Bool
 
@@ -128,11 +130,19 @@ struct StudyView: View {
     @ViewBuilder
     private func typingCard(item: SessionItem) -> some View {
         VStack(spacing: 24) {
-            Text(vm.currentFront)
-                .font(.system(size: 32, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+            HStack(alignment: .top, spacing: 8) {
+                Spacer()
+                Text(vm.currentFront)
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                Spacer()
+                Button { audio.speak(vm.currentFront) } label: {
+                    Image(systemName: "speaker.wave.2.fill")
+                        .font(.title3).foregroundStyle(Color.mnemoGreen.opacity(0.7))
+                }
+                .padding(.trailing, 32)
+            }
 
             TextField(lang.studyTypeAnswer, text: $typingInput)
                 .textFieldStyle(.plain)
@@ -155,18 +165,33 @@ struct StudyView: View {
     @ViewBuilder
     private func showCard(item: SessionItem) -> some View {
         VStack(spacing: 28) {
-            Text(vm.currentFront)
-                .font(.system(size: 32, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+            HStack(alignment: .top, spacing: 8) {
+                Spacer()
+                Text(vm.currentFront)
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                Spacer()
+                Button { audio.speak(vm.currentFront) } label: {
+                    Image(systemName: "speaker.wave.2.fill")
+                        .font(.title3).foregroundStyle(Color.mnemoGreen.opacity(0.7))
+                }
+                .padding(.trailing, 32)
+            }
 
             if showingBack {
-                Text(vm.currentBack)
-                    .font(.system(size: 26, weight: .medium, design: .rounded))
-                    .foregroundStyle(Color.mnemoGold)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
+                HStack(spacing: 8) {
+                    Text(vm.currentBack)
+                        .font(.system(size: 26, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color.mnemoGold)
+                        .multilineTextAlignment(.center)
+                        .padding(.leading, 32)
+                    Button { audio.speak(vm.currentBack) } label: {
+                        Image(systemName: "speaker.wave.2.fill")
+                            .font(.callout).foregroundStyle(Color.mnemoGold.opacity(0.7))
+                    }
+                    .padding(.trailing, 32)
+                }
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
 
                 HStack(spacing: 16) {
