@@ -31,6 +31,32 @@
 		AA000022 /* StudySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100022 /* StudySettingsView.swift */; };
 		AA000023 /* StudyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100023 /* StudyView.swift */; };
 		AA000024 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA100024 /* Assets.xcassets */; };
+		AA000025 /* BundledLibraryLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100025 /* BundledLibraryLoader.swift */; };
+		AB000001 /* CZ-AJ_1_Pozdravy.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100001 /* CZ-AJ_1_Pozdravy.txt */; };
+		AB000002 /* CZ-AJ_2_Slovesa.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100002 /* CZ-AJ_2_Slovesa.txt */; };
+		AB000003 /* CZ-AJ_3_Pridavna_jmena.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100003 /* CZ-AJ_3_Pridavna_jmena.txt */; };
+		AB000004 /* CZ-AJ_4_Podstatna_jmena.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100004 /* CZ-AJ_4_Podstatna_jmena.txt */; };
+		AB000005 /* CZ-AJ_5_Fraze.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100005 /* CZ-AJ_5_Fraze.txt */; };
+		AB000006 /* ES-AJ_1_Saludos.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100006 /* ES-AJ_1_Saludos.txt */; };
+		AB000007 /* ES-AJ_2_Verbos.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100007 /* ES-AJ_2_Verbos.txt */; };
+		AB000008 /* ES-AJ_3_Adjetivos.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100008 /* ES-AJ_3_Adjetivos.txt */; };
+		AB000009 /* ES-AJ_4_Sustantivos.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100009 /* ES-AJ_4_Sustantivos.txt */; };
+		AB000010 /* ES-AJ_5_Frases.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100010 /* ES-AJ_5_Frases.txt */; };
+		AB000011 /* FR-AJ_1_Salutations.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100011 /* FR-AJ_1_Salutations.txt */; };
+		AB000012 /* FR-AJ_2_Verbes.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100012 /* FR-AJ_2_Verbes.txt */; };
+		AB000013 /* FR-AJ_3_Adjectifs.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100013 /* FR-AJ_3_Adjectifs.txt */; };
+		AB000014 /* FR-AJ_4_Noms.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100014 /* FR-AJ_4_Noms.txt */; };
+		AB000015 /* FR-AJ_5_Phrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100015 /* FR-AJ_5_Phrases.txt */; };
+		AB000016 /* DE-AJ_1_Begruessungen.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100016 /* DE-AJ_1_Begruessungen.txt */; };
+		AB000017 /* DE-AJ_2_Verben.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100017 /* DE-AJ_2_Verben.txt */; };
+		AB000018 /* DE-AJ_3_Adjektive.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100018 /* DE-AJ_3_Adjektive.txt */; };
+		AB000019 /* DE-AJ_4_Nomen.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100019 /* DE-AJ_4_Nomen.txt */; };
+		AB000020 /* DE-AJ_5_Phrasen.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100020 /* DE-AJ_5_Phrasen.txt */; };
+		AB000021 /* ZH-AJ_1_Pozdravy.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100021 /* ZH-AJ_1_Pozdravy.txt */; };
+		AB000022 /* ZH-AJ_2_Slovesa.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100022 /* ZH-AJ_2_Slovesa.txt */; };
+		AB000023 /* ZH-AJ_3_Pridavna_jmena.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100023 /* ZH-AJ_3_Pridavna_jmena.txt */; };
+		AB000024 /* ZH-AJ_4_Podstatna_jmena.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100024 /* ZH-AJ_4_Podstatna_jmena.txt */; };
+		AB000025 /* ZH-AJ_5_Fraze.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100025 /* ZH-AJ_5_Fraze.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,6 +84,32 @@
 		AA100022 /* StudySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudySettingsView.swift; sourceTree = "<group>"; };
 		AA100023 /* StudyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyView.swift; sourceTree = "<group>"; };
 		AA100024 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AA100025 /* BundledLibraryLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundledLibraryLoader.swift; sourceTree = "<group>"; };
+		AB100001 /* CZ-AJ_1_Pozdravy.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CZ-AJ_1_Pozdravy.txt; sourceTree = "<group>"; };
+		AB100002 /* CZ-AJ_2_Slovesa.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CZ-AJ_2_Slovesa.txt; sourceTree = "<group>"; };
+		AB100003 /* CZ-AJ_3_Pridavna_jmena.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CZ-AJ_3_Pridavna_jmena.txt; sourceTree = "<group>"; };
+		AB100004 /* CZ-AJ_4_Podstatna_jmena.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CZ-AJ_4_Podstatna_jmena.txt; sourceTree = "<group>"; };
+		AB100005 /* CZ-AJ_5_Fraze.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CZ-AJ_5_Fraze.txt; sourceTree = "<group>"; };
+		AB100006 /* ES-AJ_1_Saludos.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ES-AJ_1_Saludos.txt; sourceTree = "<group>"; };
+		AB100007 /* ES-AJ_2_Verbos.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ES-AJ_2_Verbos.txt; sourceTree = "<group>"; };
+		AB100008 /* ES-AJ_3_Adjetivos.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ES-AJ_3_Adjetivos.txt; sourceTree = "<group>"; };
+		AB100009 /* ES-AJ_4_Sustantivos.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ES-AJ_4_Sustantivos.txt; sourceTree = "<group>"; };
+		AB100010 /* ES-AJ_5_Frases.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ES-AJ_5_Frases.txt; sourceTree = "<group>"; };
+		AB100011 /* FR-AJ_1_Salutations.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = FR-AJ_1_Salutations.txt; sourceTree = "<group>"; };
+		AB100012 /* FR-AJ_2_Verbes.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = FR-AJ_2_Verbes.txt; sourceTree = "<group>"; };
+		AB100013 /* FR-AJ_3_Adjectifs.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = FR-AJ_3_Adjectifs.txt; sourceTree = "<group>"; };
+		AB100014 /* FR-AJ_4_Noms.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = FR-AJ_4_Noms.txt; sourceTree = "<group>"; };
+		AB100015 /* FR-AJ_5_Phrases.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = FR-AJ_5_Phrases.txt; sourceTree = "<group>"; };
+		AB100016 /* DE-AJ_1_Begruessungen.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = DE-AJ_1_Begruessungen.txt; sourceTree = "<group>"; };
+		AB100017 /* DE-AJ_2_Verben.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = DE-AJ_2_Verben.txt; sourceTree = "<group>"; };
+		AB100018 /* DE-AJ_3_Adjektive.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = DE-AJ_3_Adjektive.txt; sourceTree = "<group>"; };
+		AB100019 /* DE-AJ_4_Nomen.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = DE-AJ_4_Nomen.txt; sourceTree = "<group>"; };
+		AB100020 /* DE-AJ_5_Phrasen.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = DE-AJ_5_Phrasen.txt; sourceTree = "<group>"; };
+		AB100021 /* ZH-AJ_1_Pozdravy.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ZH-AJ_1_Pozdravy.txt; sourceTree = "<group>"; };
+		AB100022 /* ZH-AJ_2_Slovesa.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ZH-AJ_2_Slovesa.txt; sourceTree = "<group>"; };
+		AB100023 /* ZH-AJ_3_Pridavna_jmena.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ZH-AJ_3_Pridavna_jmena.txt; sourceTree = "<group>"; };
+		AB100024 /* ZH-AJ_4_Podstatna_jmena.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ZH-AJ_4_Podstatna_jmena.txt; sourceTree = "<group>"; };
+		AB100025 /* ZH-AJ_5_Fraze.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ZH-AJ_5_Fraze.txt; sourceTree = "<group>"; };
 		AAPROD001 /* MnemoStudy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MnemoStudy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -88,6 +140,7 @@
 				AAGRP0003 /* ViewModels */,
 				AAGRP0004 /* Views */,
 				AA100024 /* Assets.xcassets */,
+				ABGRP0001 /* Resources */,
 			);
 			path = MnemoStudy;
 			sourceTree = "<group>";
@@ -102,6 +155,7 @@
 				AA100006 /* SRSEngine.swift */,
 				AA100007 /* Strings.swift */,
 				AA100008 /* StudyModels.swift */,
+				AA100025 /* BundledLibraryLoader.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -191,6 +245,86 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		ABGRP0001 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				ABGRP0002 /* BundledLibraries */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		ABGRP0002 /* BundledLibraries */ = {
+			isa = PBXGroup;
+			children = (
+				ABGRP0003 /* CZ-AJ */,
+				ABGRP0004 /* ES-AJ */,
+				ABGRP0005 /* FR-AJ */,
+				ABGRP0006 /* DE-AJ */,
+				ABGRP0007 /* ZH-AJ */,
+			);
+			path = BundledLibraries;
+			sourceTree = "<group>";
+		};
+		ABGRP0003 /* CZ-AJ */ = {
+			isa = PBXGroup;
+			children = (
+				AB100001 /* CZ-AJ_1_Pozdravy.txt */,
+				AB100002 /* CZ-AJ_2_Slovesa.txt */,
+				AB100003 /* CZ-AJ_3_Pridavna_jmena.txt */,
+				AB100004 /* CZ-AJ_4_Podstatna_jmena.txt */,
+				AB100005 /* CZ-AJ_5_Fraze.txt */,
+			);
+			path = "CZ-AJ";
+			sourceTree = "<group>";
+		};
+		ABGRP0004 /* ES-AJ */ = {
+			isa = PBXGroup;
+			children = (
+				AB100006 /* ES-AJ_1_Saludos.txt */,
+				AB100007 /* ES-AJ_2_Verbos.txt */,
+				AB100008 /* ES-AJ_3_Adjetivos.txt */,
+				AB100009 /* ES-AJ_4_Sustantivos.txt */,
+				AB100010 /* ES-AJ_5_Frases.txt */,
+			);
+			path = "ES-AJ";
+			sourceTree = "<group>";
+		};
+		ABGRP0005 /* FR-AJ */ = {
+			isa = PBXGroup;
+			children = (
+				AB100011 /* FR-AJ_1_Salutations.txt */,
+				AB100012 /* FR-AJ_2_Verbes.txt */,
+				AB100013 /* FR-AJ_3_Adjectifs.txt */,
+				AB100014 /* FR-AJ_4_Noms.txt */,
+				AB100015 /* FR-AJ_5_Phrases.txt */,
+			);
+			path = "FR-AJ";
+			sourceTree = "<group>";
+		};
+		ABGRP0006 /* DE-AJ */ = {
+			isa = PBXGroup;
+			children = (
+				AB100016 /* DE-AJ_1_Begruessungen.txt */,
+				AB100017 /* DE-AJ_2_Verben.txt */,
+				AB100018 /* DE-AJ_3_Adjektive.txt */,
+				AB100019 /* DE-AJ_4_Nomen.txt */,
+				AB100020 /* DE-AJ_5_Phrasen.txt */,
+			);
+			path = "DE-AJ";
+			sourceTree = "<group>";
+		};
+		ABGRP0007 /* ZH-AJ */ = {
+			isa = PBXGroup;
+			children = (
+				AB100021 /* ZH-AJ_1_Pozdravy.txt */,
+				AB100022 /* ZH-AJ_2_Slovesa.txt */,
+				AB100023 /* ZH-AJ_3_Pridavna_jmena.txt */,
+				AB100024 /* ZH-AJ_4_Podstatna_jmena.txt */,
+				AB100025 /* ZH-AJ_5_Fraze.txt */,
+			);
+			path = "ZH-AJ";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -252,6 +386,31 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA000024 /* Assets.xcassets in Resources */,
+				AB000001 /* CZ-AJ_1_Pozdravy.txt in Resources */,
+				AB000002 /* CZ-AJ_2_Slovesa.txt in Resources */,
+				AB000003 /* CZ-AJ_3_Pridavna_jmena.txt in Resources */,
+				AB000004 /* CZ-AJ_4_Podstatna_jmena.txt in Resources */,
+				AB000005 /* CZ-AJ_5_Fraze.txt in Resources */,
+				AB000006 /* ES-AJ_1_Saludos.txt in Resources */,
+				AB000007 /* ES-AJ_2_Verbos.txt in Resources */,
+				AB000008 /* ES-AJ_3_Adjetivos.txt in Resources */,
+				AB000009 /* ES-AJ_4_Sustantivos.txt in Resources */,
+				AB000010 /* ES-AJ_5_Frases.txt in Resources */,
+				AB000011 /* FR-AJ_1_Salutations.txt in Resources */,
+				AB000012 /* FR-AJ_2_Verbes.txt in Resources */,
+				AB000013 /* FR-AJ_3_Adjectifs.txt in Resources */,
+				AB000014 /* FR-AJ_4_Noms.txt in Resources */,
+				AB000015 /* FR-AJ_5_Phrases.txt in Resources */,
+				AB000016 /* DE-AJ_1_Begruessungen.txt in Resources */,
+				AB000017 /* DE-AJ_2_Verben.txt in Resources */,
+				AB000018 /* DE-AJ_3_Adjektive.txt in Resources */,
+				AB000019 /* DE-AJ_4_Nomen.txt in Resources */,
+				AB000020 /* DE-AJ_5_Phrasen.txt in Resources */,
+				AB000021 /* ZH-AJ_1_Pozdravy.txt in Resources */,
+				AB000022 /* ZH-AJ_2_Slovesa.txt in Resources */,
+				AB000023 /* ZH-AJ_3_Pridavna_jmena.txt in Resources */,
+				AB000024 /* ZH-AJ_4_Podstatna_jmena.txt in Resources */,
+				AB000025 /* ZH-AJ_5_Fraze.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,6 +444,7 @@
 				AA000021 /* ResultsView.swift in Sources */,
 				AA000022 /* StudySettingsView.swift in Sources */,
 				AA000023 /* StudyView.swift in Sources */,
+				AA000025 /* BundledLibraryLoader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -378,7 +538,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = 4SK4LT94PV;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mnemo Study";
@@ -406,7 +566,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = 4SK4LT94PV;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mnemo Study";

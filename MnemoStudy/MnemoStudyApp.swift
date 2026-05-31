@@ -7,6 +7,12 @@ struct MnemoStudyApp: App {
 
     @State private var showSplash = true
 
+    init() {
+        let lib = LibraryViewModel()
+        BundledLibraryLoader.loadInto(lib)
+        _library = StateObject(wrappedValue: lib)
+    }
+
     var body: some Scene {
         WindowGroup {
             Group {

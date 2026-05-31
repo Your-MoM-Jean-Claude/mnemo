@@ -42,6 +42,16 @@ extension AppLanguage {
           "Formát: slovo - překlad / alternativa",
           "Formato: palabra - traducción / alternativa")
     }
+    var editorFormatHintTitle: String { t("Format guide", "Formát", "Formato") }
+    var editorFormatHintBody: String  {
+        t(
+            "One pair per line:  front - back\nAlternatives: front - answer1 / answer2\nSkip a line or use # for comments\n\nExamples:\nhello - ahoj / čau\nrun - běžet / utíkat",
+            "Jeden pár na řádek:  přední - zadní\nAlternativy: přední - odpověď1 / odpověď2\nPrázdný řádek nebo # = komentář\n\nPříklady:\nhello - ahoj / čau\nrun - běžet / utíkat",
+            "Un par por línea:  frente - reverso\nAlternativas: frente - resp1 / resp2\nLínea vacía o # = comentario\n\nEjemplos:\nhello - hola / buenas\nrun - correr / huir"
+        )
+    }
+    var editorCardsText: String   { t("Cards (one per line)", "Kartičky (jeden pár na řádek)", "Tarjetas (un par por línea)") }
+    var editorCardCount: String   { t("cards", "karet", "tarjetas") }
     var editorSave: String        { t("Save",            "Uložit",           "Guardar") }
     var editorCancel: String      { t("Cancel",          "Zrušit",           "Cancelar") }
     var editorPaste: String       { t("Paste text",      "Vložit text",      "Pegar texto") }
