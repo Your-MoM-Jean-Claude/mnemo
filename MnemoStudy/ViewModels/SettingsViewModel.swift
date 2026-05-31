@@ -1,0 +1,90 @@
+import Foundation
+import UserNotifications
+import Combine
+
+class SettingsViewModel: ObservableObject {
+    @Published var settings: AppSettings {
+        didSet { save() }
+    }
+
+    private let key = "appSettings"
+
+    init() {
+        if let data = UserDefaults.standard.data(forKey: "appSettings"),
+           let s = try? JSONDecoder().decode(AppSettings.self, from: data) {
+            settings = s
+        } else {
+            settings = AppSettings()
+        }
+    }
+
+    var language: AppLanguage {
+        get { settings.language }
+        set { settings.language = newValue }
+    }
+
+    var srsEnabled: Bool {
+        get { settings.srsEnabled }
+        set { settings.srsEnabled = newValue }
+    }
+
+    var dailyGoalMinutes: Int {
+        get { settings.dailyGoalMinutes }
+        set { settings.dailyGoalMinutes = newValue }
+    }
+
+    // MARK: - Trial
+
+    var isTrialActive: Bool {
+        let days = Calendar.current.dateComponents([.day],
+            from: settings.trialStartDate, to: Date()).day ?? 0
+        return days < AppSettings.trialDays
+    }
+
+    var trialDaysRemaining: Int {
+        let days = Calendar.current.dateComponents([.day],
+            from: settings.trialStartDate, to: Date()).day ?? 0
+        return max(0, AppSettings.trialDays - days)
+    }
+
+    // MARK: - Notifications
+
+    func addNotification(hour: Int, minute: Int) {
+        guard settings.notifications.count < 3 else { return }
+        settings.notifications.append(NotificationTime(hour: hour, minute: minute))
+        scheduleNotifications()
+    }
+
+    func removeNotification(id: UUID) {
+        settings.notifications.removeAll { $0.id == id }
+        scheduleNotifications()
+    }
+
+    func scheduleNotifications() {
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        for n in settings.notifications {
+            let content = UNMutableNotificationContent()
+            content.title = "Mnemo Study"
+            content.body  = "Time to study! 📚"
+            content.sound = .default
+            var comps = DateComponents()
+            comps.hour   = n.hour
+            comps.minute = n.minute
+            let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
+            let req = UNNotificationRequest(identifier: n.id.uuidString, content: content, trigger: trigger)
+            UNUserNotificationCenter.current().add(req)
+        }
+    }
+
+    func requestNotificationPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
+    }
+
+    // MARK: - Persistence
+
+    private func save() {
+        if let data = try? JSONEncoder().encode(settings) {
+            UserDefaults.standard.set(data, forKey: key)
+        }
+    }
+}

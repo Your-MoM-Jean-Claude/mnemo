@@ -1,0 +1,455 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AA000001 /* MnemoStudyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100001 /* MnemoStudyApp.swift */; };
+		AA000002 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100002 /* AppSettings.swift */; };
+		AA000003 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100003 /* Card.swift */; };
+		AA000004 /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100004 /* Deck.swift */; };
+		AA000005 /* FileParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100005 /* FileParser.swift */; };
+		AA000006 /* SRSEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100006 /* SRSEngine.swift */; };
+		AA000007 /* Strings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100007 /* Strings.swift */; };
+		AA000008 /* StudyModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100008 /* StudyModels.swift */; };
+		AA000009 /* LibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100009 /* LibraryViewModel.swift */; };
+		AA000010 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100010 /* SettingsViewModel.swift */; };
+		AA000011 /* StudyViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100011 /* StudyViewModel.swift */; };
+		AA000012 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100012 /* DesignSystem.swift */; };
+		AA000013 /* DeckEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100013 /* DeckEditorView.swift */; };
+		AA000014 /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100014 /* ImportView.swift */; };
+		AA000015 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100015 /* LibraryView.swift */; };
+		AA000016 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100016 /* MainTabView.swift */; };
+		AA000017 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100017 /* PaywallView.swift */; };
+		AA000018 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100018 /* SettingsView.swift */; };
+		AA000019 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100019 /* SplashView.swift */; };
+		AA000020 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100020 /* StatisticsView.swift */; };
+		AA000021 /* ResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100021 /* ResultsView.swift */; };
+		AA000022 /* StudySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100022 /* StudySettingsView.swift */; };
+		AA000023 /* StudyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100023 /* StudyView.swift */; };
+		AA000024 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA100024 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		AA100001 /* MnemoStudyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MnemoStudyApp.swift; sourceTree = "<group>"; };
+		AA100002 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		AA100003 /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
+		AA100004 /* Deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deck.swift; sourceTree = "<group>"; };
+		AA100005 /* FileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileParser.swift; sourceTree = "<group>"; };
+		AA100006 /* SRSEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRSEngine.swift; sourceTree = "<group>"; };
+		AA100007 /* Strings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strings.swift; sourceTree = "<group>"; };
+		AA100008 /* StudyModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyModels.swift; sourceTree = "<group>"; };
+		AA100009 /* LibraryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewModel.swift; sourceTree = "<group>"; };
+		AA100010 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		AA100011 /* StudyViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyViewModel.swift; sourceTree = "<group>"; };
+		AA100012 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
+		AA100013 /* DeckEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckEditorView.swift; sourceTree = "<group>"; };
+		AA100014 /* ImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
+		AA100015 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
+		AA100016 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		AA100017 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		AA100018 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AA100019 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
+		AA100020 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
+		AA100021 /* ResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsView.swift; sourceTree = "<group>"; };
+		AA100022 /* StudySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudySettingsView.swift; sourceTree = "<group>"; };
+		AA100023 /* StudyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyView.swift; sourceTree = "<group>"; };
+		AA100024 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AAPROD001 /* MnemoStudy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MnemoStudy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AABP0001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AAGRP0000 = {
+			isa = PBXGroup;
+			children = (
+				AAGRP0001 /* MnemoStudy */,
+				AAGRP0011 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AAGRP0001 /* MnemoStudy */ = {
+			isa = PBXGroup;
+			children = (
+				AA100001 /* MnemoStudyApp.swift */,
+				AAGRP0002 /* Models */,
+				AAGRP0003 /* ViewModels */,
+				AAGRP0004 /* Views */,
+				AA100024 /* Assets.xcassets */,
+			);
+			path = MnemoStudy;
+			sourceTree = "<group>";
+		};
+		AAGRP0002 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				AA100002 /* AppSettings.swift */,
+				AA100003 /* Card.swift */,
+				AA100004 /* Deck.swift */,
+				AA100005 /* FileParser.swift */,
+				AA100006 /* SRSEngine.swift */,
+				AA100007 /* Strings.swift */,
+				AA100008 /* StudyModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AAGRP0003 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				AA100009 /* LibraryViewModel.swift */,
+				AA100010 /* SettingsViewModel.swift */,
+				AA100011 /* StudyViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		AAGRP0004 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				AA100016 /* MainTabView.swift */,
+				AA100019 /* SplashView.swift */,
+				AAGRP0005 /* Library */,
+				AAGRP0006 /* Study */,
+				AAGRP0007 /* Statistics */,
+				AAGRP0008 /* Settings */,
+				AAGRP0009 /* Paywall */,
+				AAGRP0010 /* Components */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		AAGRP0005 /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				AA100013 /* DeckEditorView.swift */,
+				AA100014 /* ImportView.swift */,
+				AA100015 /* LibraryView.swift */,
+			);
+			path = Library;
+			sourceTree = "<group>";
+		};
+		AAGRP0006 /* Study */ = {
+			isa = PBXGroup;
+			children = (
+				AA100021 /* ResultsView.swift */,
+				AA100022 /* StudySettingsView.swift */,
+				AA100023 /* StudyView.swift */,
+			);
+			path = Study;
+			sourceTree = "<group>";
+		};
+		AAGRP0007 /* Statistics */ = {
+			isa = PBXGroup;
+			children = (
+				AA100020 /* StatisticsView.swift */,
+			);
+			path = Statistics;
+			sourceTree = "<group>";
+		};
+		AAGRP0008 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				AA100018 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		AAGRP0009 /* Paywall */ = {
+			isa = PBXGroup;
+			children = (
+				AA100017 /* PaywallView.swift */,
+			);
+			path = Paywall;
+			sourceTree = "<group>";
+		};
+		AAGRP0010 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				AA100012 /* DesignSystem.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		AAGRP0011 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AAPROD001 /* MnemoStudy.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AATGT0001 /* MnemoStudy */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AACFG0010 /* Build configuration list for PBXNativeTarget "MnemoStudy" */;
+			buildPhases = (
+				AABP0002 /* Sources */,
+				AABP0001 /* Frameworks */,
+				AABP0003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MnemoStudy;
+			productName = MnemoStudy;
+			productReference = AAPROD001 /* MnemoStudy.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AAPROJ001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					AATGT0001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = AACFG0001 /* Build configuration list for PBXProject "MnemoStudy" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				cs,
+				es,
+			);
+			mainGroup = AAGRP0000;
+			productRefGroup = AAGRP0011 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AATGT0001 /* MnemoStudy */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AABP0003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000024 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AABP0002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000001 /* MnemoStudyApp.swift in Sources */,
+				AA000002 /* AppSettings.swift in Sources */,
+				AA000003 /* Card.swift in Sources */,
+				AA000004 /* Deck.swift in Sources */,
+				AA000005 /* FileParser.swift in Sources */,
+				AA000006 /* SRSEngine.swift in Sources */,
+				AA000007 /* Strings.swift in Sources */,
+				AA000008 /* StudyModels.swift in Sources */,
+				AA000009 /* LibraryViewModel.swift in Sources */,
+				AA000010 /* SettingsViewModel.swift in Sources */,
+				AA000011 /* StudyViewModel.swift in Sources */,
+				AA000012 /* DesignSystem.swift in Sources */,
+				AA000013 /* DeckEditorView.swift in Sources */,
+				AA000014 /* ImportView.swift in Sources */,
+				AA000015 /* LibraryView.swift in Sources */,
+				AA000016 /* MainTabView.swift in Sources */,
+				AA000017 /* PaywallView.swift in Sources */,
+				AA000018 /* SettingsView.swift in Sources */,
+				AA000019 /* SplashView.swift in Sources */,
+				AA000020 /* StatisticsView.swift in Sources */,
+				AA000021 /* ResultsView.swift in Sources */,
+				AA000022 /* StudySettingsView.swift in Sources */,
+				AA000023 /* StudyView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AACFG0002 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_CYCLE = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AACFG0003 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AACFG0012 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4SK4LT94PV;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Mnemo Study";
+				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "Mnemo Study uses notifications to remind you to study.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jirifilipec.mnemoapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		AACFG0013 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4SK4LT94PV;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Mnemo Study";
+				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "Mnemo Study uses notifications to remind you to study.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jirifilipec.mnemoapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AACFG0001 /* Build configuration list for PBXProject "MnemoStudy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AACFG0002 /* Debug */,
+				AACFG0003 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AACFG0010 /* Build configuration list for PBXNativeTarget "MnemoStudy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AACFG0012 /* Debug */,
+				AACFG0013 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AAPROJ001 /* Project object */;
+}

@@ -1,4 +1,4 @@
-name: Deploy LexiDrill to App Store
+name: Deploy MnemoStudy to App Store
 
 on:
   workflow_dispatch:
@@ -20,7 +20,7 @@ jobs:
 
       - name: Fix icon (remove alpha, resize to 1024x1024)
         run: |
-          ICON=LexiDrill/Assets.xcassets/AppIcon.appiconset/imgmnemo.png
+          ICON=MnemoStudy/Assets.xcassets/AppIcon.appiconset/AppIcon.png
           python3 fix_icon.py "$ICON"
           sips --resampleHeightWidth 1024 1024 "$ICON"
 
@@ -61,11 +61,11 @@ jobs:
           fi
           xcodebuild -version
           xcodebuild archive \
-            -project LexiDrill.xcodeproj \
-            -scheme LexiDrill \
+            -project MnemoStudy.xcodeproj \
+            -scheme MnemoStudy \
             -configuration Release \
             -destination 'generic/platform=iOS' \
-            -archivePath LexiDrill.xcarchive \
+            -archivePath MnemoStudy.xcarchive \
             -quiet \
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE="$PROF_UUID" \
@@ -74,7 +74,7 @@ jobs:
       - name: Set encryption compliance
         run: |
           /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" \
-            LexiDrill.xcarchive/Products/Applications/LexiDrill.app/Info.plist
+            MnemoStudy.xcarchive/Products/Applications/MnemoStudy.app/Info.plist
 
       - name: Export IPA
         run: |
@@ -86,7 +86,7 @@ jobs:
           /usr/libexec/PlistBuddy -c "Add :provisioningProfiles dict" $PLIST
           /usr/libexec/PlistBuddy -c "Add :provisioningProfiles:com.jirifilipec.mnemoapp string $PROF_UUID" $PLIST
           xcodebuild -exportArchive \
-            -archivePath LexiDrill.xcarchive \
+            -archivePath MnemoStudy.xcarchive \
             -exportPath Export \
             -exportOptionsPlist ExportOptions.plist \
             -quiet
@@ -94,7 +94,7 @@ jobs:
       - name: Upload to App Store
         run: |
           xcrun altool --upload-app \
-            -f Export/LexiDrill.ipa \
+            -f Export/MnemoStudy.ipa \
             -t ios \
             --apiKey "$ASC_KEY_ID" \
             --apiIssuer "$ASC_ISSUER_ID"
