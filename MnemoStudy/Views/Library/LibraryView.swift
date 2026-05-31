@@ -199,22 +199,21 @@ struct TempDeckCard: View {
 
     var body: some View {
         Button(action: onTap) {
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .foregroundStyle(.orange)
-                    .font(.caption)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(lang.libraryTemporary)
-                        .font(.caption).fontWeight(.semibold).foregroundStyle(.orange)
-                    Text("\(deck.cards.count) \(lang.libraryCards)")
-                        .font(.caption2).foregroundStyle(.secondary)
-                }
+                    .font(.system(size: 10))
+                Text(lang.libraryTemporary)
+                    .font(.caption2).fontWeight(.semibold).foregroundStyle(.orange)
+                Text("· \(deck.cards.count) \(lang.libraryCards)")
+                    .font(.caption2).foregroundStyle(.secondary)
                 Spacer()
-                Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.secondary)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 9)).foregroundStyle(.secondary)
             }
-            .padding(.horizontal, 14).padding(.vertical, 10)
-            .background(Color.orange.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
-            .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.orange.opacity(0.25), lineWidth: 1))
+            .padding(.horizontal, 10).padding(.vertical, 6)
+            .background(Color.orange.opacity(0.07), in: RoundedRectangle(cornerRadius: 8))
+            .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color.orange.opacity(0.2), lineWidth: 1))
         }
     }
 }
