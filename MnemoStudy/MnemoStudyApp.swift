@@ -16,7 +16,11 @@ struct MnemoStudyApp: App {
     var body: some Scene {
         WindowGroup {
             Group {
-                if showSplash {
+                if !settings.settings.hasSeenOnboarding {
+                    OnboardingView {
+                        settings.settings.hasSeenOnboarding = true
+                    }
+                } else if showSplash {
                     SplashView(lastDeck: library.lastStudiedEntry,
                                lang: settings.language,
                                onDismiss: { withAnimation(.easeOut(duration: 0.4)) { showSplash = false } })

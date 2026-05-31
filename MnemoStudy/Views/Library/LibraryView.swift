@@ -43,6 +43,22 @@ struct LibraryView: View {
                                           onDelete: { library.deleteDeck(id: $0) },
                                           onDeleteFolder: { library.deleteFolder(id: $0) })
                         }
+
+                        // Empty state
+                        if filteredDecks.isEmpty && library.folders.isEmpty && searchText.isEmpty {
+                            VStack(spacing: 16) {
+                                Image(systemName: "books.vertical")
+                                    .font(.system(size: 52))
+                                    .foregroundStyle(Color.mnemoGreen.opacity(0.5))
+                                Text(lang.libraryEmpty)
+                                    .font(.title3).fontWeight(.semibold).foregroundStyle(.white)
+                                Text("Tap + to add a deck or import a file")
+                                    .font(.subheadline).foregroundStyle(.secondary)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, 80)
+                        }
                     }
                     .padding(16)
                 }
@@ -217,6 +233,7 @@ struct FolderSection: View {
     @State private var isExpanded = false
 
     var decks: [Deck] { library.decks.filter { $0.folderID == folder.id && !$0.isTemporary } }
+    var totalCards: Int { decks.reduce(0) { $0 + $1.cards.count } }
 
     var body: some View {
         VStack(spacing: 8) {
@@ -227,7 +244,8 @@ struct FolderSection: View {
                     Image(systemName: "folder.fill").foregroundStyle(Color.mnemoGold)
                     Text(folder.name).font(.subheadline).fontWeight(.semibold).foregroundStyle(.white)
                     Spacer()
-                    Text("\(decks.count)").font(.caption).foregroundStyle(.secondary)
+                    Text("\(decks.count) · \(totalCards) \(lang.libraryCards)")
+                        .font(.caption).foregroundStyle(.secondary)
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                         .font(.caption).foregroundStyle(.secondary)
                 }

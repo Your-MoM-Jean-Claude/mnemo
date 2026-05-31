@@ -25,10 +25,37 @@ struct StatisticsView: View {
                     ScrollView {
                         VStack(spacing: 16) {
 
+                            // Daily goal progress
+                            let goalMin = settings.dailyGoalMinutes
+                            let todayMin = library.todayMinutes
+                            let ratio = goalMin > 0 ? min(1.0, todayMin / Double(goalMin)) : 0.0
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Label(lang.settingsDailyGoal, systemImage: "target")
+                                        .font(.subheadline).fontWeight(.semibold).foregroundStyle(.white)
+                                    Spacer()
+                                    Text("\(Int(todayMin))m / \(goalMin)m")
+                                        .font(.caption).foregroundStyle(Color.mnemoGold)
+                                }
+                                GeometryReader { geo in
+                                    ZStack(alignment: .leading) {
+                                        Capsule().fill(Color.white.opacity(0.08)).frame(height: 8)
+                                        Capsule().fill(
+                                            LinearGradient(colors: [Color.mnemoGreen, Color.mnemoGold],
+                                                           startPoint: .leading, endPoint: .trailing))
+                                            .frame(width: geo.size.width * ratio, height: 8)
+                                            .animation(.spring(duration: 0.5), value: ratio)
+                                    }
+                                }
+                                .frame(height: 8)
+                            }
+                            .padding(14).glassCard().padding(.horizontal)
+
                             // Top 3 headline stats
                             HStack(spacing: 12) {
                                 headlineStat(
                                     value: "\(library.studyStreak)",
+                                    sublabel: "best \(library.bestStreak)",
                                     label: lang.statsStreak,
                                     icon: "flame.fill",
                                     color: .orange)
@@ -36,6 +63,7 @@ struct StatisticsView: View {
                                 Button { showAccuracyDetail.toggle() } label: {
                                     headlineStat(
                                         value: "\(Int(library.overallAccuracy * 100))%",
+                                        sublabel: nil,
                                         label: lang.statsAccuracy,
                                         icon: "target",
                                         color: .mnemoGreen)
@@ -44,6 +72,7 @@ struct StatisticsView: View {
                                 Button { showSessionsDetail.toggle() } label: {
                                     headlineStat(
                                         value: "\(library.totalSessions)",
+                                        sublabel: nil,
                                         label: lang.statsSessions,
                                         icon: "book.fill",
                                         color: .mnemoGold)
@@ -111,13 +140,16 @@ struct StatisticsView: View {
     // MARK: - Helpers
 
     @ViewBuilder
-    private func headlineStat(value: String, label: String, icon: String, color: Color) -> some View {
-        VStack(spacing: 8) {
+    private func headlineStat(value: String, sublabel: String?, label: String, icon: String, color: Color) -> some View {
+        VStack(spacing: 6) {
             Image(systemName: icon).font(.title2).foregroundStyle(color)
             Text(value)
                 .font(.system(size: 24, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
             Text(label).font(.caption2).foregroundStyle(.secondary)
+            if let sub = sublabel {
+                Text(sub).font(.caption2).foregroundStyle(color.opacity(0.7))
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(14).glassCard()

@@ -25,7 +25,10 @@
 		AA000016 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100016 /* MainTabView.swift */; };
 		AA000017 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100017 /* PaywallView.swift */; };
 		AA000018 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100018 /* SettingsView.swift */; };
-		AA000019 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100019 /* SplashView.swift */; };
+		AA000019 /* SplashView.swift in Sources */,
+				AB000002 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100019 /* SplashView.swift */,
+				AB000001 /* OnboardingView.swift */; };
+		AB000002 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB000001 /* OnboardingView.swift */; };
 		AA000020 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100020 /* StatisticsView.swift */; };
 		AA000021 /* ResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100021 /* ResultsView.swift */; };
 		AA000022 /* StudySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100022 /* StudySettingsView.swift */; };
@@ -78,7 +81,9 @@
 		AA100016 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		AA100017 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		AA100018 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		AA100019 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
+		AA100019 /* SplashView.swift */,
+				AB000001 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
+		AB000001 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		AA100020 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
 		AA100021 /* ResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsView.swift; sourceTree = "<group>"; };
 		AA100022 /* StudySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudySettingsView.swift; sourceTree = "<group>"; };
@@ -175,6 +180,7 @@
 			children = (
 				AA100016 /* MainTabView.swift */,
 				AA100019 /* SplashView.swift */,
+				AB000001 /* OnboardingView.swift */,
 				AAGRP0005 /* Library */,
 				AAGRP0006 /* Study */,
 				AAGRP0007 /* Statistics */,
@@ -440,6 +446,7 @@
 				AA000017 /* PaywallView.swift in Sources */,
 				AA000018 /* SettingsView.swift in Sources */,
 				AA000019 /* SplashView.swift in Sources */,
+				AB000002 /* OnboardingView.swift in Sources */,
 				AA000020 /* StatisticsView.swift in Sources */,
 				AA000021 /* ResultsView.swift in Sources */,
 				AA000022 /* StudySettingsView.swift in Sources */,
@@ -538,7 +545,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_TEAM = 4SK4LT94PV;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mnemo Study";
@@ -566,7 +573,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_TEAM = 4SK4LT94PV;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mnemo Study";

@@ -227,6 +227,21 @@ class LibraryViewModel: ObservableObject {
 
     // MARK: - Global stats (for StatisticsView)
 
+    var bestStreak: Int {
+        let fmt = DateFormatter(); fmt.dateFormat = "yyyy-MM-dd"
+        var allDates = Set<String>()
+        for s in deckStats.values { for r in s.sessions { allDates.insert(fmt.string(from: r.date)) } }
+        let cal = Calendar.current
+        let sorted = allDates.compactMap { fmt.date(from: $0) }.sorted()
+        var best = 0, current = 0
+        for (i, date) in sorted.enumerated() {
+            if i == 0 { current = 1 }
+            else { current = cal.dateComponents([.day], from: sorted[i-1], to: date).day == 1 ? current + 1 : 1 }
+            best = max(best, current)
+        }
+        return best
+    }
+
     var studyStreak: Int {
         let fmt = DateFormatter(); fmt.dateFormat = "yyyy-MM-dd"
         var allDates = Set<String>()

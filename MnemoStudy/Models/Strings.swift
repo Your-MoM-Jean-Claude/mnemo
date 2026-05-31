@@ -98,6 +98,7 @@ extension AppLanguage {
     var studyWrong: String           { t("Wrong",            "Špatně",            "Incorrecto") }
     var studyCorrectAnswer: String   { t("Correct answer:",  "Správná odpověď:",  "Respuesta correcta:") }
     var studyFinish: String          { t("Finish",           "Dokončit",          "Finalizar") }
+    var studyReveal: String          { t("Reveal answer",    "Odkrýt odpověď",    "Revelar respuesta") }
 
     // MARK: - Results
     var resultsTitle: String         { t("Session results",  "Výsledky sezení",   "Resultados") }

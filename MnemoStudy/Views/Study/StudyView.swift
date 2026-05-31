@@ -9,8 +9,11 @@ struct StudyView: View {
     var config: StudyConfig
 
     @StateObject private var vm: StudyViewModel
-    @State private var typingInput = ""
-    @State private var showResults = false
+    @State private var typingInput  = ""
+    @State private var showResults  = false
+    @State private var showingBack  = false   // show mode: reveal answer before judging
+    @State private var sessionSaved = false   // prevent double-save on exit
+
     @FocusState private var inputFocused: Bool
 
     var lang: AppLanguage { settings.language }
@@ -36,7 +39,6 @@ struct StudyView: View {
                     Text(vm.completedOfTotal)
                         .font(.caption).foregroundStyle(.secondary)
                     Spacer()
-                    // balance
                     Color.clear.frame(width: 40, height: 40)
                 }
                 .padding(.horizontal, 4)
@@ -58,12 +60,10 @@ struct StudyView: View {
 
                 Spacer()
 
-                // Card
                 if let item = vm.currentItem {
                     ZStack {
                         cardContent(item: item)
 
-                        // Inline answer feedback
                         if vm.showResult {
                             Color.black.opacity(0.4).ignoresSafeArea()
                             AnswerFeedbackOverlay(
@@ -71,6 +71,7 @@ struct StudyView: View {
                                 correctText: vm.currentBack,
                                 lang: lang)
                             .onTapGesture { advance() }
+                            .gesture(DragGesture(minimumDistance: 30).onEnded { _ in advance() })
                         }
                     }
                 }
@@ -84,10 +85,17 @@ struct StudyView: View {
         .onAppear {
             if config.mode == .typing { inputFocused = true }
         }
+        .onDisappear {
+            // save wrong answers even if user exits early (taps X)
+            if !sessionSaved && !vm.wrongCardIDs.isEmpty {
+                library.recordSession(result: vm.buildResult(), srsEnabled: settings.srsEnabled)
+            }
+        }
         .fullScreenCover(isPresented: $showResults) {
             ResultsView(result: vm.buildResult(), deckName: deck.name)
                 .onDisappear {
                     library.recordSession(result: vm.buildResult(), srsEnabled: settings.srsEnabled)
+                    sessionSaved = true
                     dismiss()
                 }
         }
@@ -129,39 +137,61 @@ struct StudyView: View {
         }
     }
 
-    // MARK: - Show mode
+    // MARK: - Show mode (answer revealed first, then judge)
 
     @ViewBuilder
     private func showCard(item: SessionItem) -> some View {
-        VStack(spacing: 32) {
+        VStack(spacing: 28) {
             Text(vm.currentFront)
                 .font(.system(size: 32, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
 
-            HStack(spacing: 16) {
-                Button {
-                    vm.submitShow(knows: false)
-                    showResultThenAdvance()
-                } label: {
-                    Text(lang.studyDontKnow)
-                        .font(.headline).foregroundStyle(.white)
-                        .frame(maxWidth: .infinity).padding(.vertical, 16)
-                        .background(Color.red.opacity(0.7), in: RoundedRectangle(cornerRadius: 14))
-                }
+            if showingBack {
+                Text(vm.currentBack)
+                    .font(.system(size: 26, weight: .medium, design: .rounded))
+                    .foregroundStyle(Color.mnemoGold)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
 
-                Button {
-                    vm.submitShow(knows: true)
-                    showResultThenAdvance()
-                } label: {
-                    Text(lang.studyKnow)
-                        .font(.headline).foregroundStyle(.white)
-                        .frame(maxWidth: .infinity).padding(.vertical, 16)
-                        .background(Color.mnemoGreen, in: RoundedRectangle(cornerRadius: 14))
+                HStack(spacing: 16) {
+                    Button {
+                        vm.submitShow(knows: false)
+                        haptic(correct: false)
+                    } label: {
+                        Text(lang.studyDontKnow)
+                            .font(.headline).foregroundStyle(.white)
+                            .frame(maxWidth: .infinity).padding(.vertical, 16)
+                            .background(Color.red.opacity(0.7), in: RoundedRectangle(cornerRadius: 14))
+                    }
+
+                    Button {
+                        vm.submitShow(knows: true)
+                        haptic(correct: true)
+                    } label: {
+                        Text(lang.studyKnow)
+                            .font(.headline).foregroundStyle(.white)
+                            .frame(maxWidth: .infinity).padding(.vertical, 16)
+                            .background(Color.mnemoGreen, in: RoundedRectangle(cornerRadius: 14))
+                    }
                 }
+                .padding(.horizontal, 32)
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
+            } else {
+                Button {
+                    withAnimation(.spring(duration: 0.4)) { showingBack = true }
+                } label: {
+                    Text(lang.studyReveal)
+                        .font(.headline).foregroundStyle(Color.mnemoGreen)
+                        .frame(maxWidth: .infinity).padding(.vertical, 16)
+                        .background(Color.mnemoGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 14))
+                        .overlay(RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(Color.mnemoGreen.opacity(0.4), lineWidth: 1))
+                }
+                .padding(.horizontal, 32)
             }
-            .padding(.horizontal, 32)
         }
     }
 
@@ -180,7 +210,7 @@ struct StudyView: View {
                 ForEach(vm.quizOptions, id: \.self) { option in
                     Button {
                         vm.submitQuiz(choice: option)
-                        showResultThenAdvance()
+                        haptic(correct: vm.lastAnswerCorrect)
                     } label: {
                         Text(option)
                             .font(.body).foregroundStyle(.white)
@@ -199,18 +229,19 @@ struct StudyView: View {
 
     // MARK: - Helpers
 
+    private func haptic(correct: Bool) {
+        UINotificationFeedbackGenerator().notificationOccurred(correct ? .success : .error)
+    }
+
     private func checkTyping() {
         vm.submitTyping(typingInput)
         typingInput = ""
-        showResultThenAdvance()
-    }
-
-    private func showResultThenAdvance() {
-        // result overlay is shown; user taps it to continue (handled in AnswerFeedbackOverlay tap)
+        haptic(correct: vm.lastAnswerCorrect)
     }
 
     private func advance() {
         vm.advanceAfterResult()
+        showingBack = false
         if config.mode == .typing { inputFocused = true }
     }
 }

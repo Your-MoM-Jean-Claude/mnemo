@@ -29,5 +29,6 @@ struct AppSettings: Codable {
     var notifications: [NotificationTime] = []
     var srsEnabled: Bool = false
     var trialStartDate: Date = Date()
+    var hasSeenOnboarding: Bool = false
     static let trialDays = 3
 }

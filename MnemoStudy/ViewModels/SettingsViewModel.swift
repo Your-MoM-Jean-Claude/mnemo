@@ -60,12 +60,21 @@ class SettingsViewModel: ObservableObject {
         scheduleNotifications()
     }
 
+    private let motivationalMessages = [
+        "Time to study! 📚",
+        "Ready for a quick review? 🧠",
+        "Keep your streak going! 🔥",
+        "5 minutes a day makes a difference! ✨",
+        "Your future self will thank you! 🎯",
+        "New day, new words! 💪"
+    ]
+
     func scheduleNotifications() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
         for n in settings.notifications {
             let content = UNMutableNotificationContent()
             content.title = "Mnemo Study"
-            content.body  = "Time to study! 📚"
+            content.body  = motivationalMessages.randomElement() ?? "Time to study! 📚"
             content.sound = .default
             var comps = DateComponents()
             comps.hour   = n.hour
