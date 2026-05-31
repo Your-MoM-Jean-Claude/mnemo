@@ -18,6 +18,11 @@ struct MainTabView: View {
                     Label(lang.tabStats, systemImage: "chart.bar.fill")
                 }
 
+            FeedbackView()
+                .tabItem {
+                    Label("Feedback", systemImage: "bubble.left.and.bubble.right.fill")
+                }
+
             SettingsView()
                 .tabItem {
                     Label(lang.tabSettings, systemImage: "gearshape.fill")
