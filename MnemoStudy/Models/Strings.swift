@@ -106,6 +106,7 @@ extension AppLanguage {
     var resultsAnswered: String      { t("Answered",         "Zodpovězeno",       "Respondidas") }
     var resultsTime: String          { t("Time",             "Čas",               "Tiempo") }
     var resultsDone: String          { t("Done",             "Hotovo",            "Listo") }
+    var resultsStudyAgain: String    { t("Study again",      "Znovu studovat",    "Estudiar de nuevo") }
     var resultsWrongCreated: String  {
         t("A \"Wrong answers\" deck has been created.",
           "Byla vytvořena knihovna se špatnými odpověďmi.",

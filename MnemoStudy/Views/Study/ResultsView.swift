@@ -6,6 +6,10 @@ struct ResultsView: View {
 
     var result: SessionResult
     var deckName: String
+    var deck: Deck
+    var config: StudyConfig
+
+    @State private var studyAgainConfig: StudyConfig? = nil
 
     var lang: AppLanguage { settings.language }
 
@@ -58,10 +62,25 @@ struct ResultsView: View {
 
                 Spacer()
 
-                PrimaryButton(title: lang.resultsDone) { dismiss() }
+                VStack(spacing: 12) {
+                    PrimaryButton(title: lang.resultsStudyAgain) {
+                        studyAgainConfig = StudyConfig(
+                            mode: config.mode,
+                            direction: config.direction,
+                            order: config.order,
+                            sectionSize: config.sectionSize,
+                            requiredCorrect: config.requiredCorrect)
+                    }
                     .padding(.horizontal)
-                    .padding(.bottom, 32)
+
+                    Button(lang.resultsDone) { dismiss() }
+                        .font(.subheadline).foregroundStyle(.secondary)
+                }
+                .padding(.bottom, 32)
             }
+        }
+        .fullScreenCover(item: $studyAgainConfig) { cfg in
+            StudyView(deck: deck, config: cfg)
         }
     }
 

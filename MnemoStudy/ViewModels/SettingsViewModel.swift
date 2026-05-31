@@ -1,6 +1,7 @@
 import Foundation
 import UserNotifications
 import Combine
+import StoreKit
 
 class SettingsViewModel: ObservableObject {
     @Published var settings: AppSettings {
@@ -15,6 +16,19 @@ class SettingsViewModel: ObservableObject {
             settings = s
         } else {
             settings = AppSettings()
+        }
+        restorePurchaseIfNeeded()
+    }
+
+    private func restorePurchaseIfNeeded() {
+        Task { @MainActor in
+            for await result in Transaction.currentEntitlements {
+                if case .verified(let t) = result,
+                   t.productID == "com.jirifilipec.mnemoapp.pro",
+                   t.revocationDate == nil {
+                    settings.trialStartDate = .distantPast
+                }
+            }
         }
     }
 

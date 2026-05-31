@@ -229,7 +229,9 @@ struct FolderSection: View {
     var onDeleteFolder: (UUID) -> Void
 
     @EnvironmentObject var library: LibraryViewModel
-    @State private var isExpanded = false
+    @State private var isExpanded   = false
+    @State private var showRename   = false
+    @State private var renameText   = ""
 
     var decks: [Deck] { library.decks.filter { $0.folderID == folder.id && !$0.isTemporary } }
     var totalCards: Int { decks.reduce(0) { $0 + $1.cards.count } }
@@ -252,7 +254,20 @@ struct FolderSection: View {
                 .glassCard()
             }
             .contextMenu {
+                Button(lang.libraryRename) {
+                    renameText = folder.name
+                    showRename = true
+                }
                 Button(lang.libraryDelete, role: .destructive) { onDeleteFolder(folder.id) }
+            }
+            .alert(lang.libraryRename, isPresented: $showRename) {
+                TextField(lang.folderName, text: $renameText)
+                Button(lang.editorSave) {
+                    if !renameText.trimmingCharacters(in: .whitespaces).isEmpty {
+                        library.renameFolder(id: folder.id, name: renameText.trimmingCharacters(in: .whitespaces))
+                    }
+                }
+                Button(lang.editorCancel, role: .cancel) {}
             }
 
             if isExpanded {

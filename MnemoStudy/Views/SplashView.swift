@@ -61,7 +61,7 @@ struct SplashView: View {
                     .padding(.bottom, 12)
                     .opacity(contentOpacity)
 
-                Text("© 2025 Jiří Filipec")
+                Text("© 2026 Jiří Filipec")
                     .font(.caption2).foregroundStyle(.secondary.opacity(0.4))
                     .padding(.bottom, 32)
                     .opacity(contentOpacity)

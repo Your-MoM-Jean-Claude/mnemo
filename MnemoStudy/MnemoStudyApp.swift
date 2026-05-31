@@ -2,7 +2,7 @@ import SwiftUI
 
 @main
 struct MnemoStudyApp: App {
-    @StateObject private var library  = LibraryViewModel()
+    @StateObject private var library: LibraryViewModel
     @StateObject private var settings = SettingsViewModel()
 
     @State private var showSplash = true

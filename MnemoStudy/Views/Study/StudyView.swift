@@ -9,10 +9,11 @@ struct StudyView: View {
     var config: StudyConfig
 
     @StateObject private var vm: StudyViewModel
-    @State private var typingInput  = ""
-    @State private var showResults  = false
-    @State private var showingBack  = false   // show mode: reveal answer before judging
-    @State private var sessionSaved = false   // prevent double-save on exit
+    @State private var typingInput   = ""
+    @State private var showResults   = false
+    @State private var showingBack   = false
+    @State private var sessionSaved  = false
+    @State private var finalResult: SessionResult? = nil on exit
 
     @FocusState private var inputFocused: Bool
 
@@ -87,7 +88,10 @@ struct StudyView: View {
             }
         }
         .onChange(of: vm.isSessionFinished) { finished in
-            if finished { showResults = true }
+            if finished {
+                finalResult = vm.buildResult()
+                showResults = true
+            }
         }
         .onAppear {
             if config.mode == .typing { inputFocused = true }
@@ -99,12 +103,14 @@ struct StudyView: View {
             }
         }
         .fullScreenCover(isPresented: $showResults) {
-            ResultsView(result: vm.buildResult(), deckName: deck.name)
-                .onDisappear {
-                    library.recordSession(result: vm.buildResult(), srsEnabled: settings.srsEnabled)
-                    sessionSaved = true
-                    dismiss()
-                }
+            if let result = finalResult {
+                ResultsView(result: result, deckName: deck.name, deck: deck, config: config)
+                    .onDisappear {
+                        library.recordSession(result: result, srsEnabled: settings.srsEnabled)
+                        sessionSaved = true
+                        dismiss()
+                    }
+            }
         }
     }
 
