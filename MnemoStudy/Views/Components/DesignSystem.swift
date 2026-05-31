@@ -113,27 +113,34 @@ struct AnswerFeedbackOverlay: View {
     }
 
     var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
-                .font(.system(size: 72))
-                .foregroundStyle(feedbackColor)
-            Text(isCorrect ? lang.studyCorrect : lang.studyWrong)
-                .font(.title2).bold()
-                .foregroundStyle(feedbackColor)
-            if !isCorrect {
-                VStack(spacing: 6) {
-                    Text(lang.studyCorrectAnswer)
-                        .font(.subheadline).foregroundStyle(.secondary)
-                    Text(correctText)
-                        .font(.title3).bold()
-                        .foregroundStyle(.white)
-                        .multilineTextAlignment(.center)
+        ZStack {
+            RoundedRectangle(cornerRadius: 28)
+                .fill(feedbackColor)
+                .padding(16)
+
+            VStack(spacing: 24) {
+                Spacer()
+                Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
+                    .font(.system(size: 100))
+                    .foregroundStyle(.white)
+                Text(isCorrect ? lang.studyCorrect : lang.studyWrong)
+                    .font(.system(size: 42, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                if !isCorrect {
+                    VStack(spacing: 10) {
+                        Text(lang.studyCorrectAnswer)
+                            .font(.title3).foregroundStyle(.white.opacity(0.75))
+                        Text(correctText)
+                            .font(.title2).bold()
+                            .foregroundStyle(.white)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(.horizontal, 48)
                 }
+                Spacer()
             }
         }
-        .padding(32)
-        .background(feedbackColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 20))
-        .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(feedbackColor.opacity(0.5), lineWidth: 1.5))
-        .transition(.scale(scale: 0.85).combined(with: .opacity))
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .transition(.scale(scale: 0.95).combined(with: .opacity))
     }
 }
