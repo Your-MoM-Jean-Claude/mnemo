@@ -66,13 +66,19 @@ struct StudyView: View {
 
                         if vm.showResult {
                             Color.black.opacity(0.4).ignoresSafeArea()
+
+                            Color.clear
+                                .contentShape(Rectangle())
+                                .ignoresSafeArea()
+                                .onTapGesture { advance() }
+                                .gesture(DragGesture(minimumDistance: 30).onEnded { _ in advance() })
+
                             AnswerFeedbackOverlay(
                                 isCorrect: vm.lastAnswerCorrect,
                                 questionText: vm.currentFront,
                                 correctText: vm.currentBack,
                                 lang: lang)
-                            .onTapGesture { advance() }
-                            .gesture(DragGesture(minimumDistance: 30).onEnded { _ in advance() })
+                            .allowsHitTesting(false)
                         }
                     }
                 }
