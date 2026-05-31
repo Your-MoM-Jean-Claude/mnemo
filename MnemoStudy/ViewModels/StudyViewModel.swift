@@ -18,6 +18,7 @@ class StudyViewModel: ObservableObject {
     private var totalAnswered: Int   = 0
     private var totalCorrect: Int    = 0
     private var startTime: Date      = Date()
+    private var lastCardID: UUID?    = nil
 
     // Quiz options for current card
     @Published var quizOptions: [String] = []
@@ -48,10 +49,18 @@ class StudyViewModel: ObservableObject {
     }
 
     private func nextItem() -> SessionItem? {
-        // decrement showAfter counters
         for i in queue.indices { if queue[i].showAfter > 0 { queue[i].showAfter -= 1 } }
-        // find first ready item
-        return queue.first { $0.showAfter == 0 && !$0.isComplete }
+
+        var ready = queue.filter { $0.showAfter == 0 && !$0.isComplete }
+        guard !ready.isEmpty else { return nil }
+
+        // avoid consecutive repeat
+        if ready.count > 1, let last = lastCardID {
+            let noRepeat = ready.filter { $0.card.id != last }
+            if !noRepeat.isEmpty { ready = noRepeat }
+        }
+
+        return config.order == .random ? ready.randomElement() : ready.first
     }
 
     // MARK: - Answer
@@ -89,6 +98,7 @@ class StudyViewModel: ObservableObject {
         lastAnswerCorrect = correct
         showResult        = true
         totalAnswered    += 1
+        lastCardID        = item.card.id
 
         guard let idx = queue.firstIndex(where: { $0.id == item.id }) else { return }
 
