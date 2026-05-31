@@ -14,7 +14,7 @@ struct SplashView: View {
             Color.mnemoBg.ignoresSafeArea()
 
             // Background logo — large, semi-transparent
-            Image("AppIcon")
+            Image("MnemoLogo")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 320)
@@ -26,7 +26,7 @@ struct SplashView: View {
                 Spacer()
 
                 // Foreground logo
-                Image("AppIcon")
+                Image("MnemoLogo")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 120)

@@ -7,22 +7,31 @@ struct MainTabView: View {
     var lang: AppLanguage { settings.language }
 
     var body: some View {
-        TabView {
-            LibraryView()
-                .tabItem {
-                    Label(lang.tabLibrary, systemImage: "books.vertical.fill")
-                }
+        ZStack {
+            Image("MnemoLogo")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+                .opacity(0.06)
+                .allowsHitTesting(false)
 
-            StatisticsView()
-                .tabItem {
-                    Label(lang.tabStats, systemImage: "chart.bar.fill")
-                }
+            TabView {
+                LibraryView()
+                    .tabItem {
+                        Label(lang.tabLibrary, systemImage: "books.vertical.fill")
+                    }
 
-            SettingsView()
-                .tabItem {
-                    Label(lang.tabSettings, systemImage: "gearshape.fill")
-                }
+                StatisticsView()
+                    .tabItem {
+                        Label(lang.tabStats, systemImage: "chart.bar.fill")
+                    }
+
+                SettingsView()
+                    .tabItem {
+                        Label(lang.tabSettings, systemImage: "gearshape.fill")
+                    }
+            }
+            .tint(.mnemoGreen)
         }
-        .tint(.mnemoGreen)
     }
 }
