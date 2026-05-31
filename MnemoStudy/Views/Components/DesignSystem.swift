@@ -8,6 +8,24 @@ extension Color {
     static let mnemoSurface = Color(red: 0.16, green: 0.18, blue: 0.17)  // card surface
 }
 
+// MARK: - Shared background: dark base + MnemoLogo watermark
+struct AppBg: View {
+    var opacity: Double = 0.13
+    var body: some View {
+        ZStack {
+            Color.mnemoBg
+            Image("MnemoLogo")
+                .resizable()
+                .scaledToFill()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .clipped()
+                .opacity(opacity)
+                .allowsHitTesting(false)
+        }
+        .ignoresSafeArea()
+    }
+}
+
 // MARK: - Glass card modifier
 struct GlassCard: ViewModifier {
     var cornerRadius: CGFloat = 18

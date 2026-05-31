@@ -12,7 +12,7 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.mnemoBg.ignoresSafeArea()
+                AppBg()
 
                 ScrollView {
                     VStack(spacing: 16) {
@@ -143,7 +143,7 @@ struct TimePickerSheet: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.mnemoBg.ignoresSafeArea()
+                AppBg()
                 HStack(spacing: 0) {
                     Picker("", selection: $hour) {
                         ForEach(0..<24) { Text(String(format: "%02d", $0)).tag($0) }

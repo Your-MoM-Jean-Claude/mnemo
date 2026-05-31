@@ -14,7 +14,7 @@ struct ImportView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.mnemoBg.ignoresSafeArea()
+                AppBg()
 
                 VStack(spacing: 20) {
                     // Format info card

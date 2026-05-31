@@ -16,7 +16,7 @@ struct StatisticsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.mnemoBg.ignoresSafeArea()
+                AppBg()
 
                 if library.totalSessions == 0 {
                     Text(lang.statsNoData)

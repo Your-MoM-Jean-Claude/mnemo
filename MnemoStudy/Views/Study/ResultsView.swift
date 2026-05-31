@@ -17,7 +17,7 @@ struct ResultsView: View {
 
     var body: some View {
         ZStack {
-            Color.mnemoBg.ignoresSafeArea()
+            AppBg()
 
             VStack(spacing: 28) {
                 Spacer()

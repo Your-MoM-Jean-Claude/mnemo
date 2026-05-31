@@ -27,7 +27,7 @@ struct LibraryView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.mnemoBg.ignoresSafeArea()
+                AppBg()
 
                 ScrollView {
                     LazyVStack(spacing: 12) {

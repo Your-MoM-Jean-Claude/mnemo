@@ -22,7 +22,7 @@ struct StudyView: View {
 
     var body: some View {
         ZStack {
-            Color.mnemoBg.ignoresSafeArea()
+            AppBg()
 
             VStack(spacing: 0) {
                 // Top bar

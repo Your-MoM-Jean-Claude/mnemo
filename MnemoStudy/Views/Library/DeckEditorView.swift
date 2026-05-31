@@ -21,7 +21,7 @@ struct DeckEditorView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.mnemoBg.ignoresSafeArea()
+                AppBg()
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {

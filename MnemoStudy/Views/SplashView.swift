@@ -11,16 +11,7 @@ struct SplashView: View {
 
     var body: some View {
         ZStack {
-            Color.mnemoBg.ignoresSafeArea()
-
-            // Background logo — large, semi-transparent
-            Image("MnemoLogo")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 320)
-                .opacity(0.18)
-                .scaleEffect(1.1)
-                .blur(radius: 2)
+            AppBg(opacity: 0.18)
 
             VStack(spacing: 0) {
                 Spacer()

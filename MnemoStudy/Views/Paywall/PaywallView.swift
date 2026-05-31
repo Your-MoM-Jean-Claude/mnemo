@@ -12,18 +12,13 @@ struct PaywallView: View {
 
     var body: some View {
         ZStack {
-            Color.mnemoBg.ignoresSafeArea()
-
-            // Background logo
-            Image("AppIcon")
-                .resizable().scaledToFit()
-                .frame(width: 280).opacity(0.08)
+            AppBg()
 
             VStack(spacing: 0) {
                 Spacer()
 
                 // Logo + title
-                Image("AppIcon")
+                Image("MnemoLogo")
                     .resizable().scaledToFit().frame(width: 80)
                     .clipShape(RoundedRectangle(cornerRadius: 18))
                     .padding(.bottom, 16)
