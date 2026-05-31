@@ -89,9 +89,6 @@ struct StudyView: View {
         .onChange(of: vm.isSessionFinished) { finished in
             if finished { showResults = true }
         }
-        .onChange(of: vm.showResult) { showing in
-            if showing { inputFocused = false }
-        }
         .onAppear {
             if config.mode == .typing { inputFocused = true }
         }
