@@ -4,7 +4,7 @@ import Combine
 class LibraryViewModel: ObservableObject {
     @Published var decks: [Deck]             = []
     @Published var folders: [DeckFolder]     = []
-    @Published var deckStats: [UUID: DeckStats] = []
+    @Published var deckStats: [UUID: DeckStats] = [:]
     @Published var errorMessage: String?
     @Published var showError: Bool = false
 

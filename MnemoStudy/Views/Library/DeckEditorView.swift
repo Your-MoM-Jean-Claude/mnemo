@@ -129,7 +129,7 @@ struct DeckEditorView: View {
             existing.cards = cards
             library.updateDeck(existing)
         } else {
-            var d = Deck(name: n, cards: cards)
+            let d = Deck(name: n, cards: cards)
             library.decks.append(d)
             library.save()
         }

@@ -151,7 +151,7 @@ struct TimePickerSheet: View {
                     .pickerStyle(.wheel).frame(maxWidth: .infinity)
                     Text(":").font(.title).foregroundStyle(.white)
                     Picker("", selection: $minute) {
-                        ForEach([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]) {
+                        ForEach([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55], id: \.self) {
                             Text(String(format: "%02d", $0)).tag($0)
                         }
                     }

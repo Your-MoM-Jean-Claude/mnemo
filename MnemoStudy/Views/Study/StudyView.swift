@@ -77,7 +77,7 @@ struct StudyView: View {
                 Spacer()
             }
         }
-        .onChange(of: vm.isSessionFinished) { _, finished in
+        .onChange(of: vm.isSessionFinished) { finished in
             if finished { showResults = true }
         }
         .fullScreenCover(isPresented: $showResults) {
