@@ -64,7 +64,7 @@ struct StudyView: View {
                     ZStack {
                         cardContent(item: item)
 
-                        if vm.showResult {
+                        if vm.showResult && config.mode != .show {
                             Color.black.opacity(0.4).ignoresSafeArea()
 
                             Color.clear
@@ -170,6 +170,7 @@ struct StudyView: View {
                     Button {
                         vm.submitShow(knows: false)
                         haptic(correct: false)
+                        advance()
                     } label: {
                         Text(lang.studyDontKnow)
                             .font(.headline).foregroundStyle(.white)
@@ -180,6 +181,7 @@ struct StudyView: View {
                     Button {
                         vm.submitShow(knows: true)
                         haptic(correct: true)
+                        advance()
                     } label: {
                         Text(lang.studyKnow)
                             .font(.headline).foregroundStyle(.white)
