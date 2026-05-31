@@ -22,7 +22,8 @@ enum StudyDirection: String, CaseIterable, Codable {
 
 // MARK: - Session config
 
-struct StudyConfig {
+struct StudyConfig: Identifiable {
+    let id = UUID()
     var mode: StudyMode = .typing
     var direction: StudyDirection = .frontToBack
     var order: CardOrder = .random

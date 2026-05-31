@@ -12,8 +12,7 @@ struct StudySettingsView: View {
     @State private var order: CardOrder      = .random
     @State private var sectionSize: Int      = 10
     @State private var requiredCorrect: Int  = 2
-    @State private var showStudy             = false
-    @State private var studyConfig           = StudyConfig()
+    @State private var studyConfig: StudyConfig? = nil
 
     var lang: AppLanguage { settings.language }
 
@@ -97,7 +96,6 @@ struct StudySettingsView: View {
                                 mode: mode, direction: direction, order: order,
                                 sectionSize: max(1, min(sectionSize, deck.cards.count)),
                                 requiredCorrect: requiredCorrect)
-                            showStudy = true
                         }
                         .padding(.horizontal)
                         .padding(.top, 8)
@@ -113,8 +111,8 @@ struct StudySettingsView: View {
                     Button(lang.editorCancel) { dismiss() }.foregroundStyle(.secondary)
                 }
             }
-            .fullScreenCover(isPresented: $showStudy) {
-                StudyView(deck: deck, config: studyConfig)
+            .fullScreenCover(item: $studyConfig) { config in
+                StudyView(deck: deck, config: config)
             }
         }
         .onAppear {
