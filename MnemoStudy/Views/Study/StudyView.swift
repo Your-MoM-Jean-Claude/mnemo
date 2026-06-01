@@ -16,7 +16,7 @@ struct StudyView: View {
     @State private var sessionSaved   = false
     @State private var finalResult: SessionResult? = nil
 
-    private let audio = AudioPlayer.shared on exit
+    private let audio = AudioPlayer.shared
 
     @FocusState private var inputFocused: Bool
 
