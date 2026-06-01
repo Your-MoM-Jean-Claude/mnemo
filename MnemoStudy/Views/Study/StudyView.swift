@@ -97,10 +97,14 @@ struct StudyView: View {
                 showResults = true
             }
         }
-        .onChange(of: vm.showResult) { showing in
-            // Hide keyboard when feedback appears so a tap anywhere
-            // (including the former keyboard area) advances to the next card
-            if showing { inputFocused = false }
+        .onChange(of: typingInput) { newValue in
+            // While feedback is shown, a keystroke on the keyboard (which the
+            // system keyboard captures, not our tap layer) also advances.
+            // Keyboard never has to disappear in typing mode.
+            if vm.showResult && config.mode == .typing && !newValue.isEmpty {
+                typingInput = ""
+                advance()
+            }
         }
         .onAppear {
             if config.mode == .typing { inputFocused = true }
