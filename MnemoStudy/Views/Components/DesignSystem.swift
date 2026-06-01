@@ -105,12 +105,17 @@ struct AnswerFeedbackOverlay: View {
     var isCorrect: Bool
     var questionText: String
     var correctText: String
+    var userAnswer: String = ""
     var lang: AppLanguage
 
     private var feedbackColor: Color {
         isCorrect
             ? Color(red: 0.18, green: 0.48, blue: 0.32)
             : Color(red: 0.58, green: 0.16, blue: 0.16)
+    }
+
+    private var showUserAnswer: Bool {
+        !isCorrect && !userAnswer.trimmingCharacters(in: .whitespaces).isEmpty
     }
 
     var body: some View {
@@ -148,6 +153,20 @@ struct AnswerFeedbackOverlay: View {
                         .font(.system(size: 26, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                         .multilineTextAlignment(.center)
+
+                    // User's wrong answer — struck through
+                    if showUserAnswer {
+                        VStack(spacing: 4) {
+                            Text(lang.studyYourAnswer)
+                                .font(.caption).foregroundStyle(.white.opacity(0.6))
+                            Text(userAnswer)
+                                .font(.system(size: 20, weight: .medium, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.85))
+                                .strikethrough(true, color: .white.opacity(0.7))
+                                .multilineTextAlignment(.center)
+                        }
+                        .padding(.top, 12)
+                    }
                 }
                 .padding(.horizontal, 36)
 

@@ -9,10 +9,11 @@ struct StudyView: View {
     var config: StudyConfig
 
     @StateObject private var vm: StudyViewModel
-    @State private var typingInput   = ""
-    @State private var showResults   = false
-    @State private var showingBack   = false
-    @State private var sessionSaved  = false
+    @State private var typingInput    = ""
+    @State private var lastUserAnswer = ""
+    @State private var showResults    = false
+    @State private var showingBack    = false
+    @State private var sessionSaved   = false
     @State private var finalResult: SessionResult? = nil
 
     private let audio = AudioPlayer.shared on exit
@@ -80,6 +81,7 @@ struct StudyView: View {
                                 isCorrect: vm.lastAnswerCorrect,
                                 questionText: vm.currentFront,
                                 correctText: vm.currentBack,
+                                userAnswer: lastUserAnswer,
                                 lang: lang)
                             .allowsHitTesting(false)
                         }
@@ -249,6 +251,7 @@ struct StudyView: View {
             VStack(spacing: 10) {
                 ForEach(vm.quizOptions, id: \.self) { option in
                     Button {
+                        lastUserAnswer = option
                         vm.submitQuiz(choice: option)
                         haptic(correct: vm.lastAnswerCorrect)
                     } label: {
@@ -274,6 +277,7 @@ struct StudyView: View {
     }
 
     private func checkTyping() {
+        lastUserAnswer = typingInput
         vm.submitTyping(typingInput)
         typingInput = ""
         haptic(correct: vm.lastAnswerCorrect)

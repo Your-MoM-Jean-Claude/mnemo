@@ -97,6 +97,7 @@ extension AppLanguage {
     var studyCorrect: String         { t("Correct!",         "Správně!",          "¡Correcto!") }
     var studyWrong: String           { t("Wrong",            "Špatně",            "Incorrecto") }
     var studyCorrectAnswer: String   { t("Correct answer:",  "Správná odpověď:",  "Respuesta correcta:") }
+    var studyYourAnswer: String      { t("Your answer:",     "Tvoje odpověď:",    "Tu respuesta:") }
     var studyFinish: String          { t("Finish",           "Dokončit",          "Finalizar") }
     var studyReveal: String          { t("Reveal answer",    "Odkrýt odpověď",    "Revelar respuesta") }
 
