@@ -11,6 +11,7 @@ struct LibraryView: View {
     @State private var showImport        = false
     @State private var selectedDeck: Deck?
     @State private var editingDeck: Deck?
+    @State private var editingCardsDeck: Deck?
     @State private var newFolderName     = ""
     @State private var editMode: EditMode = .inactive
 
@@ -40,6 +41,7 @@ struct LibraryView: View {
                             FolderSection(folder: folder, lang: lang,
                                           onTapDeck: tapDeck,
                                           onEdit: { editingDeck = $0 },
+                                          onEditCards: { editingCardsDeck = $0 },
                                           onDelete: { library.deleteDeck(id: $0) },
                                           onDeleteFolder: { library.deleteFolder(id: $0) })
                         }
@@ -93,9 +95,13 @@ struct LibraryView: View {
             .sheet(isPresented: $showNewDeck) {
                 DeckEditorView(deck: nil)
             }
-            // Edit deck
+            // Edit deck (bulk text)
             .sheet(item: $editingDeck) { deck in
                 DeckEditorView(deck: deck)
+            }
+            // Edit individual cards
+            .sheet(item: $editingCardsDeck) { deck in
+                CardListEditorView(deck: deck)
             }
             // Import
             .sheet(isPresented: $showImport) {
@@ -128,6 +134,7 @@ struct LibraryView: View {
             DeckCardView(deck: deck, lang: lang,
                          onTap: { tapDeck(deck) },
                          onEdit: { editingDeck = deck },
+                         onEditCards: { editingCardsDeck = deck },
                          onDelete: { library.deleteDeck(id: deck.id) })
 
             // Temp deck attached below
@@ -150,6 +157,7 @@ struct DeckCardView: View {
     var lang: AppLanguage
     var onTap: () -> Void
     var onEdit: () -> Void
+    var onEditCards: () -> Void
     var onDelete: () -> Void
 
     @EnvironmentObject var library: LibraryViewModel
@@ -182,6 +190,9 @@ struct DeckCardView: View {
         }
         .contextMenu {
             Button(lang.libraryRename, action: onEdit)
+            Button { onEditCards() } label: {
+                Label(lang.libraryEditCards, systemImage: "square.and.pencil")
+            }
             ShareLink(item: FileParser.export(deck: deck), subject: Text(deck.name)) {
                 Label(lang.libraryShare, systemImage: "square.and.arrow.up")
             }
@@ -225,6 +236,7 @@ struct FolderSection: View {
     var lang: AppLanguage
     var onTapDeck: (Deck) -> Void
     var onEdit: (Deck) -> Void
+    var onEditCards: (Deck) -> Void
     var onDelete: (UUID) -> Void
     var onDeleteFolder: (UUID) -> Void
 
@@ -276,6 +288,7 @@ struct FolderSection: View {
                         DeckCardView(deck: deck, lang: lang,
                                      onTap: { onTapDeck(deck) },
                                      onEdit: { onEdit(deck) },
+                                     onEditCards: { onEditCards(deck) },
                                      onDelete: { onDelete(deck.id) })
 
                         if let temp = library.decks.first(where: { $0.parentDeckID == deck.id && $0.isTemporary }) {

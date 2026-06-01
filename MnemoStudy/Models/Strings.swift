@@ -25,6 +25,7 @@ extension AppLanguage {
     var libraryTemporary: String  { t("Wrong answers",   "Špatné odpovědi",  "Respuestas erróneas") }
     var libraryDelete: String     { t("Delete",          "Smazat",           "Eliminar") }
     var libraryRename: String     { t("Rename",          "Přejmenovat",      "Renombrar") }
+    var libraryEditCards: String  { t("Edit cards",      "Upravit kartičky", "Editar tarjetas") }
     var libraryMoveToFolder: String { t("Move to folder","Přesunout do složky","Mover a carpeta") }
     var libraryShare: String      { t("Share",           "Sdílet",           "Compartir") }
     var libraryStudy: String      { t("Study",           "Studovat",         "Estudiar") }

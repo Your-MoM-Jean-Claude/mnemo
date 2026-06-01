@@ -11,8 +11,25 @@ class LibraryViewModel: ObservableObject {
     private let decksKey   = "ms_decks"
     private let foldersKey = "ms_folders"
     private let statsKey   = "ms_stats"
+    private let syncDateKey = "ms_syncDate"
 
-    init() { load() }
+    // iCloud sync
+    private let cloud = NSUbiquitousKeyValueStore.default
+    private var isApplyingCloud = false
+
+    init() {
+        load()
+        // Pull from iCloud if it has newer data than local
+        mergeFromCloudIfNewer()
+        // Observe external iCloud changes (other devices)
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(cloudChanged(_:)),
+            name: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
+            object: cloud)
+        cloud.synchronize()
+    }
+
+    deinit { NotificationCenter.default.removeObserver(self) }
 
     // MARK: - Deck CRUD
 
@@ -292,9 +309,23 @@ class LibraryViewModel: ObservableObject {
     // MARK: - Persistence
 
     func save() {
-        if let d = try? JSONEncoder().encode(decks)    { UserDefaults.standard.set(d, forKey: decksKey) }
-        if let d = try? JSONEncoder().encode(folders)  { UserDefaults.standard.set(d, forKey: foldersKey) }
-        if let d = try? JSONEncoder().encode(deckStats){ UserDefaults.standard.set(d, forKey: statsKey) }
+        let decksData   = try? JSONEncoder().encode(decks)
+        let foldersData = try? JSONEncoder().encode(folders)
+        let statsData   = try? JSONEncoder().encode(deckStats)
+
+        if let d = decksData   { UserDefaults.standard.set(d, forKey: decksKey) }
+        if let d = foldersData { UserDefaults.standard.set(d, forKey: foldersKey) }
+        if let d = statsData   { UserDefaults.standard.set(d, forKey: statsKey) }
+
+        // Don't push to iCloud while applying a cloud change (avoids ping-pong)
+        guard !isApplyingCloud else { return }
+        let now = Date().timeIntervalSince1970
+        UserDefaults.standard.set(now, forKey: syncDateKey)
+        if let d = decksData   { cloud.set(d, forKey: decksKey) }
+        if let d = foldersData { cloud.set(d, forKey: foldersKey) }
+        if let d = statsData   { cloud.set(d, forKey: statsKey) }
+        cloud.set(now, forKey: syncDateKey)
+        cloud.synchronize()
     }
 
     private func load() {
@@ -304,5 +335,42 @@ class LibraryViewModel: ObservableObject {
            let v = try? JSONDecoder().decode([DeckFolder].self, from: d)   { folders   = v }
         if let d = UserDefaults.standard.data(forKey: statsKey),
            let v = try? JSONDecoder().decode([UUID: DeckStats].self, from: d) { deckStats = v }
+    }
+
+    // MARK: - iCloud sync
+
+    private func mergeFromCloudIfNewer() {
+        let cloudDate = cloud.double(forKey: syncDateKey)
+        let localDate = UserDefaults.standard.double(forKey: syncDateKey)
+        guard cloudDate > localDate, cloudDate > 0 else { return }
+        applyCloudData()
+    }
+
+    @objc private func cloudChanged(_ note: Notification) {
+        // External change from another device — pull if newer
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let cloudDate = self.cloud.double(forKey: self.syncDateKey)
+            let localDate = UserDefaults.standard.double(forKey: self.syncDateKey)
+            guard cloudDate > localDate else { return }
+            self.applyCloudData()
+        }
+    }
+
+    private func applyCloudData() {
+        isApplyingCloud = true
+        defer { isApplyingCloud = false }
+
+        if let d = cloud.data(forKey: decksKey),
+           let v = try? JSONDecoder().decode([Deck].self, from: d)            { decks = v }
+        if let d = cloud.data(forKey: foldersKey),
+           let v = try? JSONDecoder().decode([DeckFolder].self, from: d)      { folders = v }
+        if let d = cloud.data(forKey: statsKey),
+           let v = try? JSONDecoder().decode([UUID: DeckStats].self, from: d) { deckStats = v }
+
+        // Mirror to local storage + sync timestamp (no re-push to cloud)
+        save()
+        let cloudDate = cloud.double(forKey: syncDateKey)
+        UserDefaults.standard.set(cloudDate, forKey: syncDateKey)
     }
 }
