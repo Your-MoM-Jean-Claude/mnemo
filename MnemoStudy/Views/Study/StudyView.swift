@@ -97,6 +97,11 @@ struct StudyView: View {
                 showResults = true
             }
         }
+        .onChange(of: vm.showResult) { showing in
+            // Hide keyboard when feedback appears so a tap anywhere
+            // (including the former keyboard area) advances to the next card
+            if showing { inputFocused = false }
+        }
         .onAppear {
             if config.mode == .typing { inputFocused = true }
         }
