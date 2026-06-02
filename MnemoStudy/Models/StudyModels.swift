@@ -38,6 +38,7 @@ struct SessionItem {
     var correctCount: Int = 0
     var showAfter: Int = 0           // skip counter after wrong answer
     var isComplete: Bool = false
+    var reversed: Bool = false       // for .random direction: per-card fixed direction
 }
 
 // MARK: - Session result

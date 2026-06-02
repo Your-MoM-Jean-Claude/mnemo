@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ResultsView: View {
     @EnvironmentObject var settings: SettingsViewModel
+    @EnvironmentObject var library: LibraryViewModel
     @Environment(\.dismiss) var dismiss
 
     var result: SessionResult
@@ -80,7 +81,9 @@ struct ResultsView: View {
             }
         }
         .fullScreenCover(item: $studyAgainConfig) { cfg in
-            StudyView(deck: deck, config: cfg)
+            StudyView(deck: deck, config: cfg,
+                      srsEnabled: settings.srsEnabled,
+                      cardStats: library.stats(for: deck.id).cardStats)
         }
     }
 

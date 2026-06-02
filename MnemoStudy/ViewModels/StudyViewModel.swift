@@ -24,12 +24,15 @@ class StudyViewModel: ObservableObject {
 
     // Quiz options for current card
     @Published var quizOptions: [String] = []
-    private var allDeck: Deck
 
-    init(deck: Deck, config: StudyConfig, allDecks: [Deck]) {
-        self.deck   = deck
-        self.config = config
-        self.allDeck = deck
+    private let srsEnabled: Bool
+    private let cardStats: [UUID: CardStats]
+
+    init(deck: Deck, config: StudyConfig, srsEnabled: Bool = false, cardStats: [UUID: CardStats] = [:]) {
+        self.deck       = deck
+        self.config     = config
+        self.srsEnabled = srsEnabled
+        self.cardStats  = cardStats
         buildQueue()
     }
 
@@ -38,16 +41,43 @@ class StudyViewModel: ObservableObject {
     private func buildQueue() {
         startTime = Date()
         var cards = deck.cards
-        switch config.order {
-        case .ascending:  break
-        case .descending: cards.reverse()
-        case .random:     cards.shuffle()
+
+        if srsEnabled {
+            // SRS is the primary selector: most-overdue and new cards first.
+            // New cards (no due date) sort first (treated as .distantPast).
+            cards.sort { a, b in
+                let da = cardStats[a.id]?.srsDueDate ?? .distantPast
+                let db = cardStats[b.id]?.srsDueDate ?? .distantPast
+                return da < db
+            }
+        } else {
+            switch config.order {
+            case .ascending:  break
+            case .descending: cards.reverse()
+            case .random:     cards.shuffle()
+            }
         }
+
         pendingCards = Array(cards.dropFirst(config.sectionSize))
         let initial  = Array(cards.prefix(config.sectionSize))
-        queue = initial.map { SessionItem(card: $0) }
+        queue = initial.map { makeItem($0) }
         currentItem = nextItem()
         if config.mode == .quiz { buildQuizOptions() }
+    }
+
+    private func makeItem(_ card: Card) -> SessionItem {
+        var item = SessionItem(card: card)
+        if config.direction == .random { item.reversed = Bool.random() }
+        return item
+    }
+
+    // Effective direction for an item (handles .random per-card)
+    private func reversed(_ item: SessionItem) -> Bool {
+        switch config.direction {
+        case .frontToBack: return false
+        case .backToFront: return true
+        case .random:      return item.reversed
+        }
     }
 
     private func nextItem() -> SessionItem? {
@@ -85,13 +115,20 @@ class StudyViewModel: ObservableObject {
     }
 
     private func resolveAnswer(item: SessionItem, userInput: String?, choice: String?) -> Bool {
+        let rev = reversed(item)
         switch config.mode {
         case .typing:
-            return item.card.isCorrect(userInput ?? "")
+            if rev {
+                // expected answer is the FRONT side (case-insensitive exact match)
+                let t = (userInput ?? "").trimmingCharacters(in: .whitespaces).lowercased()
+                return !t.isEmpty && item.card.front.trimmingCharacters(in: .whitespaces).lowercased() == t
+            } else {
+                return item.card.isCorrect(userInput ?? "")   // back alternatives via "/"
+            }
         case .show:
             return true   // "know" branch is handled in submitShow
         case .quiz:
-            let expected = config.direction == .backToFront ? item.card.front : item.card.back
+            let expected = rev ? item.card.front : item.card.back
             return (choice ?? "") == expected
         }
     }
@@ -118,7 +155,7 @@ class StudyViewModel: ObservableObject {
                 completedCount += 1
                 if let next = pendingCards.first {
                     pendingCards.removeFirst()
-                    queue.append(SessionItem(card: next))
+                    queue.append(makeItem(next))
                 }
             }
         } else {
@@ -144,11 +181,14 @@ class StudyViewModel: ObservableObject {
 
     private func buildQuizOptions() {
         guard let item = currentItem else { quizOptions = []; return }
-        let correct = config.direction == .backToFront ? item.card.front : item.card.back
+        let rev = reversed(item)
+        let correct = rev ? item.card.front : item.card.back
 
         var pool = deck.cards
             .filter { $0.id != item.card.id }
-            .map { config.direction == .backToFront ? $0.front : $0.back }
+            .map { rev ? $0.front : $0.back }
+        pool.removeAll { $0 == correct }      // avoid a distractor identical to the answer
+        pool = Array(Set(pool))               // de-duplicate distractors
         pool.shuffle()
         var options = Array(pool.prefix(3))
         options.append(correct)
@@ -174,12 +214,12 @@ class StudyViewModel: ObservableObject {
 
     var currentFront: String {
         guard let item = currentItem else { return "" }
-        return config.direction == .backToFront ? item.card.back : item.card.front
+        return reversed(item) ? item.card.back : item.card.front
     }
 
     var currentBack: String {
         guard let item = currentItem else { return "" }
-        return config.direction == .backToFront ? item.card.front : item.card.back
+        return reversed(item) ? item.card.front : item.card.back
     }
 
     var progress: Double {

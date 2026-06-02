@@ -22,10 +22,11 @@ struct StudyView: View {
 
     var lang: AppLanguage { settings.language }
 
-    init(deck: Deck, config: StudyConfig) {
+    init(deck: Deck, config: StudyConfig, srsEnabled: Bool = false, cardStats: [UUID: CardStats] = [:]) {
         self.deck   = deck
         self.config = config
-        _vm = StateObject(wrappedValue: StudyViewModel(deck: deck, config: config, allDecks: []))
+        _vm = StateObject(wrappedValue: StudyViewModel(deck: deck, config: config,
+                                                       srsEnabled: srsEnabled, cardStats: cardStats))
     }
 
     var body: some View {

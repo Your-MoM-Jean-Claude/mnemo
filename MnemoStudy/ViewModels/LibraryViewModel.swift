@@ -159,8 +159,11 @@ class LibraryViewModel: ObservableObject {
         var stat = deckStats[result.deckID] ?? DeckStats(deckID: result.deckID)
         stat.apply(result)
 
-        // Update per-card stats
+        // Update per-card stats — ONLY for cards actually answered this session.
+        // (A card is answered iff it has a recorded response time. Cards merely
+        // present in the deck but not studied must not be counted.)
         for card in deck(id: result.deckID)?.cards ?? [] {
+            guard let adjusted = result.cardAdjustedTimes[card.id] else { continue }
             let wasCorrect = !result.wrongCardIDs.contains(card.id)
             var cs = stat.cardStats[card.id] ?? CardStats()
             cs.attempts += 1
@@ -171,8 +174,7 @@ class LibraryViewModel: ObservableObject {
                 cs.consecutiveCorrect = 0
             }
             cs.lastAnswered = result.date
-            // SRS update only for cards actually answered this session
-            if srsEnabled, let adjusted = result.cardAdjustedTimes[card.id] {
+            if srsEnabled {
                 let rating = SRSRating.from(correct: wasCorrect, adjusted: adjusted,
                                             median: profile.median, calibrated: profile.isCalibrated)
                 cs = SRSEngine.update(cs, rating: rating)
@@ -195,9 +197,9 @@ class LibraryViewModel: ObservableObject {
             updateTemporaryDeck(for: result.deckID, wrongCardIDs: result.wrongCardIDs, stat: &stat)
         }
 
-        // Remove cards from temp deck that hit 3 consecutive correct
-        if let parentID = deck(id: result.deckID)?.parentDeckID {
-            cleanTemporaryDeck(id: result.deckID, parentID: parentID)
+        // If this WAS a temp deck, remove cards answered correctly 3× in a row
+        if deck(id: result.deckID)?.parentDeckID != nil {
+            cleanTemporaryDeck(id: result.deckID)
         }
 
         save()
@@ -222,12 +224,13 @@ class LibraryViewModel: ObservableObject {
         }
     }
 
-    private func cleanTemporaryDeck(id: UUID, parentID: UUID) {
+    private func cleanTemporaryDeck(id: UUID) {
         guard let tempIdx = decks.firstIndex(where: { $0.id == id }) else { return }
-        let parentStat = deckStats[parentID] ?? DeckStats(deckID: parentID)
+        // Use the temp deck's OWN stats — that's where studying it records progress.
+        let tempStat = deckStats[id] ?? DeckStats(deckID: id)
 
         decks[tempIdx].cards.removeAll { card in
-            (parentStat.cardStats[card.id]?.consecutiveCorrect ?? 0) >= 3
+            (tempStat.cardStats[card.id]?.consecutiveCorrect ?? 0) >= 3
         }
 
         if decks[tempIdx].cards.isEmpty {
