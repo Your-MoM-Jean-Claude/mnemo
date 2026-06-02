@@ -162,10 +162,164 @@ extension AppLanguage {
     // MARK: - Folder
     var folderName: String           { t("Folder name",      "Název složky",      "Nombre de carpeta") }
     var folderCreate: String         { t("Create folder",    "Vytvořit složku",   "Crear carpeta") }
+    var libraryMoveOut: String       { t("Remove from folder","Vyjmout ze složky", "Quitar de la carpeta") }
+    var libraryMoveToFolderTitle: String { t("Move to folder", "Přesunout do složky", "Mover a carpeta") }
 
     // MARK: - Common
     var commonOK: String             { t("OK",    "OK",     "OK") }
     var commonAdd: String            { t("Add",   "Přidat", "Añadir") }
+    var commonClose: String          { t("Close", "Zavřít", "Cerrar") }
+
+    // MARK: - Tabs (info + feedback)
+    var tabInfo: String              { t("Info",     "Info",       "Info") }
+    var tabFeedback: String          { t("Feedback", "Zpětná vazba","Opiniones") }
+
+    // MARK: - Feedback
+    var feedbackTitle: String        { t("Feedback", "Zpětná vazba", "Opiniones") }
+    var feedbackHeader: String       { t("Help shape Mnemo Study", "Pomozte utvářet Mnemo Study", "Ayuda a mejorar Mnemo Study") }
+    var feedbackIntro: String        {
+        t("Which features would you like to see next? Your vote directly influences what we build.",
+          "Které funkce byste chtěli příště? Váš hlas přímo ovlivňuje, co vytvoříme.",
+          "¿Qué funciones te gustaría ver? Tu voto influye directamente en lo que creamos.")
+    }
+    var feedbackQuestion: String     { t("What would you like to see?", "Co byste si přáli?", "¿Qué te gustaría ver?") }
+    var feedbackSyncDesc: String     { t("Keep decks & progress across all your devices", "Knihovny a pokrok na všech zařízeních", "Mazos y progreso en todos tus dispositivos") }
+    var feedbackAudioDesc: String    { t("Hear native pronunciation for every card", "Nativní výslovnost u každé karty", "Pronunciación nativa en cada tarjeta") }
+    var feedbackDecksDesc: String    { t("More languages, topics, and vocabulary sets", "Více jazyků, témat a sad slovíček", "Más idiomas, temas y vocabulario") }
+    var feedbackWatchDesc: String    { t("5 quick cards on your wrist every morning", "5 rychlých karet na zápěstí každé ráno", "5 tarjetas rápidas en tu muñeca cada mañana") }
+    var feedbackAIDesc: String       { t("Paste any text and generate cards automatically", "Vložte text a karty se vytvoří samy", "Pega texto y genera tarjetas automáticamente") }
+    var feedbackSharingDesc: String  { t("Share your decks with friends via link", "Sdílejte knihovny s přáteli přes odkaz", "Comparte tus mazos con amigos por enlace") }
+    var feedbackAudio: String        { t("Audio Pronunciation", "Výslovnost (audio)", "Pronunciación") }
+    var feedbackSync: String         { t("iCloud Sync", "Synchronizace iCloud", "Sincronización iCloud") }
+    var feedbackMoreDecks: String    { t("More Built-in Decks", "Více vestavěných knihoven", "Más mazos integrados") }
+    var feedbackWatch: String        { t("Apple Watch App", "Aplikace pro Apple Watch", "App para Apple Watch") }
+    var feedbackAI: String           { t("AI Card Generator", "AI generátor karet", "Generador de tarjetas con IA") }
+    var feedbackSharing: String      { t("Deck Sharing", "Sdílení knihoven", "Compartir mazos") }
+    var feedbackElse: String         { t("Anything else on your mind?", "Cokoliv dalšího?", "¿Algo más?") }
+    var feedbackSend: String         { t("Send Feedback", "Odeslat zpětnou vazbu", "Enviar opinión") }
+    var feedbackWriteDirect: String  { t("Write directly:", "Napište přímo:", "Escribe directamente:") }
+    var feedbackRate: String         { t("Rate Mnemo Study on the App Store", "Ohodnoťte Mnemo Study v App Store", "Califica Mnemo Study en la App Store") }
+    var feedbackThanks: String       { t("Thank you! 🙏", "Děkujeme! 🙏", "¡Gracias! 🙏") }
+    var feedbackThanksBody: String   {
+        t("Your feedback has been sent. We'll use it to prioritize upcoming features.",
+          "Vaše zpětná vazba byla odeslána. Použijeme ji k určení priorit dalších funkcí.",
+          "Tu opinión ha sido enviada. La usaremos para priorizar próximas funciones.")
+    }
+
+    // MARK: - Onboarding
+    var onbContinue: String          { t("Continue", "Pokračovat", "Continuar") }
+    var onbStart: String             { t("Get Started", "Začít", "Empezar") }
+    var onbTagline: String           { t("Master any language,\none card at a time", "Zvládněte jakýkoliv jazyk,\nkartu po kartě", "Domina cualquier idioma,\nuna tarjeta a la vez") }
+    var onbHowTitle: String          { t("How it works", "Jak to funguje", "Cómo funciona") }
+    var onbTypingDesc: String        { t("Type the answer from memory", "Napište odpověď zpaměti", "Escribe la respuesta de memoria") }
+    var onbShowDesc: String          { t("Reveal the answer, judge yourself", "Odkryjte odpověď, ohodnoťte se", "Revela la respuesta, evalúate") }
+    var onbQuizDesc: String          { t("Pick from 4 options", "Vyberte ze 4 možností", "Elige entre 4 opciones") }
+    var onbSRSTitle: String          { t("Spaced Repetition", "Opakování s rozestupy", "Repetición espaciada") }
+    var onbSRSDesc: String           {
+        t("Wrong answers get flagged automatically.\n\nEnable SRS in Settings to schedule each card for review at the perfect moment — right before you forget it.",
+          "Špatné odpovědi se automaticky označí.\n\nZapněte SRS v Nastavení a každá karta se naplánuje k zopakování ve správný okamžik — těsně než ji zapomenete.",
+          "Las respuestas incorrectas se marcan automáticamente.\n\nActiva SRS en Ajustes para programar cada tarjeta en el momento justo, antes de olvidarla.")
+    }
+
+    // MARK: - Notifications (motivational + funny, rotate)
+    var notificationMessages: [String] {
+        switch self {
+        case .en: return [
+            "Time to study! 📚",
+            "Your brain called — it wants more words 🧠",
+            "Keep that streak alive, champion! 🔥",
+            "Plot twist: 5 minutes now = fluent later ✨",
+            "Your flashcards miss you 🥺",
+            "Future polyglot, your training awaits 🎯",
+            "Don't let those words escape! 🏃💨",
+            "A wild study session appeared! 🎮",
+            "Procrastination level: expert. Let's fix that 😏",
+            "New words won't learn themselves 🤷",
+            "Brain gains incoming 💪🧠",
+            "Tap. Learn. Flex. Repeat. 😎"
+        ]
+        case .cs: return [
+            "Čas se učit! 📚",
+            "Volal tvůj mozek — chce další slovíčka 🧠",
+            "Udrž tu sérii, šampione! 🔥",
+            "Zápletka: 5 minut teď = plynně později ✨",
+            "Tvoje kartičky se ti stýská 🥺",
+            "Budoucí polyglote, trénink čeká 🎯",
+            "Nenech ta slovíčka utéct! 🏃💨",
+            "Objevila se divoká lekce! 🎮",
+            "Úroveň prokrastinace: expert. Pojďme to spravit 😏",
+            "Slovíčka se sama nenaučí 🤷",
+            "Mozkové svaly na cestě 💪🧠",
+            "Ťukni. Nauč se. Zaválej. Opakuj. 😎"
+        ]
+        case .es: return [
+            "¡Hora de estudiar! 📚",
+            "Tu cerebro llamó — quiere más palabras 🧠",
+            "¡Mantén la racha, campeón! 🔥",
+            "Giro inesperado: 5 minutos hoy = fluidez mañana ✨",
+            "Tus tarjetas te extrañan 🥺",
+            "Futuro políglota, tu entrenamiento espera 🎯",
+            "¡No dejes escapar esas palabras! 🏃💨",
+            "¡Apareció una sesión salvaje! 🎮",
+            "Nivel de procrastinación: experto. Vamos a arreglarlo 😏",
+            "Las palabras no se aprenden solas 🤷",
+            "Ganancias cerebrales en camino 💪🧠",
+            "Toca. Aprende. Presume. Repite. 😎"
+        ]
+        }
+    }
+
+    // MARK: - Info / Help
+    var infoTitle: String            { t("How it works", "Jak to funguje", "Cómo funciona") }
+
+    var infoAppTitle: String         { t("Getting started", "Začínáme", "Primeros pasos") }
+    var infoAppBody: String          {
+        t("Mnemo Study helps you memorize anything using flashcards. Each card has a front (the prompt) and a back (the answer). Pick a deck, choose how you want to be tested, and start learning. Wrong answers are collected into a 'Wrong answers' deck pinned under the original so you can drill them until they stick.",
+          "Mnemo Study vám pomáhá zapamatovat si cokoliv pomocí kartiček. Každá karta má přední stranu (otázku) a zadní (odpověď). Vyberte knihovnu, zvolte způsob zkoušení a začněte. Špatné odpovědi se sbírají do knihovny „Špatné odpovědi“ připnuté pod původní, abyste je mohli procvičovat, dokud je neumíte.",
+          "Mnemo Study te ayuda a memorizar con tarjetas. Cada tarjeta tiene un anverso (la pregunta) y un reverso (la respuesta). Elige un mazo, elige cómo quieres practicar y empieza. Las respuestas incorrectas se recogen en un mazo de «Respuestas erróneas» fijado bajo el original para que las practiques hasta dominarlas.")
+    }
+
+    var infoModesTitle: String       { t("Study modes", "Způsoby zkoušení", "Modos de estudio") }
+    var infoModesBody: String        {
+        t("Typing — type the answer from memory.\nShow — reveal the answer and judge yourself.\nQuiz — pick the right answer from 4 options (needs at least 4 cards).\n\nQuick-start presets (Student, Casual, Traveler, Intensive) set everything up for you in one tap.",
+          "Psaní — napište odpověď zpaměti.\nZobrazení — odkryjte odpověď a ohodnoťte se.\nKvíz — vyberte správnou odpověď ze 4 možností (potřebuje aspoň 4 karty).\n\nPresety (Student, Pohoda, Cestovatel, Intenzivní) vám vše nastaví jedním klepnutím.",
+          "Escribir — escribe la respuesta de memoria.\nMostrar — revela la respuesta y evalúate.\nCuestionario — elige la respuesta correcta entre 4 opciones (mín. 4 tarjetas).\n\nLos preajustes (Estudiante, Casual, Viajero, Intensivo) lo configuran todo con un toque.")
+    }
+
+    var infoSRSTitle: String         { t("What is SRS?", "Co je SRS?", "¿Qué es SRS?") }
+    var infoSRSBody: String          {
+        t("SRS (Spaced Repetition System) schedules each card for review at the optimal moment — right before you would forget it. Cards you know well come back less often; cards you struggle with come back sooner. This is the most efficient way to move words into long-term memory. Enable it in Settings.",
+          "SRS (systém opakování s rozestupy) plánuje každou kartu k zopakování v optimální okamžik — těsně předtím, než byste ji zapomněli. Karty, které umíte, se vracejí méně často; karty, se kterými bojujete, dříve. Je to nejefektivnější způsob, jak dostat slovíčka do dlouhodobé paměti. Zapnete ji v Nastavení.",
+          "SRS (repetición espaciada) programa cada tarjeta para repasarla en el momento óptimo — justo antes de olvidarla. Las que dominas vuelven menos; las difíciles, antes. Es la forma más eficiente de llevar palabras a la memoria a largo plazo. Actívalo en Ajustes.")
+    }
+
+    var infoOurSRSTitle: String      { t("Our smart SRS", "Náš chytrý SRS", "Nuestro SRS inteligente") }
+    var infoOurSRSBody: String       {
+        t("Unlike other apps, you never have to rate yourself ('easy/hard'). Mnemo Study measures how quickly and accurately you answer — in the background — and figures out how well you know each card on its own. During your first 5 sessions it watches your pace and calibrates to YOU personally. A fast answer means 'easy' (longer interval); a slow or wrong one means 'review soon'. Word length is taken into account so longer words get more time.",
+          "Na rozdíl od jiných aplikací se nikdy nemusíte sami hodnotit („snadné/těžké“). Mnemo Study na pozadí měří, jak rychle a správně odpovídáte, a samo pozná, jak dobře každou kartu umíte. Během prvních 5 sezení sleduje vaše tempo a kalibruje se přímo VÁM. Rychlá odpověď znamená „snadné“ (delší interval); pomalá nebo špatná znamená „brzy zopakovat“. Zohledňuje se i délka slova — delší slova dostanou víc času.",
+          "A diferencia de otras apps, nunca tienes que evaluarte ('fácil/difícil'). Mnemo Study mide en segundo plano qué tan rápido y bien respondes, y deduce cuánto sabes cada tarjeta. Durante tus primeras 5 sesiones observa tu ritmo y se calibra a TI. Una respuesta rápida es 'fácil' (intervalo más largo); una lenta o incorrecta significa 'repasar pronto'. Se considera la longitud de la palabra.")
+    }
+
+    var infoImportTitle: String      { t("Adding & importing decks", "Přidávání a import knihoven", "Añadir e importar mazos") }
+    var infoImportBody: String       {
+        t("Create a deck with the + button and type or paste your cards. Or import a .txt file from Files, iCloud, or another app.\n\nFormat — one pair per line:\n  word - translation\n\nLines starting with # are ignored (use them as notes/headers). Empty lines are skipped.",
+          "Vytvořte knihovnu tlačítkem + a napište nebo vložte karty. Nebo importujte soubor .txt ze Souborů, iCloudu či jiné aplikace.\n\nFormát — jeden pár na řádek:\n  slovo - překlad\n\nŘádky začínající # se ignorují (použijte je jako poznámky/nadpisy). Prázdné řádky se přeskakují.",
+          "Crea un mazo con el botón + y escribe o pega tus tarjetas. O importa un archivo .txt desde Archivos, iCloud u otra app.\n\nFormato — un par por línea:\n  palabra - traducción\n\nLas líneas que empiezan por # se ignoran (úsalas como notas). Las líneas vacías se omiten.")
+    }
+
+    var infoEditTitle: String        { t("Editing decks", "Úprava knihoven", "Editar mazos") }
+    var infoEditBody: String         {
+        t("Long-press a deck for options: Rename, Edit cards (change individual cards one by one), Move to folder, Share, or Delete. Long-press a folder to rename or delete it. Folders are one level deep — move decks in and out freely.",
+          "Podržte prst na knihovně pro možnosti: Přejmenovat, Upravit kartičky (měňte jednotlivé karty), Přesunout do složky, Sdílet nebo Smazat. Podržením složky ji přejmenujete či smažete. Složky jsou jednoúrovňové — knihovny můžete volně přesouvat dovnitř i ven.",
+          "Mantén pulsado un mazo para ver opciones: Renombrar, Editar tarjetas (cambiar tarjetas una a una), Mover a carpeta, Compartir o Eliminar. Mantén pulsada una carpeta para renombrarla o eliminarla. Las carpetas son de un nivel — mueve mazos dentro y fuera libremente.")
+    }
+
+    var infoAnswersTitle: String     { t("How answers are checked", "Jak se kontrolují odpovědi", "Cómo se revisan las respuestas") }
+    var infoAnswersBody: String      {
+        t("Answers are case-insensitive: 'Hello', 'hello' and 'HELLO' all count.\n\nMultiple correct answers — separate them with a slash:\n  hello - ahoj / čau\nNow either 'ahoj' OR 'čau' is accepted.\n\nLeading/trailing spaces are ignored. You must type one full alternative exactly (no partial matches).",
+          "Na velikosti písmen nezáleží: „Ahoj“, „ahoj“ i „AHOJ“ se počítají.\n\nVíce správných odpovědí — oddělte je lomítkem:\n  hello - ahoj / čau\nUznají se „ahoj“ NEBO „čau“.\n\nMezery na začátku a konci se ignorují. Musíte napsat přesně jednu celou variantu (ne částečnou shodu).",
+          "No distingue mayúsculas: 'Hola', 'hola' y 'HOLA' valen.\n\nVarias respuestas correctas — sepáralas con una barra:\n  hello - hola / buenas\nSe acepta 'hola' O 'buenas'.\n\nLos espacios al inicio/final se ignoran. Debes escribir una alternativa completa exacta (sin coincidencias parciales).")
+    }
 
     // MARK: - Greeting helper
     var currentGreeting: String {

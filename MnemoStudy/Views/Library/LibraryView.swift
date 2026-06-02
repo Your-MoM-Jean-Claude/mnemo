@@ -193,6 +193,19 @@ struct DeckCardView: View {
             Button { onEditCards() } label: {
                 Label(lang.libraryEditCards, systemImage: "square.and.pencil")
             }
+            if !library.folders.isEmpty || deck.folderID != nil {
+                Menu {
+                    ForEach(library.folders) { folder in
+                        Button(folder.name) { library.moveDeck(id: deck.id, toFolder: folder.id) }
+                    }
+                    if deck.folderID != nil {
+                        Divider()
+                        Button(lang.libraryMoveOut) { library.moveDeck(id: deck.id, toFolder: nil) }
+                    }
+                } label: {
+                    Label(lang.libraryMoveToFolderTitle, systemImage: "folder")
+                }
+            }
             ShareLink(item: FileParser.export(deck: deck), subject: Text(deck.name)) {
                 Label(lang.libraryShare, systemImage: "square.and.arrow.up")
             }

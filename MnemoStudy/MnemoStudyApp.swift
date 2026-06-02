@@ -20,6 +20,7 @@ struct MnemoStudyApp: App {
                     OnboardingView {
                         settings.settings.hasSeenOnboarding = true
                     }
+                    .environmentObject(settings)
                 } else if showSplash {
                     SplashView(lastDeck: library.lastStudiedEntry,
                                lang: settings.language,

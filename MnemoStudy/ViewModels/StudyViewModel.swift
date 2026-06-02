@@ -15,7 +15,7 @@ class StudyViewModel: ObservableObject {
     private var pendingCards: [Card] = []
 
     private(set) var wrongCardIDs: Set<UUID> = []
-    private(set) var cardRatings: [UUID: SRSRating] = [:]
+    private(set) var cardAdjustedTimes: [UUID: Double] = [:]
     private var totalAnswered: Int   = 0
     private var totalCorrect: Int    = 0
     private var startTime: Date      = Date()
@@ -102,10 +102,11 @@ class StudyViewModel: ObservableObject {
         totalAnswered    += 1
         lastCardID        = item.card.id
 
-        // Behavioral SRS rating from response time
+        // Behavioral SRS: store word-length-adjusted response time (rating
+        // is computed at save time using the user's calibrated tempo profile)
         let elapsed  = Date().timeIntervalSince(cardAppearTime)
         let wordLen  = max(item.card.front.count, item.card.back.count)
-        cardRatings[item.card.id] = SRSRating.from(correct: correct, elapsed: elapsed, wordLen: wordLen)
+        cardAdjustedTimes[item.card.id] = SRSEngine.adjustedTime(elapsed: elapsed, wordLen: wordLen)
 
         guard let idx = queue.firstIndex(where: { $0.id == item.id }) else { return }
 
@@ -165,7 +166,7 @@ class StudyViewModel: ObservableObject {
             totalAnswered: totalAnswered,
             totalCorrect:  totalCorrect,
             wrongCardIDs:  wrongCardIDs,
-            cardRatings:   cardRatings
+            cardAdjustedTimes: cardAdjustedTimes
         )
     }
 

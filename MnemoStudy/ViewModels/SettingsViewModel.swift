@@ -87,21 +87,13 @@ class SettingsViewModel: ObservableObject {
         scheduleNotifications()
     }
 
-    private let motivationalMessages = [
-        "Time to study! 📚",
-        "Ready for a quick review? 🧠",
-        "Keep your streak going! 🔥",
-        "5 minutes a day makes a difference! ✨",
-        "Your future self will thank you! 🎯",
-        "New day, new words! 💪"
-    ]
-
     func scheduleNotifications() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        let messages = settings.language.notificationMessages
         for n in settings.notifications {
             let content = UNMutableNotificationContent()
             content.title = "Mnemo Study"
-            content.body  = motivationalMessages.randomElement() ?? "Time to study! 📚"
+            content.body  = messages.randomElement() ?? "Time to study! 📚"
             content.sound = .default
             var comps = DateComponents()
             comps.hour   = n.hour
@@ -110,6 +102,21 @@ class SettingsViewModel: ObservableObject {
             let req = UNNotificationRequest(identifier: n.id.uuidString, content: content, trigger: trigger)
             UNUserNotificationCenter.current().add(req)
         }
+    }
+
+    // MARK: - SRS tempo calibration
+
+    func recordCalibration(_ adjustedTimes: [Double]) {
+        guard !adjustedTimes.isEmpty else {
+            // still count the session even if no correct answers
+            settings.tempoProfile.sessions += 1
+            return
+        }
+        var p = settings.tempoProfile
+        p.samples.append(contentsOf: adjustedTimes)
+        if p.samples.count > 300 { p.samples.removeFirst(p.samples.count - 300) }
+        p.sessions += 1
+        settings.tempoProfile = p
     }
 
     func requestNotificationPermission() {

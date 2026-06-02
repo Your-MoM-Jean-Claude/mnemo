@@ -1,9 +1,11 @@
 import SwiftUI
 
 struct OnboardingView: View {
+    @EnvironmentObject var settings: SettingsViewModel
     var onComplete: () -> Void
 
     @State private var page = 0
+    var lang: AppLanguage { settings.language }
 
     var body: some View {
         ZStack {
@@ -18,7 +20,7 @@ struct OnboardingView: View {
                 .tabViewStyle(.page(indexDisplayMode: .always))
                 .indexViewStyle(.page(backgroundDisplayMode: .always))
 
-                PrimaryButton(title: page < 2 ? "Continue" : "Get Started") {
+                PrimaryButton(title: page < 2 ? lang.onbContinue : lang.onbStart) {
                     if page < 2 {
                         withAnimation { page += 1 }
                     } else {
@@ -44,7 +46,7 @@ struct OnboardingView: View {
             Text("Mnemo Study")
                 .font(.system(size: 34, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
-            Text("Master any language,\none card at a time")
+            Text(lang.onbTagline)
                 .font(.title3).foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             Spacer()
@@ -55,13 +57,13 @@ struct OnboardingView: View {
     private var page2: some View {
         VStack(spacing: 32) {
             Spacer()
-            Text("How it works")
+            Text(lang.onbHowTitle)
                 .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
             VStack(spacing: 14) {
-                onboardingRow(icon: "keyboard", title: "Typing", desc: "Type the answer from memory")
-                onboardingRow(icon: "eye", title: "Show", desc: "Reveal the answer, judge yourself")
-                onboardingRow(icon: "list.bullet", title: "Quiz", desc: "Pick from 4 options")
+                onboardingRow(icon: "keyboard", title: lang.settingsModeTyping, desc: lang.onbTypingDesc)
+                onboardingRow(icon: "eye", title: lang.settingsModeShow, desc: lang.onbShowDesc)
+                onboardingRow(icon: "list.bullet", title: lang.settingsModeQuiz, desc: lang.onbQuizDesc)
             }
             .padding(.horizontal, 32)
             Spacer()
@@ -74,10 +76,10 @@ struct OnboardingView: View {
             Image(systemName: "brain.head.profile")
                 .font(.system(size: 64))
                 .foregroundStyle(Color.mnemoGreen)
-            Text("Spaced Repetition")
+            Text(lang.onbSRSTitle)
                 .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
-            Text("Wrong answers get flagged automatically.\n\nEnable SRS in Settings to schedule each card for review at the perfect moment — right before you forget it.")
+            Text(lang.onbSRSDesc)
                 .font(.subheadline).foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)

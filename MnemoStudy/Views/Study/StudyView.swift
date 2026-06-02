@@ -112,14 +112,14 @@ struct StudyView: View {
         .onDisappear {
             // save wrong answers even if user exits early (taps X)
             if !sessionSaved && !vm.wrongCardIDs.isEmpty {
-                library.recordSession(result: vm.buildResult(), srsEnabled: settings.srsEnabled)
+                library.recordSession(result: vm.buildResult(), settings: settings)
             }
         }
         .fullScreenCover(isPresented: $showResults) {
             if let result = finalResult {
                 ResultsView(result: result, deckName: deck.name, deck: deck, config: config)
                     .onDisappear {
-                        library.recordSession(result: result, srsEnabled: settings.srsEnabled)
+                        library.recordSession(result: result, settings: settings)
                         sessionSaved = true
                         dismiss()
                     }

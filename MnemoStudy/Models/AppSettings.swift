@@ -30,5 +30,6 @@ struct AppSettings: Codable {
     var srsEnabled: Bool = false
     var trialStartDate: Date = Date()
     var hasSeenOnboarding: Bool = false
+    var tempoProfile: UserTempoProfile = UserTempoProfile()
     static let trialDays = 3
 }

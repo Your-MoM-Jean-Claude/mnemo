@@ -58,6 +58,10 @@ class LibraryViewModel: ObservableObject {
     func moveDeck(id: UUID, toFolder folderID: UUID?) {
         guard let i = decks.firstIndex(where: { $0.id == id }) else { return }
         decks[i].folderID = folderID
+        // keep the linked temporary deck in the same folder
+        if let ti = decks.firstIndex(where: { $0.parentDeckID == id && $0.isTemporary }) {
+            decks[ti].folderID = folderID
+        }
         save()
     }
 
@@ -148,7 +152,10 @@ class LibraryViewModel: ObservableObject {
 
     // MARK: - Statistics
 
-    func recordSession(result: SessionResult, srsEnabled: Bool) {
+    func recordSession(result: SessionResult, settings: SettingsViewModel) {
+        let srsEnabled = settings.srsEnabled
+        let profile    = settings.settings.tempoProfile
+
         var stat = deckStats[result.deckID] ?? DeckStats(deckID: result.deckID)
         stat.apply(result)
 
@@ -164,12 +171,17 @@ class LibraryViewModel: ObservableObject {
                 cs.consecutiveCorrect = 0
             }
             cs.lastAnswered = result.date
-            if srsEnabled {
-                let rating = result.cardRatings[card.id] ?? (wasCorrect ? .good : .again)
+            // SRS update only for cards actually answered this session
+            if srsEnabled, let adjusted = result.cardAdjustedTimes[card.id] {
+                let rating = SRSRating.from(correct: wasCorrect, adjusted: adjusted,
+                                            median: profile.median, calibrated: profile.isCalibrated)
                 cs = SRSEngine.update(cs, rating: rating)
             }
             stat.cardStats[card.id] = cs
         }
+
+        // Feed the user's tempo profile (calibration runs over first sessions)
+        settings.recordCalibration(result.correctAdjustedTimes)
 
         deckStats[result.deckID] = stat
 

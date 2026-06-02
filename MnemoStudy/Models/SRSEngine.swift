@@ -7,15 +7,26 @@ enum SRSRating: Int, Codable {
     case good  = 4   // correct, normal speed (3–6s adjusted)
     case easy  = 5   // correct, fast (< 3s adjusted)
 
-    // Compute rating from response time + correctness
-    // wordLen adjusts thresholds: +0.4s per char above 5
-    static func from(correct: Bool, elapsed: TimeInterval, wordLen: Int) -> SRSRating {
-        if !correct { return .again }
+    // Word-length adjusted elapsed time: +0.4s allowance per char above 5
+    static func adjustedTime(elapsed: TimeInterval, wordLen: Int) -> Double {
         let bonus = max(0.0, Double(wordLen - 5)) * 0.4
-        let t = elapsed - bonus
-        if t < 3  { return .easy }
-        if t < 6  { return .good }
-        if t < 10 { return .hard }
+        return max(0, elapsed - bonus)
+    }
+
+    // Rating from adjusted time. Before calibration uses universal thresholds;
+    // after calibration uses thresholds relative to the user's personal median.
+    static func from(correct: Bool, adjusted: Double, median: Double, calibrated: Bool) -> SRSRating {
+        if !correct { return .again }
+        if !calibrated {
+            if adjusted < 3  { return .easy }
+            if adjusted < 6  { return .good }
+            if adjusted < 10 { return .hard }
+            return .again
+        }
+        // personalized relative to median
+        if adjusted < median * 0.7 { return .easy }
+        if adjusted < median * 1.3 { return .good }
+        if adjusted < median * 2.5 { return .hard }
         return .again
     }
 }

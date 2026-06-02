@@ -50,11 +50,33 @@ struct SessionResult {
     var totalAnswered: Int
     var totalCorrect: Int
     var wrongCardIDs: Set<UUID>
-    var cardRatings: [UUID: SRSRating] = [:]   // behavioral timing ratings
+    var cardAdjustedTimes: [UUID: Double] = [:]   // response time adjusted for word length
 
     var accuracy: Double {
         guard totalAnswered > 0 else { return 0 }
         return Double(totalCorrect) / Double(totalAnswered)
+    }
+
+    // Adjusted times of correctly answered cards — fed into calibration
+    var correctAdjustedTimes: [Double] {
+        cardAdjustedTimes.compactMap { (id, t) in wrongCardIDs.contains(id) ? nil : t }
+    }
+}
+
+// MARK: - User tempo profile (behavioral SRS calibration)
+
+struct UserTempoProfile: Codable {
+    var samples: [Double] = []       // adjusted response times of correct answers (rolling)
+    var sessions: Int = 0            // completed study sessions observed
+
+    static let calibrationSessions = 5
+    var isCalibrated: Bool { sessions >= UserTempoProfile.calibrationSessions }
+
+    // Median of observed times — personal baseline
+    var median: Double {
+        guard !samples.isEmpty else { return 4.0 }
+        let s = samples.sorted()
+        return s[s.count / 2]
     }
 }
 

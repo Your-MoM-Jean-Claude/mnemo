@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FeedbackView: View {
     @EnvironmentObject var settings: SettingsViewModel
+    var lang: AppLanguage { settings.language }
 
     // Survey state
     @State private var wantsSync       = false
@@ -28,9 +29,10 @@ struct FeedbackView: View {
                             Image(systemName: "bubble.left.and.bubble.right.fill")
                                 .font(.system(size: 40))
                                 .foregroundStyle(Color.mnemoGreen)
-                            Text("Help shape Mnemo Study")
+                            Text(lang.feedbackHeader)
                                 .font(.title2).fontWeight(.bold).foregroundStyle(.white)
-                            Text("Which features would you like to see next? Your vote directly influences what we build.")
+                                .multilineTextAlignment(.center)
+                            Text(lang.feedbackIntro)
                                 .font(.subheadline).foregroundStyle(.secondary)
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal, 16)
@@ -39,62 +41,34 @@ struct FeedbackView: View {
 
                         // Survey card
                         VStack(alignment: .leading, spacing: 0) {
-                            Text("What would you like to see?")
+                            Text(lang.feedbackQuestion)
                                 .font(.subheadline).fontWeight(.semibold)
                                 .foregroundStyle(.secondary)
                                 .padding(.bottom, 12)
 
-                            surveyToggle(
-                                icon: "icloud.fill", color: .blue,
-                                title: "iCloud Sync",
-                                desc: "Keep decks & progress across all your devices",
-                                binding: $wantsSync)
-
+                            surveyToggle(icon: "icloud.fill", color: .blue,
+                                title: lang.feedbackSync, desc: lang.feedbackSyncDesc, binding: $wantsSync)
                             Divider().background(Color.white.opacity(0.08))
-
-                            surveyToggle(
-                                icon: "speaker.wave.2.fill", color: .mnemoGold,
-                                title: "Audio Pronunciation",
-                                desc: "Hear native pronunciation for every card",
-                                binding: $wantsAudio)
-
+                            surveyToggle(icon: "speaker.wave.2.fill", color: .mnemoGold,
+                                title: lang.feedbackAudio, desc: lang.feedbackAudioDesc, binding: $wantsAudio)
                             Divider().background(Color.white.opacity(0.08))
-
-                            surveyToggle(
-                                icon: "books.vertical.fill", color: .mnemoGreen,
-                                title: "More Built-in Decks",
-                                desc: "More languages, topics, and vocabulary sets",
-                                binding: $wantsMoreDecks)
-
+                            surveyToggle(icon: "books.vertical.fill", color: .mnemoGreen,
+                                title: lang.feedbackMoreDecks, desc: lang.feedbackDecksDesc, binding: $wantsMoreDecks)
                             Divider().background(Color.white.opacity(0.08))
-
-                            surveyToggle(
-                                icon: "applewatch", color: Color(red: 0.6, green: 0.6, blue: 0.9),
-                                title: "Apple Watch App",
-                                desc: "5 quick cards on your wrist every morning",
-                                binding: $wantsWatch)
-
+                            surveyToggle(icon: "applewatch", color: Color(red: 0.6, green: 0.6, blue: 0.9),
+                                title: lang.feedbackWatch, desc: lang.feedbackWatchDesc, binding: $wantsWatch)
                             Divider().background(Color.white.opacity(0.08))
-
-                            surveyToggle(
-                                icon: "brain.head.profile", color: Color(red: 0.9, green: 0.5, blue: 0.3),
-                                title: "AI Card Generator",
-                                desc: "Paste any text and generate cards automatically",
-                                binding: $wantsAI)
-
+                            surveyToggle(icon: "brain.head.profile", color: Color(red: 0.9, green: 0.5, blue: 0.3),
+                                title: lang.feedbackAI, desc: lang.feedbackAIDesc, binding: $wantsAI)
                             Divider().background(Color.white.opacity(0.08))
-
-                            surveyToggle(
-                                icon: "person.2.fill", color: .orange,
-                                title: "Deck Sharing",
-                                desc: "Share your decks with friends via link",
-                                binding: $wantsSharing)
+                            surveyToggle(icon: "person.2.fill", color: .orange,
+                                title: lang.feedbackSharing, desc: lang.feedbackSharingDesc, binding: $wantsSharing)
                         }
                         .padding(16).glassCard().padding(.horizontal)
 
                         // Free text
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Anything else on your mind?")
+                            Text(lang.feedbackElse)
                                 .font(.subheadline).fontWeight(.semibold).foregroundStyle(.secondary)
                             TextEditor(text: $freeComment)
                                 .scrollContentBackground(.hidden)
@@ -107,7 +81,7 @@ struct FeedbackView: View {
                         .padding(16).glassCard().padding(.horizontal)
 
                         // Send button
-                        PrimaryButton(title: "Send Feedback") {
+                        PrimaryButton(title: lang.feedbackSend) {
                             sendFeedback()
                         }
                         .padding(.horizontal)
@@ -120,7 +94,7 @@ struct FeedbackView: View {
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "envelope")
-                                Text("Write directly: \(feedbackEmail)")
+                                Text("\(lang.feedbackWriteDirect) \(feedbackEmail)")
                             }
                             .font(.subheadline).foregroundStyle(Color.mnemoGreen)
                         }
@@ -133,8 +107,7 @@ struct FeedbackView: View {
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "star.fill").foregroundStyle(.yellow)
-                                Text("Rate Mnemo Study on the App Store")
-                                    .foregroundStyle(.secondary)
+                                Text(lang.feedbackRate).foregroundStyle(.secondary)
                             }
                             .font(.subheadline)
                         }
@@ -144,12 +117,12 @@ struct FeedbackView: View {
                     .padding(.top, 16)
                 }
             }
-            .navigationTitle("Feedback")
+            .navigationTitle(lang.feedbackTitle)
             .navigationBarTitleDisplayMode(.large)
-            .alert("Thank you! 🙏", isPresented: $showThankYou) {
-                Button("OK", role: .cancel) {}
+            .alert(lang.feedbackThanks, isPresented: $showThankYou) {
+                Button(lang.commonOK, role: .cancel) {}
             } message: {
-                Text("Your feedback has been sent. We'll use it to prioritize upcoming features.")
+                Text(lang.feedbackThanksBody)
             }
         }
     }
@@ -182,7 +155,7 @@ struct FeedbackView: View {
         if !freeComment.trimmingCharacters(in: .whitespaces).isEmpty {
             body += "\nComment:\n\(freeComment)\n"
         }
-        body += "\n---\nApp version: 1.0 (build 29)"
+        body += "\n---\nApp version: 1.0"
 
         let encoded = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let subject = "Mnemo%20Study%20Feature%20Survey"

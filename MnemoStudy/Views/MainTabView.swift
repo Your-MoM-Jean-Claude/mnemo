@@ -18,9 +18,14 @@ struct MainTabView: View {
                     Label(lang.tabStats, systemImage: "chart.bar.fill")
                 }
 
+            InfoView()
+                .tabItem {
+                    Label(lang.tabInfo, systemImage: "questionmark.circle.fill")
+                }
+
             FeedbackView()
                 .tabItem {
-                    Label("Feedback", systemImage: "bubble.left.and.bubble.right.fill")
+                    Label(lang.tabFeedback, systemImage: "bubble.left.and.bubble.right.fill")
                 }
 
             SettingsView()

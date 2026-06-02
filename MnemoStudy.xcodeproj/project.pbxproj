@@ -27,6 +27,7 @@
 		AA000018 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100018 /* SettingsView.swift */; };
 		AA000019 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100019 /* SplashView.swift */; };
 		AC000001 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC100001 /* OnboardingView.swift */; };
+		BA000001 /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA100001 /* InfoView.swift */; };
 		AD000001 /* FeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD100001 /* FeedbackView.swift */; };
 		AF000001 /* CardListEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF100001 /* CardListEditorView.swift */; };
 		AA000020 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100020 /* StatisticsView.swift */; };
@@ -84,6 +85,7 @@
 		AA100018 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		AA100019 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		AC100001 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		BA100001 /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
 		AD100001 /* FeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackView.swift; sourceTree = "<group>"; };
 		AF100001 /* CardListEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardListEditorView.swift; sourceTree = "<group>"; };
 		AA100020 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
@@ -185,6 +187,7 @@
 				AA100016 /* MainTabView.swift */,
 				AA100019 /* SplashView.swift */,
 				AC100001 /* OnboardingView.swift */,
+				BA100001 /* InfoView.swift */,
 				AD100001 /* FeedbackView.swift */,
 				AAGRP0005 /* Library */,
 				AAGRP0006 /* Study */,
@@ -453,6 +456,7 @@
 				AA000018 /* SettingsView.swift in Sources */,
 				AA000019 /* SplashView.swift in Sources */,
 				AC000001 /* OnboardingView.swift in Sources */,
+				BA000001 /* InfoView.swift in Sources */,
 				AD000001 /* FeedbackView.swift in Sources */,
 				AF000001 /* CardListEditorView.swift in Sources */,
 				AA000020 /* StatisticsView.swift in Sources */,
@@ -554,7 +558,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_TEAM = 4SK4LT94PV;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mnemo Study";
@@ -582,7 +586,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_TEAM = 4SK4LT94PV;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mnemo Study";
