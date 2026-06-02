@@ -153,7 +153,7 @@ class StudyViewModel: ObservableObject {
         // is computed at save time using the user's calibrated tempo profile)
         let elapsed  = Date().timeIntervalSince(cardAppearTime)
         let wordLen  = max(item.card.front.count, item.card.back.count)
-        cardAdjustedTimes[item.card.id] = SRSEngine.adjustedTime(elapsed: elapsed, wordLen: wordLen)
+        cardAdjustedTimes[item.card.id] = SRSRating.adjustedTime(elapsed: elapsed, wordLen: wordLen)
 
         guard let idx = queue.firstIndex(where: { $0.id == item.id }) else { return }
 
