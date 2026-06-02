@@ -7,6 +7,7 @@ struct StudyView: View {
 
     var deck: Deck
     var config: StudyConfig
+    var reviewOrigins: [UUID: UUID]? = nil   // set when this is a cross-deck daily review
 
     @StateObject private var vm: StudyViewModel
     @State private var typingInput    = ""
@@ -14,6 +15,7 @@ struct StudyView: View {
     @State private var showResults    = false
     @State private var showingBack    = false
     @State private var sessionSaved   = false
+    @State private var selectedQuiz: String? = nil
     @State private var finalResult: SessionResult? = nil
 
     private let audio = AudioPlayer.shared
@@ -22,11 +24,21 @@ struct StudyView: View {
 
     var lang: AppLanguage { settings.language }
 
-    init(deck: Deck, config: StudyConfig, srsEnabled: Bool = false, cardStats: [UUID: CardStats] = [:]) {
-        self.deck   = deck
-        self.config = config
+    init(deck: Deck, config: StudyConfig, srsEnabled: Bool = false,
+         cardStats: [UUID: CardStats] = [:], reviewOrigins: [UUID: UUID]? = nil) {
+        self.deck          = deck
+        self.config        = config
+        self.reviewOrigins = reviewOrigins
         _vm = StateObject(wrappedValue: StudyViewModel(deck: deck, config: config,
                                                        srsEnabled: srsEnabled, cardStats: cardStats))
+    }
+
+    private func save(_ result: SessionResult) {
+        if let origins = reviewOrigins {
+            library.recordReviewSession(result: result, origins: origins, settings: settings)
+        } else {
+            library.recordSession(result: result, settings: settings)
+        }
     }
 
     var body: some View {
@@ -69,7 +81,18 @@ struct StudyView: View {
                     ZStack {
                         cardContent(item: item)
 
-                        if vm.showResult && config.mode != .show {
+                        // Quiz: highlight options inline (green correct / red wrong),
+                        // tap anywhere to advance — no full-screen overlay.
+                        if vm.showResult && config.mode == .quiz {
+                            Color.clear
+                                .contentShape(Rectangle())
+                                .ignoresSafeArea()
+                                .onTapGesture { advance() }
+                                .gesture(DragGesture(minimumDistance: 30).onEnded { _ in advance() })
+                        }
+
+                        // Typing: full-screen feedback overlay
+                        if vm.showResult && config.mode == .typing {
                             Color.black.opacity(0.4).ignoresSafeArea()
 
                             Color.clear
@@ -113,14 +136,14 @@ struct StudyView: View {
         .onDisappear {
             // save wrong answers even if user exits early (taps X)
             if !sessionSaved && !vm.wrongCardIDs.isEmpty {
-                library.recordSession(result: vm.buildResult(), settings: settings)
+                save(vm.buildResult())
             }
         }
         .fullScreenCover(isPresented: $showResults) {
             if let result = finalResult {
                 ResultsView(result: result, deckName: deck.name, deck: deck, config: config)
                     .onDisappear {
-                        library.recordSession(result: result, settings: settings)
+                        save(result)
                         sessionSaved = true
                         dismiss()
                     }
@@ -261,6 +284,8 @@ struct StudyView: View {
             VStack(spacing: 10) {
                 ForEach(vm.quizOptions, id: \.self) { option in
                     Button {
+                        guard !vm.showResult else { advance(); return }
+                        selectedQuiz  = option
                         lastUserAnswer = option
                         vm.submitQuiz(choice: option)
                         haptic(correct: vm.lastAnswerCorrect)
@@ -269,15 +294,28 @@ struct StudyView: View {
                             .font(.body).foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .padding(16)
-                            .background(Color.mnemoSurface, in: RoundedRectangle(cornerRadius: 14))
+                            .background(quizOptionColor(option), in: RoundedRectangle(cornerRadius: 14))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 14)
-                                    .strokeBorder(Color.white.opacity(0.1), lineWidth: 1))
+                                    .strokeBorder(quizOptionBorder(option), lineWidth: 1))
                     }
                 }
             }
             .padding(.horizontal, 32)
         }
+    }
+
+    // Inline quiz highlight after answering
+    private func quizOptionColor(_ option: String) -> Color {
+        guard vm.showResult else { return Color.mnemoSurface }
+        if option == vm.currentExpectedAnswer { return Color.mnemoGreen.opacity(0.85) }
+        if option == selectedQuiz             { return Color.red.opacity(0.7) }
+        return Color.mnemoSurface
+    }
+    private func quizOptionBorder(_ option: String) -> Color {
+        guard vm.showResult else { return Color.white.opacity(0.1) }
+        if option == vm.currentExpectedAnswer || option == selectedQuiz { return Color.white.opacity(0.4) }
+        return Color.white.opacity(0.1)
     }
 
     // MARK: - Helpers
@@ -295,7 +333,8 @@ struct StudyView: View {
 
     private func advance() {
         vm.advanceAfterResult()
-        showingBack = false
+        showingBack  = false
+        selectedQuiz = nil
         if config.mode == .typing { inputFocused = true }
     }
 }

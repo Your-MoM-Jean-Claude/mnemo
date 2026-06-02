@@ -30,6 +30,25 @@ extension AppLanguage {
     var libraryShare: String      { t("Share",           "Sdílet",           "Compartir") }
     var libraryStudy: String      { t("Study",           "Studovat",         "Estudiar") }
     var librarySRSDue: String     { t("due today",       "dnes ke zkoušení", "para hoy") }
+    var reviewDue: String         { t("Review due",      "Procvičit splatné","Repasar pendientes") }
+    var reviewDeckName: String    { t("Daily review",    "Denní opakování",  "Repaso diario") }
+    var reviewCardsDue: String    { t("cards due for review", "karet ke zopakování", "tarjetas para repasar") }
+    var emptyDeckTitle: String    { t("No cards yet",    "Zatím žádné kartičky", "Sin tarjetas") }
+    var emptyDeckMsg: String      {
+        t("This deck has no cards. Add or import some first.",
+          "Tato knihovna nemá žádné kartičky. Nejprve nějaké přidejte nebo naimportujte.",
+          "Este mazo no tiene tarjetas. Añade o importa algunas primero.")
+    }
+    var deleteDeckConfirm: String {
+        t("Delete this deck? This can't be undone.",
+          "Smazat tuto knihovnu? Tuto akci nelze vrátit.",
+          "¿Eliminar este mazo? No se puede deshacer.")
+    }
+    var deleteFolderConfirm: String {
+        t("Delete this folder? Decks inside will be moved out, not deleted.",
+          "Smazat tuto složku? Knihovny uvnitř se přesunou ven, nesmažou se.",
+          "¿Eliminar esta carpeta? Los mazos se moverán fuera, no se eliminarán.")
+    }
 
     // MARK: - Deck editor
     var editorNewDeck: String     { t("New deck",        "Nová knihovna",    "Nuevo mazo") }

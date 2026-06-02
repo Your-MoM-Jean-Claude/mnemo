@@ -128,9 +128,19 @@ class StudyViewModel: ObservableObject {
         case .show:
             return true   // "know" branch is handled in submitShow
         case .quiz:
-            let expected = rev ? item.card.front : item.card.back
-            return (choice ?? "") == expected
+            return (choice ?? "") == primaryAnswer(item.card, reversed: rev)
         }
+    }
+
+    // For quiz: the answer side collapsed to its primary alternative (no "/")
+    private func primaryAnswer(_ card: Card, reversed: Bool) -> String {
+        reversed ? card.front : (card.backAlternatives.first ?? card.back)
+    }
+
+    // Correct option text for the current quiz card (for inline highlight)
+    var currentExpectedAnswer: String {
+        guard let item = currentItem else { return "" }
+        return primaryAnswer(item.card, reversed: reversed(item))
     }
 
     private func handleResult(item: SessionItem, correct: Bool) {
@@ -182,11 +192,11 @@ class StudyViewModel: ObservableObject {
     private func buildQuizOptions() {
         guard let item = currentItem else { quizOptions = []; return }
         let rev = reversed(item)
-        let correct = rev ? item.card.front : item.card.back
+        let correct = primaryAnswer(item.card, reversed: rev)
 
         var pool = deck.cards
             .filter { $0.id != item.card.id }
-            .map { rev ? $0.front : $0.back }
+            .map { primaryAnswer($0, reversed: rev) }
         pool.removeAll { $0 == correct }      // avoid a distractor identical to the answer
         pool = Array(Set(pool))               // de-duplicate distractors
         pool.shuffle()

@@ -15,6 +15,13 @@ struct LibraryView: View {
     @State private var newFolderName     = ""
     @State private var editMode: EditMode = .inactive
 
+    // Daily review
+    @State private var reviewSession: ReviewSession?
+    // Delete confirmation
+    @State private var deckToDelete: Deck?
+    // Empty deck warning
+    @State private var showEmptyDeckAlert = false
+
     var lang: AppLanguage { settings.language }
 
     var filteredDecks: [Deck] {
@@ -30,6 +37,32 @@ struct LibraryView: View {
 
                 ScrollView {
                     LazyVStack(spacing: 12) {
+                        // Daily review banner — only when SRS on and cards are due
+                        if settings.srsEnabled {
+                            let due = library.dueReviewCount
+                            if due > 0 {
+                                Button { startReview() } label: {
+                                    HStack(spacing: 12) {
+                                        Image(systemName: "bolt.heart.fill")
+                                            .font(.title2).foregroundStyle(.white)
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(lang.reviewDue)
+                                                .font(.headline).foregroundStyle(.white)
+                                            Text("\(due) \(lang.reviewCardsDue)")
+                                                .font(.caption).foregroundStyle(.white.opacity(0.85))
+                                        }
+                                        Spacer()
+                                        Image(systemName: "chevron.right").foregroundStyle(.white.opacity(0.8))
+                                    }
+                                    .padding(16)
+                                    .background(
+                                        LinearGradient(colors: [Color.mnemoGreen, Color.mnemoGold],
+                                                       startPoint: .leading, endPoint: .trailing),
+                                        in: RoundedRectangle(cornerRadius: 16))
+                                }
+                            }
+                        }
+
                         // Standalone decks (no folder)
                         let standalone = filteredDecks.filter { $0.folderID == nil }
                         ForEach(standalone) { deck in
@@ -42,7 +75,7 @@ struct LibraryView: View {
                                           onTapDeck: tapDeck,
                                           onEdit: { editingDeck = $0 },
                                           onEditCards: { editingCardsDeck = $0 },
-                                          onDelete: { library.deleteDeck(id: $0) },
+                                          onDelete: { id in deckToDelete = library.decks.first { $0.id == id } },
                                           onDeleteFolder: { library.deleteFolder(id: $0) })
                         }
 
@@ -123,6 +156,27 @@ struct LibraryView: View {
             } message: {
                 Text(library.errorMessage ?? "")
             }
+            // Empty deck warning
+            .alert(lang.emptyDeckTitle, isPresented: $showEmptyDeckAlert) {
+                Button(lang.commonOK, role: .cancel) {}
+            } message: {
+                Text(lang.emptyDeckMsg)
+            }
+            // Delete deck confirmation
+            .confirmationDialog(lang.deleteDeckConfirm, isPresented: Binding(
+                get: { deckToDelete != nil },
+                set: { if !$0 { deckToDelete = nil } }), titleVisibility: .visible) {
+                Button(lang.libraryDelete, role: .destructive) {
+                    if let d = deckToDelete { library.deleteDeck(id: d.id) }
+                    deckToDelete = nil
+                }
+                Button(lang.editorCancel, role: .cancel) { deckToDelete = nil }
+            }
+            // Daily review session
+            .fullScreenCover(item: $reviewSession) { rs in
+                StudyView(deck: rs.deck, config: rs.config,
+                          srsEnabled: true, cardStats: rs.stats, reviewOrigins: rs.origins)
+            }
         }
     }
 
@@ -135,7 +189,7 @@ struct LibraryView: View {
                          onTap: { tapDeck(deck) },
                          onEdit: { editingDeck = deck },
                          onEditCards: { editingCardsDeck = deck },
-                         onDelete: { library.deleteDeck(id: deck.id) })
+                         onDelete: { deckToDelete = deck })
 
             // Temp deck attached below
             if let temp = library.decks.first(where: { $0.parentDeckID == deck.id && $0.isTemporary }) {
@@ -146,8 +200,39 @@ struct LibraryView: View {
     }
 
     private func tapDeck(_ deck: Deck) {
-        selectedDeck = deck
+        if deck.cards.isEmpty {
+            showEmptyDeckAlert = true
+        } else {
+            selectedDeck = deck
+        }
     }
+
+    private func startReview() {
+        let due = library.dueReviewCards()
+        guard !due.isEmpty else { return }
+        var deck = Deck(name: lang.reviewDeckName, cards: due.map { $0.card })
+        deck.id = UUID()
+        var origins: [UUID: UUID] = [:]
+        var stats:   [UUID: CardStats] = [:]
+        for entry in due {
+            origins[entry.card.id] = entry.deckID
+            if let cs = library.deckStats[entry.deckID]?.cardStats[entry.card.id] {
+                stats[entry.card.id] = cs
+            }
+        }
+        let config = StudyConfig(mode: .typing, direction: .frontToBack, order: .random,
+                                 sectionSize: deck.cards.count, requiredCorrect: 1)
+        reviewSession = ReviewSession(deck: deck, config: config, origins: origins, stats: stats)
+    }
+}
+
+// Wrapper for a transient cross-deck review session
+struct ReviewSession: Identifiable {
+    let id = UUID()
+    let deck: Deck
+    let config: StudyConfig
+    let origins: [UUID: UUID]
+    let stats: [UUID: CardStats]
 }
 
 // MARK: - Deck card
@@ -254,9 +339,10 @@ struct FolderSection: View {
     var onDeleteFolder: (UUID) -> Void
 
     @EnvironmentObject var library: LibraryViewModel
-    @State private var isExpanded   = false
-    @State private var showRename   = false
-    @State private var renameText   = ""
+    @State private var isExpanded      = false
+    @State private var showRename      = false
+    @State private var showDeleteFolder = false
+    @State private var renameText      = ""
 
     var decks: [Deck] { library.decks.filter { $0.folderID == folder.id && !$0.isTemporary } }
     var totalCards: Int { decks.reduce(0) { $0 + $1.cards.count } }
@@ -283,7 +369,7 @@ struct FolderSection: View {
                     renameText = folder.name
                     showRename = true
                 }
-                Button(lang.libraryDelete, role: .destructive) { onDeleteFolder(folder.id) }
+                Button(lang.libraryDelete, role: .destructive) { showDeleteFolder = true }
             }
             .alert(lang.libraryRename, isPresented: $showRename) {
                 TextField(lang.folderName, text: $renameText)
@@ -292,6 +378,10 @@ struct FolderSection: View {
                         library.renameFolder(id: folder.id, name: renameText.trimmingCharacters(in: .whitespaces))
                     }
                 }
+                Button(lang.editorCancel, role: .cancel) {}
+            }
+            .confirmationDialog(lang.deleteFolderConfirm, isPresented: $showDeleteFolder, titleVisibility: .visible) {
+                Button(lang.libraryDelete, role: .destructive) { onDeleteFolder(folder.id) }
                 Button(lang.editorCancel, role: .cancel) {}
             }
 

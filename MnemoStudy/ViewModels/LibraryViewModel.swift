@@ -152,7 +152,54 @@ class LibraryViewModel: ObservableObject {
 
     // MARK: - Statistics
 
-    func recordSession(result: SessionResult, settings: SettingsViewModel) {
+    // MARK: - Daily review (all due across decks)
+
+    static let reviewSessionCap = 40
+
+    // Cards already learned (have a due date) whose review is due now, across
+    // all real (non-temporary) decks. Returns each card with its origin deck id.
+    // New/never-studied cards are NOT included — those are learned via normal study.
+    func dueReviewCards() -> [(card: Card, deckID: UUID)] {
+        let now = Date()
+        var result: [(Card, UUID, Date)] = []
+        for d in decks where !d.isTemporary {
+            let cs = deckStats[d.id]?.cardStats ?? [:]
+            for card in d.cards {
+                if let due = cs[card.id]?.srsDueDate, due <= now {
+                    result.append((card, d.id, due))
+                }
+            }
+        }
+        return result.sorted { $0.2 < $1.2 }                       // most overdue first
+            .prefix(LibraryViewModel.reviewSessionCap)
+            .map { (card: $0.0, deckID: $0.1) }
+    }
+
+    var dueReviewCount: Int { dueReviewCards().count }
+
+    // Split a combined review result back into per-origin-deck results so each
+    // deck's stats & SRS update correctly. Calibration runs once at the end.
+    func recordReviewSession(result: SessionResult, origins: [UUID: UUID], settings: SettingsViewModel) {
+        let byDeck = Dictionary(grouping: result.cardAdjustedTimes.keys) { origins[$0] ?? UUID() }
+        for (deckID, cardIDs) in byDeck {
+            guard decks.contains(where: { $0.id == deckID }) else { continue }
+            var times: [UUID: Double] = [:]
+            var wrong: Set<UUID> = []
+            for id in cardIDs {
+                times[id] = result.cardAdjustedTimes[id]
+                if result.wrongCardIDs.contains(id) { wrong.insert(id) }
+            }
+            let sub = SessionResult(
+                deckID: deckID, date: result.date, duration: result.duration / Double(byDeck.count),
+                mode: result.mode, totalAnswered: cardIDs.count,
+                totalCorrect: cardIDs.count - wrong.count,
+                wrongCardIDs: wrong, cardAdjustedTimes: times)
+            recordSession(result: sub, settings: settings, calibrate: false)
+        }
+        settings.recordCalibration(result.correctAdjustedTimes)
+    }
+
+    func recordSession(result: SessionResult, settings: SettingsViewModel, calibrate: Bool = true) {
         let srsEnabled = settings.srsEnabled
         let profile    = settings.settings.tempoProfile
 
@@ -183,7 +230,7 @@ class LibraryViewModel: ObservableObject {
         }
 
         // Feed the user's tempo profile (calibration runs over first sessions)
-        settings.recordCalibration(result.correctAdjustedTimes)
+        if calibrate { settings.recordCalibration(result.correctAdjustedTimes) }
 
         deckStats[result.deckID] = stat
 
