@@ -107,17 +107,47 @@ class LibraryViewModel: ObservableObject {
     }
 
     func deleteFolder(id: UUID) {
-        folders.removeAll { $0.id == id }
-        // move decks out of deleted folder
-        for i in decks.indices where decks[i].folderID == id {
-            decks[i].folderID = nil
+        // Delete the folder AND everything inside it (decks + their temp decks + stats)
+        let insideIDs = decks.filter { $0.folderID == id }.map { $0.id }
+        for deckID in insideIDs {
+            deckStats.removeValue(forKey: deckID)
+            decks.removeAll { $0.parentDeckID == deckID }   // linked temp decks
         }
+        decks.removeAll { $0.folderID == id }
+        folders.removeAll { $0.id == id }
         save()
     }
 
     func renameFolder(id: UUID, name: String) {
         guard let i = folders.firstIndex(where: { $0.id == id }) else { return }
         folders[i].name = name
+        save()
+    }
+
+    func moveFolder(id: UUID, before targetID: UUID) {
+        guard id != targetID,
+              let from = folders.firstIndex(where: { $0.id == id }) else { return }
+        let f = folders.remove(at: from)
+        let insertAt = folders.firstIndex(where: { $0.id == targetID }) ?? folders.count
+        folders.insert(f, at: insertAt)
+        for i in folders.indices { folders[i].sortOrder = i }
+        save()
+    }
+
+    // Reorder a deck to sit before targetID; also adopts the target's folder
+    // (so dragging onto a standalone deck moves it out of its folder).
+    func reorderDeck(id: UUID, before targetID: UUID) {
+        guard id != targetID,
+              let from = decks.firstIndex(where: { $0.id == id }),
+              let target = decks.first(where: { $0.id == targetID }) else { return }
+        var d = decks.remove(at: from)
+        let targetFolder = target.folderID
+        d.folderID = targetFolder
+        if let ti = decks.firstIndex(where: { $0.parentDeckID == id && $0.isTemporary }) {
+            decks[ti].folderID = targetFolder
+        }
+        let insertAt = decks.firstIndex(where: { $0.id == targetID }) ?? decks.count
+        decks.insert(d, at: insertAt)
         save()
     }
 

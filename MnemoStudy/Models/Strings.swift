@@ -45,9 +45,9 @@ extension AppLanguage {
           "¿Eliminar este mazo? No se puede deshacer.")
     }
     var deleteFolderConfirm: String {
-        t("Delete this folder? Decks inside will be moved out, not deleted.",
-          "Smazat tuto složku? Knihovny uvnitř se přesunou ven, nesmažou se.",
-          "¿Eliminar esta carpeta? Los mazos se moverán fuera, no se eliminarán.")
+        t("Delete this folder AND all decks inside it? This can't be undone.",
+          "Smazat tuto složku i se všemi knihovnami uvnitř? Tuto akci nelze vrátit.",
+          "¿Eliminar esta carpeta y todos sus mazos? No se puede deshacer.")
     }
 
     // MARK: - Deck editor
@@ -258,46 +258,58 @@ extension AppLanguage {
     var notificationMessages: [String] {
         switch self {
         case .en: return [
-            "Time to study! 📚",
-            "Your brain called — it wants more words 🧠",
-            "Keep that streak alive, champion! 🔥",
-            "Plot twist: 5 minutes now = fluent later ✨",
-            "Your flashcards miss you 🥺",
-            "Future polyglot, your training awaits 🎯",
-            "Don't let those words escape! 🏃💨",
-            "A wild study session appeared! 🎮",
-            "Procrastination level: expert. Let's fix that 😏",
-            "New words won't learn themselves 🤷",
-            "Brain gains incoming 💪🧠",
-            "Tap. Learn. Flex. Repeat. 😎"
+            "Your brain called. It's bored. Feed it words 🧠",
+            "That streak won't defend itself, champ 🔥",
+            "Plot twist: 5 minutes now = sounding smart on holiday ✨",
+            "Your flashcards left 47 unread messages 🥺",
+            "Be honest — you've opened Instagram 3× already 👀",
+            "The words are RIGHT THERE. Go get 'em 🏃💨",
+            "Future-you is begging present-you to study 🙏",
+            "A wild study session appeared! It's super effective 🎮",
+            "Procrastination: 9th dan black belt. Respect. Now study 🥋",
+            "Vocabulary doesn't grow on trees. Or does it? Study to find out 🌳",
+            "Skip today and a kitten forgets a word somewhere 🐱",
+            "2 minutes. That's it. I'll even wait ⏳",
+            "Your couch will still be there after. Promise 🛋️",
+            "Polyglots aren't born. They tap this notification 😎",
+            "Knowledge tax due. Pay in flashcards 🧾",
+            "Don't make me send another one of these 😤"
         ]
         case .cs: return [
-            "Čas se učit! 📚",
-            "Volal tvůj mozek — chce další slovíčka 🧠",
-            "Udrž tu sérii, šampione! 🔥",
-            "Zápletka: 5 minut teď = plynně později ✨",
-            "Tvoje kartičky se ti stýská 🥺",
-            "Budoucí polyglote, trénink čeká 🎯",
-            "Nenech ta slovíčka utéct! 🏃💨",
-            "Objevila se divoká lekce! 🎮",
-            "Úroveň prokrastinace: expert. Pojďme to spravit 😏",
-            "Slovíčka se sama nenaučí 🤷",
-            "Mozkové svaly na cestě 💪🧠",
-            "Ťukni. Nauč se. Zaválej. Opakuj. 😎"
+            "Volal tvůj mozek. Nudí se. Nakrm ho slovíčky 🧠",
+            "Ta série se sama neubrání, šampione 🔥",
+            "Zápletka: 5 minut teď = znít chytře na dovolené ✨",
+            "Tvoje kartičky ti nechaly 47 nepřečtených zpráv 🥺",
+            "Buď upřímný — Instagram už jsi dnes otevřel 3× 👀",
+            "Ta slovíčka jsou PŘÍMO TADY. Běž si pro ně 🏃💨",
+            "Budoucí ty prosí současného tebe, ať se učíš 🙏",
+            "Objevila se divoká lekce! Je velmi efektivní 🎮",
+            "Prokrastinace: 9. dan černý pásek. Respekt. Teď se uč 🥋",
+            "Slovíčka nerostou na stromech. Nebo jo? Zjisti to učením 🌳",
+            "Když to dnes vynecháš, někde kotě zapomene slovíčko 🐱",
+            "2 minuty. To je vše. Klidně počkám ⏳",
+            "Gauč tu po tom pořád bude. Slibuju 🛋️",
+            "Polygloti se nerodí. Ťuknou na tuhle notifikaci 😎",
+            "Splatná daň ze znalostí. Plať kartičkami 🧾",
+            "Nenuť mě poslat další takovou 😤"
         ]
         case .es: return [
-            "¡Hora de estudiar! 📚",
-            "Tu cerebro llamó — quiere más palabras 🧠",
-            "¡Mantén la racha, campeón! 🔥",
-            "Giro inesperado: 5 minutos hoy = fluidez mañana ✨",
-            "Tus tarjetas te extrañan 🥺",
-            "Futuro políglota, tu entrenamiento espera 🎯",
-            "¡No dejes escapar esas palabras! 🏃💨",
-            "¡Apareció una sesión salvaje! 🎮",
-            "Nivel de procrastinación: experto. Vamos a arreglarlo 😏",
-            "Las palabras no se aprenden solas 🤷",
-            "Ganancias cerebrales en camino 💪🧠",
-            "Toca. Aprende. Presume. Repite. 😎"
+            "Tu cerebro llamó. Está aburrido. Dale palabras 🧠",
+            "Esa racha no se defiende sola, campeón 🔥",
+            "Giro inesperado: 5 minutos hoy = sonar listo de vacaciones ✨",
+            "Tus tarjetas te dejaron 47 mensajes sin leer 🥺",
+            "Sé honesto — ya abriste Instagram 3 veces 👀",
+            "Las palabras están AHÍ MISMO. Ve por ellas 🏃💨",
+            "Tu yo futuro le ruega a tu yo presente que estudie 🙏",
+            "¡Apareció una sesión salvaje! Es supereficaz 🎮",
+            "Procrastinación: cinturón negro 9º dan. Respeto. Ahora estudia 🥋",
+            "El vocabulario no crece en árboles. ¿O sí? Estudia y averígualo 🌳",
+            "Si lo saltas hoy, un gatito olvida una palabra 🐱",
+            "2 minutos. Nada más. Hasta espero ⏳",
+            "El sofá seguirá ahí después. Lo prometo 🛋️",
+            "Los políglotas no nacen. Tocan esta notificación 😎",
+            "Impuesto de conocimiento vencido. Paga en tarjetas 🧾",
+            "No me hagas enviar otra de estas 😤"
         ]
         }
     }

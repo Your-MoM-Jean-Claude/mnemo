@@ -311,6 +311,14 @@ struct DeckCardView: View {
             }
             Button(lang.libraryDelete, role: .destructive, action: onDelete)
         }
+        // Drag this deck; drop onto another deck to reorder / move out of a folder
+        .draggable("deck:\(deck.id.uuidString)")
+        .dropDestination(for: String.self) { items, _ in
+            guard let s = items.first, s.hasPrefix("deck:"),
+                  let id = UUID(uuidString: String(s.dropFirst(5))) else { return false }
+            library.reorderDeck(id: id, before: deck.id)
+            return true
+        }
     }
 }
 
@@ -378,6 +386,20 @@ struct FolderSection: View {
                 }
                 .padding(.horizontal, 16).padding(.vertical, 12)
                 .glassCard()
+            }
+            // Drag the folder to reorder; drop a deck here to move it in
+            .draggable("folder:\(folder.id.uuidString)")
+            .dropDestination(for: String.self) { items, _ in
+                guard let s = items.first else { return false }
+                if s.hasPrefix("deck:"), let id = UUID(uuidString: String(s.dropFirst(5))) {
+                    library.moveDeck(id: id, toFolder: folder.id)
+                    return true
+                }
+                if s.hasPrefix("folder:"), let id = UUID(uuidString: String(s.dropFirst(7))) {
+                    library.moveFolder(id: id, before: folder.id)
+                    return true
+                }
+                return false
             }
             .contextMenu {
                 Button(lang.libraryRename) {
