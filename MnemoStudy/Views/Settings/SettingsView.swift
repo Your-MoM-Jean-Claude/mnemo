@@ -6,6 +6,7 @@ struct SettingsView: View {
     @State private var showTimePicker  = false
     @State private var pickerHour      = 8
     @State private var pickerMinute    = 0
+    @State private var showPaywall     = false
 
     var lang: AppLanguage { settings.language }
 
@@ -81,14 +82,55 @@ struct SettingsView: View {
                             }
                         }
 
-                        // SRS
+                        // Pro status / upsell
+                        Button {
+                            if !settings.isProUnlocked { showPaywall = true }
+                        } label: {
+                            settingsCard {
+                                HStack(spacing: 12) {
+                                    Image(systemName: settings.isProUnlocked ? "checkmark.seal.fill" : "crown.fill")
+                                        .foregroundStyle(Color.mnemoGold)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(lang.proRow)
+                                            .font(.subheadline).fontWeight(.semibold).foregroundStyle(.white)
+                                        if settings.isProUnlocked {
+                                            Text(lang.paywallProActive)
+                                                .font(.caption).foregroundStyle(Color.mnemoGreen)
+                                        } else if settings.inTrial {
+                                            Text("\(settings.trialSessionsRemaining) \(lang.proTrialLeft)")
+                                                .font(.caption).foregroundStyle(.secondary)
+                                        } else {
+                                            Text(lang.paywallSubtitle)
+                                                .font(.caption).foregroundStyle(.secondary)
+                                        }
+                                    }
+                                    Spacer()
+                                    if !settings.isProUnlocked {
+                                        Image(systemName: "chevron.right").font(.caption).foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+                        }
+
+                        // SRS (Pro feature)
                         settingsCard {
                             VStack(alignment: .leading, spacing: 10) {
                                 HStack {
                                     Label(lang.settingsSRS, systemImage: "brain.head.profile")
                                         .font(.subheadline).fontWeight(.semibold).foregroundStyle(.white)
+                                    if !settings.hasPro {
+                                        Image(systemName: "lock.fill").font(.caption).foregroundStyle(Color.mnemoGold)
+                                    }
                                     Spacer()
-                                    Toggle("", isOn: $settings.settings.srsEnabled)
+                                    Toggle("", isOn: Binding(
+                                        get: { settings.settings.srsEnabled },
+                                        set: { newValue in
+                                            if newValue && !settings.hasPro {
+                                                showPaywall = true        // gate: don't enable
+                                            } else {
+                                                settings.settings.srsEnabled = newValue
+                                            }
+                                        }))
                                         .tint(.mnemoGreen)
                                 }
                                 Text(lang.settingsSRSDesc)
@@ -120,6 +162,9 @@ struct SettingsView: View {
                 TimePickerSheet(hour: $pickerHour, minute: $pickerMinute, lang: lang) {
                     settings.addNotification(hour: pickerHour, minute: pickerMinute)
                 }
+            }
+            .sheet(isPresented: $showPaywall) {
+                PaywallView().environmentObject(settings)
             }
         }
     }

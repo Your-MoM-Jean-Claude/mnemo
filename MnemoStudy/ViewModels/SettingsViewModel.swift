@@ -61,18 +61,23 @@ class SettingsViewModel: ObservableObject {
         }
     }
 
-    var isTrialActive: Bool {
-        if isProUnlocked { return true }
-        let days = Calendar.current.dateComponents([.day],
-            from: settings.trialStartDate, to: Date()).day ?? 0
-        return days < AppSettings.trialDays
-    }
+    // MARK: - Access model (value-based trial + soft free tier)
+    // First N study sessions give full Pro access (taste SRS + unlimited decks).
+    // After that, a soft free tier remains (bundled decks + studying + 1 custom
+    // deck + audio + basic stats). Pro unlocks everything. No hard paywall.
 
-    var trialDaysRemaining: Int {
-        let days = Calendar.current.dateComponents([.day],
-            from: settings.trialStartDate, to: Date()).day ?? 0
-        return max(0, AppSettings.trialDays - days)
-    }
+    static let trialSessions = 5
+    static let freeCustomDecks = 1
+
+    var trialSessionsUsed: Int { settings.tempoProfile.sessions }
+    var inTrial: Bool { trialSessionsUsed < SettingsViewModel.trialSessions }
+    var trialSessionsRemaining: Int { max(0, SettingsViewModel.trialSessions - trialSessionsUsed) }
+
+    // Full access = purchased OR still within the value-based trial
+    var hasPro: Bool { isProUnlocked || inTrial }
+
+    // SRS only actually runs when enabled AND the user has Pro access
+    var srsActive: Bool { settings.srsEnabled && hasPro }
 
     // MARK: - Notifications
 

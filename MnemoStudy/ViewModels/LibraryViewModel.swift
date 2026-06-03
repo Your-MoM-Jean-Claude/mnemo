@@ -200,7 +200,7 @@ class LibraryViewModel: ObservableObject {
     }
 
     func recordSession(result: SessionResult, settings: SettingsViewModel, calibrate: Bool = true) {
-        let srsEnabled = settings.srsEnabled
+        let srsEnabled = settings.srsActive
         let profile    = settings.settings.tempoProfile
 
         var stat = deckStats[result.deckID] ?? DeckStats(deckID: result.deckID)
@@ -288,6 +288,9 @@ class LibraryViewModel: ObservableObject {
     // MARK: - Stats helpers
 
     func deck(id: UUID) -> Deck? { decks.first { $0.id == id } }
+
+    // User-created decks (excludes built-in bundled decks and temp decks)
+    var customDeckCount: Int { decks.filter { !$0.isTemporary && !$0.isBundled }.count }
 
     func stats(for deckID: UUID) -> DeckStats { deckStats[deckID] ?? DeckStats(deckID: deckID) }
 

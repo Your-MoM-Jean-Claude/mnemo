@@ -61,6 +61,7 @@ struct BundledLibraryLoader {
             var deck = Deck(name: entry.deckName, cards: cards)
             deck.folderID  = folderID
             deck.sortOrder = library.decks.count
+            deck.isBundled = true
             library.decks.append(deck)
         }
 

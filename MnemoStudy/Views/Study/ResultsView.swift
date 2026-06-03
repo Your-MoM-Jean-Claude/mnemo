@@ -82,7 +82,7 @@ struct ResultsView: View {
         }
         .fullScreenCover(item: $studyAgainConfig) { cfg in
             StudyView(deck: deck, config: cfg,
-                      srsEnabled: settings.srsEnabled,
+                      srsEnabled: settings.srsActive,
                       cardStats: library.stats(for: deck.id).cardStats)
         }
     }

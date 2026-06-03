@@ -21,6 +21,8 @@ struct LibraryView: View {
     @State private var deckToDelete: Deck?
     // Empty deck warning
     @State private var showEmptyDeckAlert = false
+    // Pro upsell
+    @State private var showPaywall = false
 
     var lang: AppLanguage { settings.language }
 
@@ -38,7 +40,7 @@ struct LibraryView: View {
                 ScrollView {
                     LazyVStack(spacing: 12) {
                         // Daily review banner — only when SRS on and cards are due
-                        if settings.srsEnabled {
+                        if settings.srsActive {
                             let due = library.dueReviewCount
                             if due > 0 {
                                 Button { startReview() } label: {
@@ -104,13 +106,13 @@ struct LibraryView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
-                        Button { showNewDeck = true } label: {
+                        Button { if canAddDeck() { showNewDeck = true } } label: {
                             Label(lang.libraryAdd, systemImage: "plus.square")
                         }
                         Button { showNewFolder = true } label: {
                             Label(lang.libraryNewFolder, systemImage: "folder.badge.plus")
                         }
-                        Button { showImport = true } label: {
+                        Button { if canAddDeck() { showImport = true } } label: {
                             Label(lang.libraryImport, systemImage: "square.and.arrow.down")
                         }
                     } label: {
@@ -177,6 +179,10 @@ struct LibraryView: View {
                 StudyView(deck: rs.deck, config: rs.config,
                           srsEnabled: true, cardStats: rs.stats, reviewOrigins: rs.origins)
             }
+            // Pro upsell (soft — dismissable)
+            .sheet(isPresented: $showPaywall) {
+                PaywallView().environmentObject(settings)
+            }
         }
     }
 
@@ -205,6 +211,15 @@ struct LibraryView: View {
         } else {
             selectedDeck = deck
         }
+    }
+
+    // Free tier allows freeCustomDecks; beyond that needs Pro
+    private func canAddDeck() -> Bool {
+        if settings.hasPro || library.customDeckCount < SettingsViewModel.freeCustomDecks {
+            return true
+        }
+        showPaywall = true
+        return false
     }
 
     private func startReview() {
@@ -262,7 +277,7 @@ struct DeckCardView: View {
                         .font(.headline).foregroundStyle(.white)
                     Text("\(deck.cards.count) \(lang.libraryCards)")
                         .font(.caption).foregroundStyle(.secondary)
-                    if settings.srsEnabled && dueCount > 0 {
+                    if settings.srsActive && dueCount > 0 {
                         TagBadge(text: "\(dueCount) \(lang.librarySRSDue)", color: .mnemoGold)
                     }
                 }

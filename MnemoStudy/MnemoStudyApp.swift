@@ -31,13 +31,10 @@ struct MnemoStudyApp: App {
                             }
                         }
                 } else {
+                    // No hard paywall — soft free tier + contextual Pro upsell
                     MainTabView()
                         .environmentObject(library)
                         .environmentObject(settings)
-                        .fullScreenCover(isPresented: .constant(!settings.isTrialActive)) {
-                            PaywallView()
-                                .environmentObject(settings)
-                        }
                 }
             }
             .preferredColorScheme(.dark)

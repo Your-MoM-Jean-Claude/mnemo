@@ -3,6 +3,7 @@ import StoreKit
 
 struct PaywallView: View {
     @EnvironmentObject var settings: SettingsViewModel
+    @Environment(\.dismiss) var dismiss
     @State private var product: Product?
     @State private var isPurchasing = false
     @State private var purchaseError: String?
@@ -13,6 +14,18 @@ struct PaywallView: View {
     var body: some View {
         ZStack {
             AppBg()
+
+            // Close button (soft paywall — always dismissable)
+            VStack {
+                HStack {
+                    Spacer()
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark")
+                            .foregroundStyle(.secondary).padding(16)
+                    }
+                }
+                Spacer()
+            }
 
             VStack(spacing: 0) {
                 Spacer()
@@ -51,8 +64,10 @@ struct PaywallView: View {
                     Text(p.displayPrice)
                         .font(.system(size: 36, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.mnemoGold)
+                    Text(lang.paywallFounder)
+                        .font(.caption).fontWeight(.semibold).foregroundStyle(Color.mnemoGreen)
                     Text(lang.paywallCancelAnytime)
-                        .font(.caption).foregroundStyle(.secondary)
+                        .font(.caption2).foregroundStyle(.secondary)
                         .padding(.bottom, 16)
                 }
 
@@ -93,8 +108,8 @@ struct PaywallView: View {
             case .success(let v):
                 switch v {
                 case .verified:
-                    settings.settings.trialStartDate = .distantPast  // mark trial as always-valid
-                    // In a real paywall you'd store the entitlement; for now we mark trial as active
+                    settings.isProUnlocked = true   // persisted to iCloud, survives reinstall
+                    dismiss()
                 default: break
                 }
             default: break
@@ -109,7 +124,8 @@ struct PaywallView: View {
         try? await AppStore.sync()
         for await result in Transaction.currentEntitlements {
             if case .verified(let t) = result, t.productID == Self.productID {
-                settings.settings.trialStartDate = .distantPast
+                settings.isProUnlocked = true
+                dismiss()
             }
         }
     }

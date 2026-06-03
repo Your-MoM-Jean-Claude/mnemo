@@ -10,6 +10,7 @@ struct Deck: Identifiable, Codable {
     var isTemporary: Bool = false
     var parentDeckID: UUID?      // set when isTemporary == true
     var sortOrder: Int = 0
+    var isBundled: Bool = false  // true for built-in starter decks (free, don't count to limit)
 }
 
 struct DeckFolder: Identifiable, Codable {

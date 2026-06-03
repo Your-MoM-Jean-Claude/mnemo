@@ -126,7 +126,7 @@ struct StudySettingsView: View {
             }
             .fullScreenCover(item: $studyConfig) { config in
                 StudyView(deck: deck, config: config,
-                          srsEnabled: settings.srsEnabled,
+                          srsEnabled: settings.srsActive,
                           cardStats: library.stats(for: deck.id).cardStats)
             }
         }

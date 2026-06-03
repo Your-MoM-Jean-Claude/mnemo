@@ -176,7 +176,21 @@ extension AppLanguage {
     var paywallFeature4: String      { t("Statistics & progress",        "Statistiky a pokrok",          "Estadísticas y progreso") }
     var paywallPurchase: String      { t("Unlock",                       "Odemknout",                    "Desbloquear") }
     var paywallRestore: String       { t("Restore purchase",             "Obnovit nákup",                "Restaurar compra") }
-    var paywallCancelAnytime: String { t("Cancel anytime",               "Zrušit kdykoliv",              "Cancela cuando quieras") }
+    var paywallCancelAnytime: String { t("One-time purchase · yours forever", "Jednorázově · navždy vaše", "Pago único · tuyo para siempre") }
+    var paywallFounder: String       { t("🚀 Launch price — going up soon", "🚀 Zaváděcí cena — brzy se zvýší", "🚀 Precio de lanzamiento — subirá pronto") }
+    var paywallProActive: String     { t("Pro unlocked — thank you! 🎉", "Pro odemčeno — děkujeme! 🎉", "Pro desbloqueado — ¡gracias! 🎉") }
+    var proRow: String               { t("Mnemo Study Pro", "Mnemo Study Pro", "Mnemo Study Pro") }
+    var proTrialLeft: String         { t("sessions of full access left", "sezení s plným přístupem", "sesiones de acceso completo") }
+    var gateDecksMsg: String         {
+        t("The free version includes 1 custom deck. Unlock Pro for unlimited decks, SRS, import and more.",
+          "Verze zdarma obsahuje 1 vlastní knihovnu. Odemkněte Pro pro neomezené knihovny, SRS, import a další.",
+          "La versión gratuita incluye 1 mazo propio. Desbloquea Pro para mazos ilimitados, SRS, importación y más.")
+    }
+    var gateSRSMsg: String           {
+        t("Spaced Repetition is a Pro feature. Unlock Pro to let Mnemo schedule your reviews automatically.",
+          "Opakování s rozestupy je funkce Pro. Odemkněte Pro a nechte Mnemo plánovat opakování automaticky.",
+          "La repetición espaciada es una función Pro. Desbloquea Pro para que Mnemo programe tus repasos.")
+    }
 
     // MARK: - Folder
     var folderName: String           { t("Folder name",      "Název složky",      "Nombre de carpeta") }
