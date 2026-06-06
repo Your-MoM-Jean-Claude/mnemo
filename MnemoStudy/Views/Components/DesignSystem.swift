@@ -124,22 +124,23 @@ struct AnswerFeedbackOverlay: View {
                 .fill(feedbackColor)
                 .padding(16)
 
-            VStack(spacing: 0) {
-                // Heading — upper area
+            // All content kept in the UPPER part of the screen so it is never
+            // hidden behind the keyboard or its predictive bar (typing mode keeps
+            // the keyboard up). The colored area below stays empty.
+            VStack(spacing: 20) {
+                // Heading
                 VStack(spacing: 10) {
                     Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
-                        .font(.system(size: 60))
+                        .font(.system(size: 56))
                         .foregroundStyle(.white.opacity(0.92))
                     Text(isCorrect ? lang.studyCorrect : lang.studyWrong)
                         .font(.system(size: 30, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                 }
-                .padding(.top, 52)
+                .padding(.top, 72)
 
-                Spacer()
-
-                // Word pair — center
-                VStack(spacing: 14) {
+                // Word pair — directly under the heading (top region)
+                VStack(spacing: 12) {
                     Text(questionText)
                         .font(.system(size: 20, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.75))
@@ -165,7 +166,7 @@ struct AnswerFeedbackOverlay: View {
                                 .strikethrough(true, color: .white.opacity(0.7))
                                 .multilineTextAlignment(.center)
                         }
-                        .padding(.top, 12)
+                        .padding(.top, 8)
                     }
                 }
                 .padding(.horizontal, 36)

@@ -188,6 +188,11 @@ struct StudyView: View {
                 .submitLabel(.done)
                 .onSubmit { checkTyping() }
                 .focused($inputFocused)
+                // Hide the predictive/QuickType bar (covers feedback + would
+                // suggest the answer) and stop autocapitalization mangling input.
+                // NOTE: no .keyboardType restriction — must allow accents/CJK.
+                .autocorrectionDisabled(true)
+                .textInputAutocapitalization(.never)
                 .padding(.horizontal, 32)
 
             PrimaryButton(title: lang.studyCheck) { checkTyping() }
