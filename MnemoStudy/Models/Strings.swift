@@ -148,6 +148,8 @@ extension AppLanguage {
     var settingsMinutes: String      { t("min",              "min",               "min") }
     var settingsNotifications: String{ t("Reminders",        "Připomínky",        "Recordatorios") }
     var settingsAddReminder: String  { t("Add reminder",     "Přidat připomínku", "Añadir recordatorio") }
+    var settingsSnooze: String       { t("Pause reminders for 10 min", "Pozastavit připomínky na 10 min", "Pausar recordatorios 10 min") }
+    var settingsSnoozed: String      { t("Reminders paused for 10 minutes", "Připomínky pozastaveny na 10 minut", "Recordatorios pausados 10 minutos") }
     var settingsLanguage: String     { t("Language",         "Jazyk",             "Idioma") }
     var settingsSRS: String          { t("Spaced Repetition (SRS)", "Opakování se rozestupy (SRS)", "Repetición espaciada (SRS)") }
     var settingsSRSDesc: String      {
@@ -254,62 +256,80 @@ extension AppLanguage {
           "Las respuestas incorrectas se marcan automáticamente.\n\nActiva SRS en Ajustes para programar cada tarjeta en el momento justo, antes de olvidarla.")
     }
 
-    // MARK: - Notifications (motivational + funny, rotate)
+    // MARK: - Notifications — 10 funny + 10 philosophical, rotated randomly
     var notificationMessages: [String] {
         switch self {
         case .en: return [
+            // funny
             "Your brain called. It's bored. Feed it words 🧠",
-            "That streak won't defend itself, champ 🔥",
-            "Plot twist: 5 minutes now = sounding smart on holiday ✨",
-            "Your flashcards left 47 unread messages 🥺",
             "Be honest — you've opened Instagram 3× already 👀",
-            "The words are RIGHT THERE. Go get 'em 🏃💨",
-            "Future-you is begging present-you to study 🙏",
-            "A wild study session appeared! It's super effective 🎮",
-            "Procrastination: 9th dan black belt. Respect. Now study 🥋",
-            "Vocabulary doesn't grow on trees. Or does it? Study to find out 🌳",
             "Skip today and a kitten forgets a word somewhere 🐱",
             "2 minutes. That's it. I'll even wait ⏳",
-            "Your couch will still be there after. Promise 🛋️",
             "Polyglots aren't born. They tap this notification 😎",
-            "Knowledge tax due. Pay in flashcards 🧾",
-            "Don't make me send another one of these 😤"
+            "Your flashcards left 47 unread messages 🥺",
+            "Your couch will still be there after. Promise 🛋️",
+            "Procrastination: 9th dan black belt. Now study 🥋",
+            "Words won't learn themselves. Trust me, I tried 🤷",
+            "Don't make me send another one of these 😤",
+            // philosophical / focus
+            "We are what we repeatedly do. A few minutes today is an investment 🌱",
+            "Focus is a muscle. Every review strengthens it 💪",
+            "Calm. One word. Then another. That's how a language is built 🧱",
+            "Five focused minutes beat an hour of distraction 🎯",
+            "The master was once a beginner who didn't quit 🧭",
+            "The brain grows where you aim your attention 🧠",
+            "You don't have to be great to start. Start to be great 🚀",
+            "Small progress is still progress ✨",
+            "You don't learn a language for a test, but for life 🌍",
+            "Discipline is the bridge between goals and results 🌉"
         ]
         case .cs: return [
+            // vtipné
             "Volal tvůj mozek. Nudí se. Nakrm ho slovíčky 🧠",
-            "Ta série se sama neubrání, šampione 🔥",
-            "Zápletka: 5 minut teď = znít chytře na dovolené ✨",
-            "Tvoje kartičky ti nechaly 47 nepřečtených zpráv 🥺",
             "Buď upřímný — Instagram už jsi dnes otevřel 3× 👀",
-            "Ta slovíčka jsou PŘÍMO TADY. Běž si pro ně 🏃💨",
-            "Budoucí ty prosí současného tebe, ať se učíš 🙏",
-            "Objevila se divoká lekce! Je velmi efektivní 🎮",
-            "Prokrastinace: 9. dan černý pásek. Respekt. Teď se uč 🥋",
-            "Slovíčka nerostou na stromech. Nebo jo? Zjisti to učením 🌳",
             "Když to dnes vynecháš, někde kotě zapomene slovíčko 🐱",
             "2 minuty. To je vše. Klidně počkám ⏳",
-            "Gauč tu po tom pořád bude. Slibuju 🛋️",
             "Polygloti se nerodí. Ťuknou na tuhle notifikaci 😎",
-            "Splatná daň ze znalostí. Plať kartičkami 🧾",
-            "Nenuť mě poslat další takovou 😤"
+            "Tvoje kartičky ti nechaly 47 nepřečtených zpráv 🥺",
+            "Gauč tu po tom pořád bude. Slibuju 🛋️",
+            "Prokrastinace: 9. dan černý pásek. Teď se uč 🥋",
+            "Slovíčka se sama nenaučí. Věř mi, zkoušel jsem 🤷",
+            "Nenuť mě poslat další takovou 😤",
+            // filozoficko-motivační
+            "Jsme to, co opakovaně děláme. Pár minut dnes je investice 🌱",
+            "Soustředění je sval. Každé opakování ho posiluje 💪",
+            "Klid. Jedno slovo. Pak další. Tak se staví jazyk 🧱",
+            "Pět minut soustředění porazí hodinu roztěkanosti 🎯",
+            "Mistr byl kdysi začátečník, který se nevzdal 🧭",
+            "Mozek roste tam, kam směřuješ pozornost 🧠",
+            "Nemusíš být skvělý, abys začal. Začni, abys byl skvělý 🚀",
+            "Malý pokrok je pořád pokrok ✨",
+            "Jazyk se neučíš na zkoušku, ale na celý život 🌍",
+            "Disciplína je most mezi cílem a výsledkem 🌉"
         ]
         case .es: return [
+            // graciosas
             "Tu cerebro llamó. Está aburrido. Dale palabras 🧠",
-            "Esa racha no se defiende sola, campeón 🔥",
-            "Giro inesperado: 5 minutos hoy = sonar listo de vacaciones ✨",
-            "Tus tarjetas te dejaron 47 mensajes sin leer 🥺",
             "Sé honesto — ya abriste Instagram 3 veces 👀",
-            "Las palabras están AHÍ MISMO. Ve por ellas 🏃💨",
-            "Tu yo futuro le ruega a tu yo presente que estudie 🙏",
-            "¡Apareció una sesión salvaje! Es supereficaz 🎮",
-            "Procrastinación: cinturón negro 9º dan. Respeto. Ahora estudia 🥋",
-            "El vocabulario no crece en árboles. ¿O sí? Estudia y averígualo 🌳",
             "Si lo saltas hoy, un gatito olvida una palabra 🐱",
             "2 minutos. Nada más. Hasta espero ⏳",
-            "El sofá seguirá ahí después. Lo prometo 🛋️",
             "Los políglotas no nacen. Tocan esta notificación 😎",
-            "Impuesto de conocimiento vencido. Paga en tarjetas 🧾",
-            "No me hagas enviar otra de estas 😤"
+            "Tus tarjetas te dejaron 47 mensajes sin leer 🥺",
+            "El sofá seguirá ahí después. Lo prometo 🛋️",
+            "Procrastinación: cinturón negro 9º dan. Ahora estudia 🥋",
+            "Las palabras no se aprenden solas. Créeme, lo intenté 🤷",
+            "No me hagas enviar otra de estas 😤",
+            // filosóficas / concentración
+            "Somos lo que hacemos repetidamente. Unos minutos hoy son una inversión 🌱",
+            "La concentración es un músculo. Cada repaso lo fortalece 💪",
+            "Calma. Una palabra. Luego otra. Así se construye un idioma 🧱",
+            "Cinco minutos de concentración vencen una hora de distracción 🎯",
+            "El maestro fue un principiante que no se rindió 🧭",
+            "El cerebro crece donde diriges tu atención 🧠",
+            "No tienes que ser grande para empezar. Empieza para ser grande 🚀",
+            "Un pequeño progreso sigue siendo progreso ✨",
+            "No aprendes un idioma para un examen, sino para la vida 🌍",
+            "La disciplina es el puente entre metas y resultados 🌉"
         ]
         }
     }

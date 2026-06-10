@@ -7,6 +7,7 @@ struct SettingsView: View {
     @State private var pickerHour      = 8
     @State private var pickerMinute    = 0
     @State private var showPaywall     = false
+    @State private var showSnoozed     = false
 
     var lang: AppLanguage { settings.language }
 
@@ -63,6 +64,18 @@ struct SettingsView: View {
                                     } label: {
                                         Label(lang.settingsAddReminder, systemImage: "plus")
                                             .font(.subheadline).foregroundStyle(Color.mnemoGreen)
+                                    }
+                                }
+
+                                // Snooze — pause reminders for 10 minutes
+                                if !settings.settings.notifications.isEmpty {
+                                    Divider().background(Color.white.opacity(0.08))
+                                    Button {
+                                        settings.snoozeReminders(minutes: 10)
+                                        showSnoozed = true
+                                    } label: {
+                                        Label(lang.settingsSnooze, systemImage: "moon.zzz.fill")
+                                            .font(.subheadline).foregroundStyle(Color.mnemoGold)
                                     }
                                 }
                             }
@@ -165,6 +178,9 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $showPaywall) {
                 PaywallView().environmentObject(settings)
+            }
+            .alert(lang.settingsSnoozed, isPresented: $showSnoozed) {
+                Button(lang.commonOK, role: .cancel) {}
             }
         }
     }

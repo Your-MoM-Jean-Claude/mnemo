@@ -127,46 +127,46 @@ struct AnswerFeedbackOverlay: View {
             // All content kept in the UPPER part of the screen so it is never
             // hidden behind the keyboard or its predictive bar (typing mode keeps
             // the keyboard up). The colored area below stays empty.
-            VStack(spacing: 20) {
-                // Heading
-                VStack(spacing: 10) {
+            VStack(spacing: 14) {
+                // Heading — compact
+                VStack(spacing: 6) {
                     Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
-                        .font(.system(size: 56))
+                        .font(.system(size: 40))
                         .foregroundStyle(.white.opacity(0.92))
                     Text(isCorrect ? lang.studyCorrect : lang.studyWrong)
-                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                 }
-                .padding(.top, 72)
+                .padding(.top, 60)
 
                 // Word pair — directly under the heading (top region)
-                VStack(spacing: 12) {
+                VStack(spacing: 8) {
                     Text(questionText)
-                        .font(.system(size: 20, weight: .medium, design: .rounded))
+                        .font(.system(size: 16, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.75))
                         .multilineTextAlignment(.center)
 
                     Image(systemName: "arrow.down")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.45))
 
                     Text(correctText)
-                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                         .multilineTextAlignment(.center)
 
                     // User's wrong answer — struck through
                     if showUserAnswer {
-                        VStack(spacing: 4) {
+                        VStack(spacing: 2) {
                             Text(lang.studyYourAnswer)
-                                .font(.caption).foregroundStyle(.white.opacity(0.6))
+                                .font(.caption2).foregroundStyle(.white.opacity(0.6))
                             Text(userAnswer)
-                                .font(.system(size: 20, weight: .medium, design: .rounded))
+                                .font(.system(size: 16, weight: .medium, design: .rounded))
                                 .foregroundStyle(.white.opacity(0.85))
                                 .strikethrough(true, color: .white.opacity(0.7))
                                 .multilineTextAlignment(.center)
                         }
-                        .padding(.top, 8)
+                        .padding(.top, 6)
                     }
                 }
                 .padding(.horizontal, 36)

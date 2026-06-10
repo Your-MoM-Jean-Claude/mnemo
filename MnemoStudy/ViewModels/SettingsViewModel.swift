@@ -18,6 +18,8 @@ class SettingsViewModel: ObservableObject {
             settings = AppSettings()
         }
         restorePurchaseIfNeeded()
+        // Refresh the rolling notification window on every launch
+        if !settings.notifications.isEmpty { scheduleNotifications() }
     }
 
     private func restorePurchaseIfNeeded() {
@@ -92,21 +94,45 @@ class SettingsViewModel: ObservableObject {
         scheduleNotifications()
     }
 
+    private var snoozeUntil: Date?
+
+    // Schedule a rolling 7-day window of individual notifications, each with a
+    // RANDOM message — so reminders actually vary (a single repeating trigger
+    // would freeze one message). Refreshed on launch and whenever times change.
     func scheduleNotifications() {
-        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        let center = UNUserNotificationCenter.current()
+        center.removeAllPendingNotificationRequests()
+        guard !settings.notifications.isEmpty else { return }
+
         let messages = settings.language.notificationMessages
+        let cal = Calendar.current
+        let now = Date()
+        let floor = max(now, snoozeUntil ?? .distantPast)
+
         for n in settings.notifications {
-            let content = UNMutableNotificationContent()
-            content.title = "Mnemo Study"
-            content.body  = messages.randomElement() ?? "Time to study! 📚"
-            content.sound = .default
-            var comps = DateComponents()
-            comps.hour   = n.hour
-            comps.minute = n.minute
-            let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
-            let req = UNNotificationRequest(identifier: n.id.uuidString, content: content, trigger: trigger)
-            UNUserNotificationCenter.current().add(req)
+            for dayOffset in 0..<7 {
+                guard let base = cal.date(byAdding: .day, value: dayOffset, to: now) else { continue }
+                var comps = cal.dateComponents([.year, .month, .day], from: base)
+                comps.hour = n.hour; comps.minute = n.minute
+                guard let fireDate = cal.date(from: comps), fireDate > floor else { continue }
+
+                let content = UNMutableNotificationContent()
+                content.title = "Mnemo Study"
+                content.body  = messages.randomElement() ?? "📚"
+                content.sound = .default
+                let trigComps = cal.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
+                let trigger = UNCalendarNotificationTrigger(dateMatching: trigComps, repeats: false)
+                let req = UNNotificationRequest(identifier: "\(n.id.uuidString)-\(dayOffset)",
+                                                content: content, trigger: trigger)
+                center.add(req)
+            }
         }
+    }
+
+    // Pause reminders for N minutes, then they resume automatically.
+    func snoozeReminders(minutes: Int = 10) {
+        snoozeUntil = Date().addingTimeInterval(Double(minutes) * 60)
+        scheduleNotifications()
     }
 
     // MARK: - SRS tempo calibration
