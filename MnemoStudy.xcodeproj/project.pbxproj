@@ -14,6 +14,7 @@
 		AA000005 /* FileParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100005 /* FileParser.swift */; };
 		AA000006 /* SRSEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100006 /* SRSEngine.swift */; };
 		AA000090 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100090 /* Persistence.swift */; };
+		AA000092 /* LibraryMerge.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100093 /* LibraryMerge.swift */; };
 		AA000007 /* Strings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100007 /* Strings.swift */; };
 		AA000008 /* StudyModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100008 /* StudyModels.swift */; };
 		AA000009 /* LibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100009 /* LibraryViewModel.swift */; };
@@ -74,6 +75,7 @@
 		AA100005 /* FileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileParser.swift; sourceTree = "<group>"; };
 		AA100006 /* SRSEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRSEngine.swift; sourceTree = "<group>"; };
 		AA100090 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		AA100093 /* LibraryMerge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryMerge.swift; sourceTree = "<group>"; };
 		AA100007 /* Strings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strings.swift; sourceTree = "<group>"; };
 		AA100008 /* StudyModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyModels.swift; sourceTree = "<group>"; };
 		AA100009 /* LibraryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewModel.swift; sourceTree = "<group>"; };
@@ -171,6 +173,7 @@
 				AA100005 /* FileParser.swift */,
 				AA100006 /* SRSEngine.swift */,
 				AA100090 /* Persistence.swift */,
+				AA100093 /* LibraryMerge.swift */,
 				AA100007 /* Strings.swift */,
 				AA100008 /* StudyModels.swift */,
 				AA100025 /* BundledLibraryLoader.swift */,
@@ -452,6 +455,7 @@
 				AA000005 /* FileParser.swift in Sources */,
 				AA000006 /* SRSEngine.swift in Sources */,
 				AA000090 /* Persistence.swift in Sources */,
+				AA000092 /* LibraryMerge.swift in Sources */,
 				AA000007 /* Strings.swift in Sources */,
 				AA000008 /* StudyModels.swift in Sources */,
 				AA000009 /* LibraryViewModel.swift in Sources */,

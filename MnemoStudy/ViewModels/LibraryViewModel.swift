@@ -1,21 +1,6 @@
 import Foundation
 import Combine
 
-/// Per-day rollup used by the streak counter and the weekly chart, so neither
-/// has to walk the whole session history on every SwiftUI render.
-struct DayStat: Codable {
-    var sessions: Int = 0
-    var minutes: Double = 0
-
-    init() {}
-
-    init(from decoder: Decoder) throws {
-        let c = try decoder.container(keyedBy: CodingKeys.self)
-        sessions = try c.decodeIfPresent(Int.self, forKey: .sessions) ?? 0
-        minutes  = try c.decodeIfPresent(Double.self, forKey: .minutes) ?? 0
-    }
-}
-
 class LibraryViewModel: ObservableObject {
     @Published var decks: [Deck]             = []
     @Published var folders: [DeckFolder]     = []
@@ -311,14 +296,16 @@ class LibraryViewModel: ObservableObject {
                 mode: result.mode, totalAnswered: cardIDs.count,
                 totalCorrect: cardIDs.count - wrong.count,
                 wrongCardIDs: wrong, cardAdjustedTimes: times)
-            recordSession(result: sub, settings: settings, calibrate: false)
+            recordSession(result: sub, settings: settings, calibrate: false, countDay: false)
         }
         isBatching = false
+        recordDay(result.date, minutes: result.duration / 60)
         settings.recordCalibration(result.correctAdjustedTimes)
         save()
     }
 
-    func recordSession(result: SessionResult, settings: SettingsViewModel, calibrate: Bool = true) {
+    func recordSession(result: SessionResult, settings: SettingsViewModel,
+                       calibrate: Bool = true, countDay: Bool = true) {
         let srsEnabled = settings.srsActive
         let profile    = settings.settings.tempoProfile
 
@@ -352,7 +339,10 @@ class LibraryViewModel: ObservableObject {
         if calibrate { settings.recordCalibration(result.correctAdjustedTimes) }
 
         deckStats[result.deckID] = stat
-        recordDay(result.date, minutes: result.duration / 60)
+        // One review session that spans five decks is still one session. Letting
+        // each per-deck sub-result record its own day entry multiplied the day's
+        // session count by the number of decks involved.
+        if countDay { recordDay(result.date, minutes: result.duration / 60) }
 
         // Update lastStudied
         if let i = decks.firstIndex(where: { $0.id == result.deckID }) {
@@ -584,6 +574,23 @@ class LibraryViewModel: ObservableObject {
 
     // MARK: - iCloud sync
 
+    private func currentSnapshot() -> LibrarySnapshot {
+        LibrarySnapshot(decks: decks, folders: folders, stats: deckStats, days: dayStats)
+    }
+
+    private func cloudSnapshot() -> LibrarySnapshot? {
+        guard let d = cloud.data(forKey: decksKey),
+              let remoteDecks = SafeJSON.array(Deck.self, from: d) else { return nil }
+        var snap = LibrarySnapshot(decks: remoteDecks)
+        if let fd = cloud.data(forKey: foldersKey),
+           let v = SafeJSON.array(DeckFolder.self, from: fd)                 { snap.folders = v }
+        if let sd = cloud.data(forKey: statsKey),
+           let v = SafeJSON.dictionary(UUID.self, DeckStats.self, from: sd)  { snap.stats = v }
+        if let dd = cloud.data(forKey: daysKey),
+           let v = SafeJSON.dictionary(String.self, DayStat.self, from: dd)  { snap.days = v }
+        return snap
+    }
+
     private func mergeFromCloudIfNewer() {
         guard cloud.data(forKey: decksKey) != nil else { return }
         // A device that has never been edited locally holds nothing worth
@@ -612,56 +619,50 @@ class LibraryViewModel: ObservableObject {
         }
     }
 
-    /// Cloud copy is older than ours, so it does not get to replace anything —
-    /// but decks it holds that we have never seen are adopted rather than
-    /// dropped. Without this, two devices edited offline meant the slower one's
-    /// work was erased by the next push.
+    /// Our copy is the newer one, so it wins — but decks the cloud holds that we
+    /// have never seen are adopted rather than dropped. Temporary "wrong answers"
+    /// decks are not adopted; they are regenerated from this device's own
+    /// mistakes and importing another device's is just noise.
     private func unionInCloudExtras() {
-        guard let d = cloud.data(forKey: decksKey),
-              let remote = SafeJSON.array(Deck.self, from: d) else { return }
-        let known = Set(decks.map { $0.id })
-        let extras = remote.filter { !known.contains($0.id) && !$0.isTemporary }
-        guard !extras.isEmpty else { return }
+        guard var remote = cloudSnapshot() else { return }
+        remote.decks.removeAll { $0.isTemporary }
 
-        if let fd = cloud.data(forKey: foldersKey),
-           let remoteFolders = SafeJSON.array(DeckFolder.self, from: fd) {
-            let knownFolders = Set(folders.map { $0.id })
-            let neededFolders = Set(extras.compactMap { $0.folderID })
-            folders.append(contentsOf: remoteFolders.filter {
-                !knownFolders.contains($0.id) && neededFolders.contains($0.id)
-            })
-        }
-        decks.append(contentsOf: extras)
+        let merged = LibraryMerge.adopting(currentSnapshot(), into: remote)
+        guard merged.decks.count != decks.count || merged.folders.count != folders.count else { return }
 
-        if let sd = cloud.data(forKey: statsKey),
-           let remoteStats = SafeJSON.dictionary(UUID.self, DeckStats.self, from: sd) {
-            for e in extras where deckStats[e.id] == nil {
-                if let s = remoteStats[e.id] { deckStats[e.id] = s }
-            }
-        }
+        decks     = merged.decks
+        folders   = merged.folders
+        deckStats = merged.stats
+        dayStats  = merged.days
         save()
     }
 
+    /// The cloud copy is newer, so it decides everything it knows about — but it
+    /// does not get to delete decks it has never seen. Replacing outright meant
+    /// whichever device synced second lost its entire offline session.
     private func applyCloudData() {
-        isApplyingCloud = true
-        defer { isApplyingCloud = false }
+        guard let remote = cloudSnapshot() else { return }
+        let merged = LibraryMerge.adopting(remote, into: currentSnapshot())
 
-        if let d = cloud.data(forKey: decksKey),
-           let v = SafeJSON.array(Deck.self, from: d)                       { decks = v }
-        if let d = cloud.data(forKey: foldersKey),
-           let v = SafeJSON.array(DeckFolder.self, from: d)                 { folders = v }
-        if let d = cloud.data(forKey: statsKey),
-           let v = SafeJSON.dictionary(UUID.self, DeckStats.self, from: d)  { deckStats = v }
-        if let d = cloud.data(forKey: daysKey),
-           let v = SafeJSON.dictionary(String.self, DayStat.self, from: d)  { dayStats = v }
+        isApplyingCloud = true
+        decks     = merged.decks
+        folders   = merged.folders
+        deckStats = merged.stats
+        dayStats  = merged.days
 
         if dayStats.isEmpty && !deckStats.isEmpty { rebuildDayStats() }
 
-        // Mirror to local storage + sync timestamp (no re-push to cloud)
+        // Mirror to local storage + sync timestamp (the push is suppressed while
+        // isApplyingCloud is set, so this writes locally only).
         save()
-        let cloudDate = cloud.double(forKey: syncDateKey)
-        UserDefaults.standard.set(cloudDate, forKey: syncDateKey)
+        UserDefaults.standard.set(cloud.double(forKey: syncDateKey), forKey: syncDateKey)
         // Adopted data counts as real data from here on.
         hasUserData = true
+        isApplyingCloud = false
+
+        // Whatever this device held that the cloud copy did not has to go back up,
+        // or it stays stranded here until the user happens to edit something.
+        let remoteIDs = Set(remote.decks.map { $0.id })
+        if merged.decks.contains(where: { !remoteIDs.contains($0.id) }) { save() }
     }
 }
