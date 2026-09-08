@@ -107,8 +107,11 @@ struct PaywallView: View {
             switch result {
             case .success(let v):
                 switch v {
-                case .verified:
+                case .verified(let transaction):
                     settings.isProUnlocked = true   // persisted to iCloud, survives reinstall
+                    // StoreKit redelivers a transaction that was never finished,
+                    // which makes the App Store re-present a purchase already paid for.
+                    await transaction.finish()
                     dismiss()
                 default: break
                 }

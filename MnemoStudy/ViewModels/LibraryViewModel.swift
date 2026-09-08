@@ -642,7 +642,14 @@ class LibraryViewModel: ObservableObject {
     /// whichever device synced second lost its entire offline session.
     private func applyCloudData() {
         guard let remote = cloudSnapshot() else { return }
-        let merged = LibraryMerge.adopting(remote, into: currentSnapshot())
+        // Only a device that already holds data of its own gets to keep content
+        // the cloud copy has never seen. On a fresh install everything local is
+        // just the built-in seed, and preserving that would merge 25 starter decks
+        // into the user's real library and push them back up — which is the exact
+        // overwrite this whole path exists to prevent.
+        let merged = hasUserData
+            ? LibraryMerge.adopting(remote, into: currentSnapshot())
+            : remote
 
         isApplyingCloud = true
         decks     = merged.decks

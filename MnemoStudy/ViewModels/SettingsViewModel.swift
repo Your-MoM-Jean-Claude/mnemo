@@ -24,6 +24,7 @@ class SettingsViewModel: ObservableObject {
     fileprivate static let proKey = "mnemo_pro_unlocked"
 
     private let iCloudStore = NSUbiquitousKeyValueStore.default
+    private var updatesTask: Task<Void, Never>?
 
     init() {
         if let data = UserDefaults.standard.data(forKey: "appSettings"),
@@ -41,11 +42,15 @@ class SettingsViewModel: ObservableObject {
             object: iCloudStore)
 
         restorePurchaseIfNeeded()
+        listenForTransactions()
         // Refresh the rolling notification window on every launch
         if !settings.notifications.isEmpty { scheduleNotifications() }
     }
 
-    deinit { NotificationCenter.default.removeObserver(self) }
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+        updatesTask?.cancel()
+    }
 
     @objc private func cloudProChanged() {
         DispatchQueue.main.async { [weak self] in
@@ -67,6 +72,23 @@ class SettingsViewModel: ObservableObject {
                    t.revocationDate == nil {
                     isProUnlocked = true
                 }
+            }
+        }
+    }
+
+    /// StoreKit redelivers every transaction that was never finished — an Ask to
+    /// Buy approval that lands while the app is open, a purchase made on another
+    /// device, one interrupted mid-flow. Without a listener those only take
+    /// effect on the next launch, and nothing ever finishes them, so the App
+    /// Store keeps re-presenting a purchase the user has already paid for.
+    private func listenForTransactions() {
+        updatesTask = Task { @MainActor [weak self] in
+            for await result in Transaction.updates {
+                guard case .verified(let t) = result else { continue }
+                if t.productID == SettingsViewModel.productID, t.revocationDate == nil {
+                    self?.isProUnlocked = true
+                }
+                await t.finish()
             }
         }
     }
