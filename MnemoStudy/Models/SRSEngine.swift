@@ -32,24 +32,25 @@ enum SRSRating: Int, Codable {
 }
 
 struct SRSEngine {
+    /// Updates only the scheduling fields. `consecutiveCorrect` is owned by
+    /// `LibraryViewModel.recordSession` — incrementing it here too made it climb
+    /// twice per answer whenever SRS was on, which retired "wrong answer" cards
+    /// a whole session early.
     static func update(_ stats: CardStats, rating: SRSRating) -> CardStats {
         var s = stats
         let q = Double(rating.rawValue)
 
         switch rating {
         case .again:
-            s.srsInterval        = 1
-            s.consecutiveCorrect = 0
-            s.srsEaseFactor      = max(1.3, s.srsEaseFactor - 0.2)
+            s.srsInterval   = 1
+            s.srsEaseFactor = max(1.3, s.srsEaseFactor - 0.2)
         case .hard:
             s.srsInterval   = max(1, Int(Double(s.srsInterval) * 1.2))
             s.srsEaseFactor = max(1.3, s.srsEaseFactor - 0.15)
-            s.consecutiveCorrect += 1
         case .good, .easy:
             let newEF = max(1.3, s.srsEaseFactor + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)))
             s.srsEaseFactor = newEF
             s.srsInterval   = nextInterval(current: s.srsInterval, ef: newEF)
-            s.consecutiveCorrect += 1
         }
 
         s.srsDueDate = Calendar.current.date(byAdding: .day, value: s.srsInterval, to: Date())

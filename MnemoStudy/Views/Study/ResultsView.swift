@@ -2,15 +2,14 @@ import SwiftUI
 
 struct ResultsView: View {
     @EnvironmentObject var settings: SettingsViewModel
-    @EnvironmentObject var library: LibraryViewModel
-    @Environment(\.dismiss) var dismiss
 
     var result: SessionResult
     var deckName: String
-    var deck: Deck
-    var config: StudyConfig
-
-    @State private var studyAgainConfig: StudyConfig? = nil
+    /// Restart the same run in the presenting StudyView. Presenting a second
+    /// StudyView from here instead made the results screen disappear, which used
+    /// to trigger its own save-and-dismiss side effects mid-session.
+    var onStudyAgain: () -> Void
+    var onDone: () -> Void
 
     var lang: AppLanguage { settings.language }
 
@@ -64,26 +63,14 @@ struct ResultsView: View {
                 Spacer()
 
                 VStack(spacing: 12) {
-                    PrimaryButton(title: lang.resultsStudyAgain) {
-                        studyAgainConfig = StudyConfig(
-                            mode: config.mode,
-                            direction: config.direction,
-                            order: config.order,
-                            sectionSize: config.sectionSize,
-                            requiredCorrect: config.requiredCorrect)
-                    }
-                    .padding(.horizontal)
+                    PrimaryButton(title: lang.resultsStudyAgain, action: onStudyAgain)
+                        .padding(.horizontal)
 
-                    Button(lang.resultsDone) { dismiss() }
+                    Button(lang.resultsDone, action: onDone)
                         .font(.subheadline).foregroundStyle(.secondary)
                 }
                 .padding(.bottom, 32)
             }
-        }
-        .fullScreenCover(item: $studyAgainConfig) { cfg in
-            StudyView(deck: deck, config: cfg,
-                      srsEnabled: settings.srsActive,
-                      cardStats: library.stats(for: deck.id).cardStats)
         }
     }
 

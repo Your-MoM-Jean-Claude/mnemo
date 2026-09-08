@@ -4,17 +4,23 @@ enum ParseError: LocalizedError {
     case emptyFile
     case noValidPairs
     case invalidFormat(line: Int)
+    case tooLarge(limitMB: Int)
 
     var errorDescription: String? {
         switch self {
         case .emptyFile:            return "The file is empty."
         case .noValidPairs:         return "No valid pairs found. Use format: front - back"
         case .invalidFormat(let l): return "Invalid format on line \(l). Use: front - back"
+        case .tooLarge(let mb):     return "That file is too large (limit \(mb) MB)."
         }
     }
 }
 
 struct FileParser {
+    /// Import ceiling. A .txt of word pairs runs to tens of KB; this only exists
+    /// so a multi-megabyte file cannot be read whole into memory.
+    static let maxBytes = 4 * 1024 * 1024
+
     static func parse(text: String) throws -> [Card] {
         let lines = text.components(separatedBy: .newlines)
         guard !lines.isEmpty else { throw ParseError.emptyFile }
@@ -44,7 +50,16 @@ struct FileParser {
 
         NSFileCoordinator().coordinate(readingItemAt: url, options: .withoutChanges, error: &coordinatorError) { coordURL in
             do {
-                let data = try Data(contentsOf: coordURL)
+                if let size = try? coordURL.resourceValues(forKeys: [.fileSizeKey]).fileSize,
+                   size > FileParser.maxBytes {
+                    parseResult = .failure(ParseError.tooLarge(limitMB: FileParser.maxBytes / (1024 * 1024)))
+                    return
+                }
+                let data = try Data(contentsOf: coordURL, options: .mappedIfSafe)
+                guard data.count <= FileParser.maxBytes else {
+                    parseResult = .failure(ParseError.tooLarge(limitMB: FileParser.maxBytes / (1024 * 1024)))
+                    return
+                }
                 let text = String(data: data, encoding: .utf8)
                     ?? String(data: data, encoding: .isoLatin1)
                     ?? String(data: data, encoding: .windowsCP1252)

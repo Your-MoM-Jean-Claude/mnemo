@@ -26,7 +26,7 @@ struct InfoView: View {
                         infoCard(icon: "checkmark.seal.fill", color: .green,
                                  title: lang.infoAnswersTitle, body: lang.infoAnswersBody)
 
-                        Text("Mnemo Study · 1.0")
+                        Text("Mnemo Study · \(AppInfo.versionString)")
                             .font(.caption2).foregroundStyle(.secondary.opacity(0.5))
                             .padding(.top, 8).padding(.bottom, 32)
                     }

@@ -8,27 +8,64 @@ class SettingsViewModel: ObservableObject {
         didSet { save() }
     }
 
+    /// Pro entitlement. Mirrored to UserDefaults as well as iCloud so the unlock
+    /// survives on a device that is not signed into iCloud at all.
+    @Published var isProUnlocked: Bool = false {
+        didSet {
+            guard isProUnlocked != oldValue else { return }
+            UserDefaults.standard.set(isProUnlocked, forKey: SettingsViewModel.proKey)
+            iCloudStore.set(isProUnlocked, forKey: SettingsViewModel.proKey)
+            iCloudStore.synchronize()
+        }
+    }
+
     private let key = "appSettings"
+    static let productID = "com.jirifilipec.mnemoapp.pro"
+    fileprivate static let proKey = "mnemo_pro_unlocked"
+
+    private let iCloudStore = NSUbiquitousKeyValueStore.default
 
     init() {
         if let data = UserDefaults.standard.data(forKey: "appSettings"),
-           let s = try? JSONDecoder().decode(AppSettings.self, from: data) {
+           let s = SafeJSON.object(AppSettings.self, from: data) {
             settings = s
         } else {
             settings = AppSettings()
         }
+        isProUnlocked = UserDefaults.standard.bool(forKey: SettingsViewModel.proKey)
+            || iCloudStore.bool(forKey: SettingsViewModel.proKey)
+
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(cloudProChanged),
+            name: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
+            object: iCloudStore)
+
         restorePurchaseIfNeeded()
         // Refresh the rolling notification window on every launch
         if !settings.notifications.isEmpty { scheduleNotifications() }
     }
 
+    deinit { NotificationCenter.default.removeObserver(self) }
+
+    @objc private func cloudProChanged() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if self.iCloudStore.bool(forKey: SettingsViewModel.proKey) { self.isProUnlocked = true }
+        }
+    }
+
+    /// Reinstating a purchase after a reinstall. This previously wrote
+    /// `settings.trialStartDate = .distantPast` — a field the access model stopped
+    /// consulting when the session-based trial landed in build 41 — so a paying
+    /// customer who reinstalled silently lost Pro until they found the Restore
+    /// button themselves.
     private func restorePurchaseIfNeeded() {
         Task { @MainActor in
             for await result in Transaction.currentEntitlements {
                 if case .verified(let t) = result,
-                   t.productID == "com.jirifilipec.mnemoapp.pro",
+                   t.productID == SettingsViewModel.productID,
                    t.revocationDate == nil {
-                    settings.trialStartDate = .distantPast
+                    isProUnlocked = true
                 }
             }
         }
@@ -47,20 +84,6 @@ class SettingsViewModel: ObservableObject {
     var dailyGoalMinutes: Int {
         get { settings.dailyGoalMinutes }
         set { settings.dailyGoalMinutes = newValue }
-    }
-
-    // MARK: - Trial
-
-    private let iCloudStore = NSUbiquitousKeyValueStore.default
-    private let iCloudProKey = "mnemo_pro_unlocked"
-
-    var isProUnlocked: Bool {
-        get { iCloudStore.bool(forKey: iCloudProKey) }
-        set {
-            iCloudStore.set(newValue, forKey: iCloudProKey)
-            iCloudStore.synchronize()
-            if newValue { settings.trialStartDate = .distantPast }
-        }
     }
 
     // MARK: - Access model (value-based trial + soft free tier)
@@ -86,7 +109,12 @@ class SettingsViewModel: ObservableObject {
     func addNotification(hour: Int, minute: Int) {
         guard settings.notifications.count < 3 else { return }
         settings.notifications.append(NotificationTime(hour: hour, minute: minute))
-        scheduleNotifications()
+        // Scheduling before the authorization prompt is answered silently drops
+        // every request, so ask first and schedule from the callback.
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+            guard granted else { return }
+            DispatchQueue.main.async { [weak self] in self?.scheduleNotifications() }
+        }
     }
 
     func removeNotification(id: UUID) {

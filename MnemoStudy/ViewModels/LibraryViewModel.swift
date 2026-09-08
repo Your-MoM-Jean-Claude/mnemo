@@ -1,27 +1,63 @@
 import Foundation
 import Combine
 
+/// Per-day rollup used by the streak counter and the weekly chart, so neither
+/// has to walk the whole session history on every SwiftUI render.
+struct DayStat: Codable {
+    var sessions: Int = 0
+    var minutes: Double = 0
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        sessions = try c.decodeIfPresent(Int.self, forKey: .sessions) ?? 0
+        minutes  = try c.decodeIfPresent(Double.self, forKey: .minutes) ?? 0
+    }
+}
+
 class LibraryViewModel: ObservableObject {
     @Published var decks: [Deck]             = []
     @Published var folders: [DeckFolder]     = []
     @Published var deckStats: [UUID: DeckStats] = [:]
+    @Published var dayStats: [String: DayStat]  = [:]
     @Published var errorMessage: String?
     @Published var showError: Bool = false
 
-    private let decksKey   = "ms_decks"
-    private let foldersKey = "ms_folders"
-    private let statsKey   = "ms_stats"
+    private let decksKey    = "ms_decks"
+    private let foldersKey  = "ms_folders"
+    private let statsKey    = "ms_stats"
+    private let daysKey     = "ms_days"
     private let syncDateKey = "ms_syncDate"
+    private let touchedKey  = "ms_userTouched"
+
+    static let maxDeckNameLength = 120
+    static let maxStoredDays     = 730
 
     // iCloud sync
     private let cloud = NSUbiquitousKeyValueStore.default
     private var isApplyingCloud = false
+    private var isBatching      = false
+
+    /// True once the user has made any change of their own on this device. Until
+    /// then the local library is just the built-in starter content and iCloud
+    /// always wins — that is what stops a late-arriving cloud sync from being
+    /// overwritten by the seed on a fresh install.
+    private var hasUserData: Bool {
+        get { UserDefaults.standard.bool(forKey: touchedKey) }
+        set { UserDefaults.standard.set(newValue, forKey: touchedKey) }
+    }
+
+    /// Whether a library blob exists on disk at all — checked as raw bytes, not
+    /// as a successful decode, so a blob we failed to read is never mistaken for
+    /// "new install" and seeded over.
+    var hasStoredLibrary: Bool {
+        UserDefaults.standard.data(forKey: decksKey) != nil
+    }
 
     init() {
         load()
-        // Pull from iCloud if it has newer data than local
         mergeFromCloudIfNewer()
-        // Observe external iCloud changes (other devices)
         NotificationCenter.default.addObserver(
             self, selector: #selector(cloudChanged(_:)),
             name: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
@@ -33,8 +69,13 @@ class LibraryViewModel: ObservableObject {
 
     // MARK: - Deck CRUD
 
+    private func clamped(_ name: String) -> String {
+        let t = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return String(t.prefix(LibraryViewModel.maxDeckNameLength))
+    }
+
     func addDeck(name: String, folderID: UUID? = nil) {
-        var d = Deck(name: name)
+        var d = Deck(name: clamped(name))
         d.folderID  = folderID
         d.sortOrder = decks.count
         decks.append(d)
@@ -42,16 +83,18 @@ class LibraryViewModel: ObservableObject {
     }
 
     func deleteDeck(id: UUID) {
-        decks.removeAll { $0.id == id }
+        // Drop the deck, its linked temp deck, and BOTH of their stats — leaving
+        // stats behind kept the iCloud payload growing after every deletion.
+        let linked = decks.filter { $0.parentDeckID == id }.map { $0.id }
+        for orphan in linked { deckStats.removeValue(forKey: orphan) }
         deckStats.removeValue(forKey: id)
-        // also delete linked temporary decks
-        decks.removeAll { $0.parentDeckID == id }
+        decks.removeAll { $0.id == id || $0.parentDeckID == id }
         save()
     }
 
     func renameDeck(id: UUID, name: String) {
         guard let i = decks.firstIndex(where: { $0.id == id }) else { return }
-        decks[i].name = name
+        decks[i].name = clamped(name)
         save()
     }
 
@@ -67,7 +110,11 @@ class LibraryViewModel: ObservableObject {
 
     func updateDeck(_ deck: Deck) {
         guard let i = decks.firstIndex(where: { $0.id == deck.id }) else { return }
-        decks[i] = deck
+        var d = deck
+        d.name = clamped(d.name)
+        decks[i] = d
+        // Cards removed by the editor must not leave their stats behind.
+        pruneCardStats(forDeck: d)
         save()
     }
 
@@ -75,6 +122,13 @@ class LibraryViewModel: ObservableObject {
         decks.move(fromOffsets: source, toOffset: dest)
         for (i, _) in decks.enumerated() { decks[i].sortOrder = i }
         save()
+    }
+
+    private func pruneCardStats(forDeck deck: Deck) {
+        guard var stat = deckStats[deck.id] else { return }
+        let live = Set(deck.cards.map { $0.id })
+        stat.cardStats = stat.cardStats.filter { live.contains($0.key) }
+        deckStats[deck.id] = stat
     }
 
     // MARK: - Card CRUD
@@ -102,7 +156,7 @@ class LibraryViewModel: ObservableObject {
     // MARK: - Folder CRUD
 
     func addFolder(name: String) {
-        folders.append(DeckFolder(name: name, sortOrder: folders.count))
+        folders.append(DeckFolder(name: clamped(name), sortOrder: folders.count))
         save()
     }
 
@@ -111,6 +165,9 @@ class LibraryViewModel: ObservableObject {
         let insideIDs = decks.filter { $0.folderID == id }.map { $0.id }
         for deckID in insideIDs {
             deckStats.removeValue(forKey: deckID)
+            for orphan in decks.filter({ $0.parentDeckID == deckID }) {
+                deckStats.removeValue(forKey: orphan.id)
+            }
             decks.removeAll { $0.parentDeckID == deckID }   // linked temp decks
         }
         decks.removeAll { $0.folderID == id }
@@ -120,7 +177,7 @@ class LibraryViewModel: ObservableObject {
 
     func renameFolder(id: UUID, name: String) {
         guard let i = folders.firstIndex(where: { $0.id == id }) else { return }
-        folders[i].name = name
+        folders[i].name = clamped(name)
         save()
     }
 
@@ -153,34 +210,51 @@ class LibraryViewModel: ObservableObject {
 
     // MARK: - Import
 
-    func importFromURL(_ url: URL, folderID: UUID? = nil, name: String? = nil) {
+    /// Max accepted import size. A .txt of word pairs is a few tens of KB; this
+    /// only exists to stop a multi-MB file being read wholly into memory.
+    static let maxImportBytes = 4 * 1024 * 1024
+
+    @discardableResult
+    func importFromURL(_ url: URL, folderID: UUID? = nil, name: String? = nil) -> Bool {
+        clearError()
         do {
             let cards = try FileParser.parse(url: url)
-            let n = name ?? url.deletingPathExtension().lastPathComponent
-            var deck = Deck(name: n, cards: cards)
+            let n = clamped(name ?? url.deletingPathExtension().lastPathComponent)
+            var deck = Deck(name: n.isEmpty ? "Import" : n, cards: cards)
             deck.folderID = folderID
             decks.append(deck)
             save()
+            return true
         } catch {
             errorMessage = error.localizedDescription
             showError    = true
+            return false
         }
     }
 
-    func importFromText(_ text: String, name: String, folderID: UUID? = nil) {
+    @discardableResult
+    func importFromText(_ text: String, name: String, folderID: UUID? = nil) -> Bool {
+        clearError()
         do {
             let cards = try FileParser.parse(text: text)
-            var deck = Deck(name: name, cards: cards)
+            var deck = Deck(name: clamped(name), cards: cards)
             deck.folderID = folderID
             decks.append(deck)
             save()
+            return true
         } catch {
             errorMessage = error.localizedDescription
             showError    = true
+            return false
         }
     }
 
-    // MARK: - Statistics
+    /// Import used to leave `errorMessage` set forever after the first failure,
+    /// so every later import looked like it had failed too.
+    func clearError() {
+        errorMessage = nil
+        showError    = false
+    }
 
     // MARK: - Daily review (all due across decks)
 
@@ -205,12 +279,25 @@ class LibraryViewModel: ObservableObject {
             .map { (card: $0.0, deckID: $0.1) }
     }
 
-    var dueReviewCount: Int { dueReviewCards().count }
+    /// Cheap count that must agree with `dueReviewCards()` — walking the decks
+    /// without building and sorting the whole card list.
+    var dueReviewCount: Int {
+        let now = Date()
+        var n = 0
+        for d in decks where !d.isTemporary {
+            guard let cs = deckStats[d.id]?.cardStats else { continue }
+            for card in d.cards {
+                if let due = cs[card.id]?.srsDueDate, due <= now { n += 1 }
+            }
+        }
+        return min(n, LibraryViewModel.reviewSessionCap)
+    }
 
     // Split a combined review result back into per-origin-deck results so each
     // deck's stats & SRS update correctly. Calibration runs once at the end.
     func recordReviewSession(result: SessionResult, origins: [UUID: UUID], settings: SettingsViewModel) {
         let byDeck = Dictionary(grouping: result.cardAdjustedTimes.keys) { origins[$0] ?? UUID() }
+        isBatching = true
         for (deckID, cardIDs) in byDeck {
             guard decks.contains(where: { $0.id == deckID }) else { continue }
             var times: [UUID: Double] = [:]
@@ -226,7 +313,9 @@ class LibraryViewModel: ObservableObject {
                 wrongCardIDs: wrong, cardAdjustedTimes: times)
             recordSession(result: sub, settings: settings, calibrate: false)
         }
+        isBatching = false
         settings.recordCalibration(result.correctAdjustedTimes)
+        save()
     }
 
     func recordSession(result: SessionResult, settings: SettingsViewModel, calibrate: Bool = true) {
@@ -263,6 +352,7 @@ class LibraryViewModel: ObservableObject {
         if calibrate { settings.recordCalibration(result.correctAdjustedTimes) }
 
         deckStats[result.deckID] = stat
+        recordDay(result.date, minutes: result.duration / 60)
 
         // Update lastStudied
         if let i = decks.firstIndex(where: { $0.id == result.deckID }) {
@@ -271,7 +361,7 @@ class LibraryViewModel: ObservableObject {
 
         // Handle wrong cards → temporary deck
         if !result.wrongCardIDs.isEmpty {
-            updateTemporaryDeck(for: result.deckID, wrongCardIDs: result.wrongCardIDs, stat: &stat)
+            updateTemporaryDeck(for: result.deckID, wrongCardIDs: result.wrongCardIDs)
         }
 
         // If this WAS a temp deck, remove cards answered correctly 3× in a row
@@ -282,7 +372,22 @@ class LibraryViewModel: ObservableObject {
         save()
     }
 
-    private func updateTemporaryDeck(for parentID: UUID, wrongCardIDs: Set<UUID>, stat: inout DeckStats) {
+    private func recordDay(_ date: Date, minutes: Double) {
+        let key = DayKey.string(from: date)
+        var d = dayStats[key] ?? DayStat()
+        d.sessions += 1
+        d.minutes  += minutes
+        dayStats[key] = d
+        trimDayStats()
+    }
+
+    private func trimDayStats() {
+        guard dayStats.count > LibraryViewModel.maxStoredDays else { return }
+        let keep = dayStats.keys.sorted().suffix(LibraryViewModel.maxStoredDays)
+        dayStats = dayStats.filter { keep.contains($0.key) }
+    }
+
+    private func updateTemporaryDeck(for parentID: UUID, wrongCardIDs: Set<UUID>) {
         guard let parent = deck(id: parentID) else { return }
         let wrongCards = parent.cards.filter { wrongCardIDs.contains($0.id) }
 
@@ -312,6 +417,7 @@ class LibraryViewModel: ObservableObject {
 
         if decks[tempIdx].cards.isEmpty {
             decks.remove(at: tempIdx)
+            deckStats.removeValue(forKey: id)
         }
     }
 
@@ -324,9 +430,17 @@ class LibraryViewModel: ObservableObject {
 
     func stats(for deckID: UUID) -> DeckStats { deckStats[deckID] ?? DeckStats(deckID: deckID) }
 
-    func srueDueCount(for deck: Deck) -> Int {
-        let cs = deckStats[deck.id]?.cardStats ?? [:]
-        return deck.cards.filter { cs[$0.id]?.isDue ?? true }.count
+    /// Cards this deck has scheduled for review today. Deliberately counts only
+    /// cards SRS has actually scheduled, matching `dueReviewCards()` — the old
+    /// version treated every never-studied card as due, so the badge advertised
+    /// "50 due today" while the review button offered nothing.
+    func dueCount(for deck: Deck) -> Int {
+        guard let cs = deckStats[deck.id]?.cardStats else { return 0 }
+        let now = Date()
+        return deck.cards.filter { card in
+            guard let due = cs[card.id]?.srsDueDate else { return false }
+            return due <= now
+        }.count
     }
 
     func deleteStats(for deckID: UUID) {
@@ -340,34 +454,42 @@ class LibraryViewModel: ObservableObject {
     // MARK: - Global stats (for StatisticsView)
 
     var bestStreak: Int {
-        let fmt = DateFormatter(); fmt.dateFormat = "yyyy-MM-dd"
-        var allDates = Set<String>()
-        for s in deckStats.values { for r in s.sessions { allDates.insert(fmt.string(from: r.date)) } }
-        let cal = Calendar.current
-        let sorted = allDates.compactMap { fmt.date(from: $0) }.sorted()
+        let sorted = dayStats.keys.compactMap { DayKey.date(from: $0) }.sorted()
         var best = 0, current = 0
         for (i, date) in sorted.enumerated() {
             if i == 0 { current = 1 }
-            else { current = cal.dateComponents([.day], from: sorted[i-1], to: date).day == 1 ? current + 1 : 1 }
+            else {
+                let gap = DayKey.calendar.dateComponents([.day], from: sorted[i-1], to: date).day
+                current = gap == 1 ? current + 1 : 1
+            }
             best = max(best, current)
         }
         return best
     }
 
     var studyStreak: Int {
-        let fmt = DateFormatter(); fmt.dateFormat = "yyyy-MM-dd"
-        var allDates = Set<String>()
-        for s in deckStats.values { for r in s.sessions { allDates.insert(fmt.string(from: r.date)) } }
+        let days = Set(dayStats.keys)
         var streak = 0
-        var day    = Date()
-        if !allDates.contains(fmt.string(from: day)) {
-            day = Calendar.current.date(byAdding: .day, value: -1, to: day) ?? .distantPast
+        var day = Date()
+        if !days.contains(DayKey.string(from: day)) {
+            guard let y = DayKey.calendar.date(byAdding: .day, value: -1, to: day) else { return 0 }
+            day = y
         }
-        while allDates.contains(fmt.string(from: day)) {
+        while days.contains(DayKey.string(from: day)) {
             streak += 1
-            day = Calendar.current.date(byAdding: .day, value: -1, to: day) ?? .distantPast
+            guard let p = DayKey.calendar.date(byAdding: .day, value: -1, to: day) else { break }
+            day = p
         }
         return streak
+    }
+
+    /// Session counts for the last 7 days, oldest first.
+    var weeklyCounts: [Int] {
+        (0..<7).map { offset in
+            guard let day = DayKey.calendar.date(byAdding: .day, value: -(6 - offset), to: Date())
+            else { return 0 }
+            return dayStats[DayKey.string(from: day)]?.sessions ?? 0
+        }
     }
 
     var overallAccuracy: Double {
@@ -396,60 +518,128 @@ class LibraryViewModel: ObservableObject {
     }
 
     var todayMinutes: Double {
-        allSessions
-            .filter { Calendar.current.isDateInToday($0.date) }
-            .reduce(0) { $0 + $1.duration } / 60
+        dayStats[DayKey.string(from: Date())]?.minutes ?? 0
     }
 
     // MARK: - Persistence
 
-    func save() {
+    func save(pushToCloud: Bool = true) {
+        guard !isBatching || !pushToCloud else { return }
+
         let decksData   = try? JSONEncoder().encode(decks)
         let foldersData = try? JSONEncoder().encode(folders)
         let statsData   = try? JSONEncoder().encode(deckStats)
+        let daysData    = try? JSONEncoder().encode(dayStats)
 
         if let d = decksData   { UserDefaults.standard.set(d, forKey: decksKey) }
         if let d = foldersData { UserDefaults.standard.set(d, forKey: foldersKey) }
         if let d = statsData   { UserDefaults.standard.set(d, forKey: statsKey) }
+        if let d = daysData    { UserDefaults.standard.set(d, forKey: daysKey) }
 
-        // Don't push to iCloud while applying a cloud change (avoids ping-pong)
-        guard !isApplyingCloud else { return }
+        // Don't push to iCloud while applying a cloud change (avoids ping-pong),
+        // and don't push the built-in starter seed at all — pushing it used to
+        // stamp a fresh timestamp over a real library that simply hadn't
+        // downloaded yet, which destroyed it on every other device.
+        guard !isApplyingCloud, pushToCloud else { return }
+        hasUserData = true
+
         let now = Date().timeIntervalSince1970
         UserDefaults.standard.set(now, forKey: syncDateKey)
         if let d = decksData   { cloud.set(d, forKey: decksKey) }
         if let d = foldersData { cloud.set(d, forKey: foldersKey) }
         if let d = statsData   { cloud.set(d, forKey: statsKey) }
+        if let d = daysData    { cloud.set(d, forKey: daysKey) }
         cloud.set(now, forKey: syncDateKey)
         cloud.synchronize()
     }
 
     private func load() {
         if let d = UserDefaults.standard.data(forKey: decksKey),
-           let v = try? JSONDecoder().decode([Deck].self, from: d)         { decks     = v }
+           let v = SafeJSON.array(Deck.self, from: d)                  { decks     = v }
         if let d = UserDefaults.standard.data(forKey: foldersKey),
-           let v = try? JSONDecoder().decode([DeckFolder].self, from: d)   { folders   = v }
+           let v = SafeJSON.array(DeckFolder.self, from: d)            { folders   = v }
         if let d = UserDefaults.standard.data(forKey: statsKey),
-           let v = try? JSONDecoder().decode([UUID: DeckStats].self, from: d) { deckStats = v }
+           let v = SafeJSON.dictionary(UUID.self, DeckStats.self, from: d) { deckStats = v }
+        if let d = UserDefaults.standard.data(forKey: daysKey),
+           let v = SafeJSON.dictionary(String.self, DayStat.self, from: d) { dayStats  = v }
+
+        if dayStats.isEmpty && !deckStats.isEmpty { rebuildDayStats() }
+    }
+
+    /// Backfill the per-day rollup for libraries saved before it existed.
+    private func rebuildDayStats() {
+        var built: [String: DayStat] = [:]
+        for stat in deckStats.values {
+            for r in stat.sessions {
+                let key = DayKey.string(from: r.date)
+                var d = built[key] ?? DayStat()
+                d.sessions += 1
+                d.minutes  += r.duration / 60
+                built[key] = d
+            }
+        }
+        dayStats = built
+        trimDayStats()
     }
 
     // MARK: - iCloud sync
 
     private func mergeFromCloudIfNewer() {
+        guard cloud.data(forKey: decksKey) != nil else { return }
+        // A device that has never been edited locally holds nothing worth
+        // keeping — take whatever iCloud has.
+        if !hasUserData { applyCloudData(); return }
+
         let cloudDate = cloud.double(forKey: syncDateKey)
         let localDate = UserDefaults.standard.double(forKey: syncDateKey)
-        guard cloudDate > localDate, cloudDate > 0 else { return }
-        applyCloudData()
+        if cloudDate > localDate, cloudDate > 0 { applyCloudData() }
+        else { unionInCloudExtras() }
     }
 
     @objc private func cloudChanged(_ note: Notification) {
-        // External change from another device — pull if newer
+        // External change from another device — or the first payload finally
+        // arriving on a fresh install.
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
+            guard self.cloud.data(forKey: self.decksKey) != nil else { return }
+
+            if !self.hasUserData { self.applyCloudData(); return }
+
             let cloudDate = self.cloud.double(forKey: self.syncDateKey)
             let localDate = UserDefaults.standard.double(forKey: self.syncDateKey)
-            guard cloudDate > localDate else { return }
-            self.applyCloudData()
+            if cloudDate > localDate { self.applyCloudData() }
+            else { self.unionInCloudExtras() }
         }
+    }
+
+    /// Cloud copy is older than ours, so it does not get to replace anything —
+    /// but decks it holds that we have never seen are adopted rather than
+    /// dropped. Without this, two devices edited offline meant the slower one's
+    /// work was erased by the next push.
+    private func unionInCloudExtras() {
+        guard let d = cloud.data(forKey: decksKey),
+              let remote = SafeJSON.array(Deck.self, from: d) else { return }
+        let known = Set(decks.map { $0.id })
+        let extras = remote.filter { !known.contains($0.id) && !$0.isTemporary }
+        guard !extras.isEmpty else { return }
+
+        if let fd = cloud.data(forKey: foldersKey),
+           let remoteFolders = SafeJSON.array(DeckFolder.self, from: fd) {
+            let knownFolders = Set(folders.map { $0.id })
+            let neededFolders = Set(extras.compactMap { $0.folderID })
+            folders.append(contentsOf: remoteFolders.filter {
+                !knownFolders.contains($0.id) && neededFolders.contains($0.id)
+            })
+        }
+        decks.append(contentsOf: extras)
+
+        if let sd = cloud.data(forKey: statsKey),
+           let remoteStats = SafeJSON.dictionary(UUID.self, DeckStats.self, from: sd) {
+            for e in extras where deckStats[e.id] == nil {
+                if let s = remoteStats[e.id] { deckStats[e.id] = s }
+            }
+        }
+        save()
     }
 
     private func applyCloudData() {
@@ -457,15 +647,21 @@ class LibraryViewModel: ObservableObject {
         defer { isApplyingCloud = false }
 
         if let d = cloud.data(forKey: decksKey),
-           let v = try? JSONDecoder().decode([Deck].self, from: d)            { decks = v }
+           let v = SafeJSON.array(Deck.self, from: d)                       { decks = v }
         if let d = cloud.data(forKey: foldersKey),
-           let v = try? JSONDecoder().decode([DeckFolder].self, from: d)      { folders = v }
+           let v = SafeJSON.array(DeckFolder.self, from: d)                 { folders = v }
         if let d = cloud.data(forKey: statsKey),
-           let v = try? JSONDecoder().decode([UUID: DeckStats].self, from: d) { deckStats = v }
+           let v = SafeJSON.dictionary(UUID.self, DeckStats.self, from: d)  { deckStats = v }
+        if let d = cloud.data(forKey: daysKey),
+           let v = SafeJSON.dictionary(String.self, DayStat.self, from: d)  { dayStats = v }
+
+        if dayStats.isEmpty && !deckStats.isEmpty { rebuildDayStats() }
 
         // Mirror to local storage + sync timestamp (no re-push to cloud)
         save()
         let cloudDate = cloud.double(forKey: syncDateKey)
         UserDefaults.standard.set(cloudDate, forKey: syncDateKey)
+        // Adopted data counts as real data from here on.
+        hasUserData = true
     }
 }

@@ -9,7 +9,7 @@ struct StatisticsView: View {
 
     var lang: AppLanguage { settings.language }
 
-    private let dateFormatter: DateFormatter = {
+    private static let dayFormatter: DateFormatter = {
         let f = DateFormatter(); f.dateStyle = .medium; f.timeStyle = .none; return f
     }()
 
@@ -180,7 +180,7 @@ struct StatisticsView: View {
     }
 
     private func groupedSessions() -> [(String, [SessionRecord])] {
-        let fmt = DateFormatter(); fmt.dateStyle = .medium
+        let fmt = StatisticsView.dayFormatter
         let all = library.allSessions
         var groups: [(String, [SessionRecord])] = []
         var seen: [String: Int] = [:]
@@ -197,25 +197,16 @@ struct StatisticsView: View {
 
 struct WeeklyChart: View {
     @EnvironmentObject var library: LibraryViewModel
+    @EnvironmentObject var settings: SettingsViewModel
 
-    private var counts: [Int] {
-        let cal = Calendar.current
-        let fmt = DateFormatter(); fmt.dateFormat = "yyyy-MM-dd"
-        var dict: [String: Int] = [:]
-        for s in library.deckStats.values {
-            for r in s.sessions { dict[fmt.string(from: r.date), default: 0] += 1 }
-        }
-        return (0..<7).map { offset in
-            let day = cal.date(byAdding: .day, value: -(6 - offset), to: Date()) ?? Date()
-            return dict[fmt.string(from: day)] ?? 0
-        }
-    }
+    // Reads the per-day rollup instead of walking every session on each render.
+    private var counts: [Int] { library.weeklyCounts }
 
     private var maxCount: Int { counts.max() ?? 1 }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Last 7 days").font(.caption).foregroundStyle(.secondary)
+            Text(settings.language.statsLast7Days).font(.caption).foregroundStyle(.secondary)
             HStack(alignment: .bottom, spacing: 6) {
                 ForEach(0..<7, id: \.self) { i in
                     let h = maxCount > 0 ? Double(counts[i]) / Double(maxCount) : 0

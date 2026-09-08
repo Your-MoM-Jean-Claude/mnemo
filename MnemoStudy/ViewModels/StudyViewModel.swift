@@ -84,7 +84,21 @@ class StudyViewModel: ObservableObject {
         for i in queue.indices { if queue[i].showAfter > 0 { queue[i].showAfter -= 1 } }
 
         var ready = queue.filter { $0.showAfter == 0 && !$0.isComplete }
-        guard !ready.isEmpty else { return nil }
+
+        if ready.isEmpty {
+            // Every remaining card is still on its post-mistake cooldown. Returning
+            // nil here left the session with no card to draw and no way to finish —
+            // StudyView rendered an empty screen whose only exit was the X button.
+            // Reachable simply by getting the last two cards of a deck wrong in a
+            // row. Release the card that has waited longest instead.
+            guard let soonest = queue.filter({ !$0.isComplete })
+                .min(by: { $0.showAfter < $1.showAfter }) else { return nil }
+            for i in queue.indices where queue[i].card.id == soonest.card.id {
+                queue[i].showAfter = 0
+            }
+            ready = queue.filter { $0.showAfter == 0 && !$0.isComplete }
+            guard !ready.isEmpty else { return nil }
+        }
 
         // avoid consecutive repeat
         if ready.count > 1, let last = lastCardID {
@@ -93,6 +107,32 @@ class StudyViewModel: ObservableObject {
         }
 
         return config.order == .random ? ready.randomElement() : ready.first
+    }
+
+    /// Ends the session where it stands and hands control to the results screen.
+    func finishNow() {
+        showResult        = false
+        isSessionFinished = true
+    }
+
+    // MARK: - Restart
+
+    /// Replays the same deck and config in place. Used by "Study again" so the
+    /// results screen does not have to stack another StudyView on top of itself.
+    func restart() {
+        queue.removeAll()
+        pendingCards.removeAll()
+        completedCount    = 0
+        totalAnswered     = 0
+        totalCorrect      = 0
+        wrongCardIDs.removeAll()
+        cardAdjustedTimes.removeAll()
+        lastCardID        = nil
+        showResult        = false
+        lastAnswerCorrect = false
+        isSessionFinished = false
+        buildQueue()
+        cardAppearTime = Date()
     }
 
     // MARK: - Answer
