@@ -54,6 +54,14 @@ class LibraryViewModel: ObservableObject {
 
     // MARK: - Deck CRUD
 
+    /// Keeps `sortOrder` in step with the actual array order. Every mutator that
+    /// changes the order has to call it: `reorderDeck` did not, so drag-and-drop
+    /// left the field disagreeing with what the user sees. Nothing reads it yet,
+    /// which is exactly why the drift went unnoticed.
+    private func renumberDecks() {
+        for i in decks.indices { decks[i].sortOrder = i }
+    }
+
     private func clamped(_ name: String) -> String {
         let t = name.trimmingCharacters(in: .whitespacesAndNewlines)
         return String(t.prefix(LibraryViewModel.maxDeckNameLength))
@@ -74,6 +82,7 @@ class LibraryViewModel: ObservableObject {
         for orphan in linked { deckStats.removeValue(forKey: orphan) }
         deckStats.removeValue(forKey: id)
         decks.removeAll { $0.id == id || $0.parentDeckID == id }
+        renumberDecks()
         save()
     }
 
@@ -105,7 +114,7 @@ class LibraryViewModel: ObservableObject {
 
     func moveDecks(from source: IndexSet, to dest: Int) {
         decks.move(fromOffsets: source, toOffset: dest)
-        for (i, _) in decks.enumerated() { decks[i].sortOrder = i }
+        renumberDecks()
         save()
     }
 
@@ -190,6 +199,7 @@ class LibraryViewModel: ObservableObject {
         }
         let insertAt = decks.firstIndex(where: { $0.id == targetID }) ?? decks.count
         decks.insert(d, at: insertAt)
+        renumberDecks()
         save()
     }
 

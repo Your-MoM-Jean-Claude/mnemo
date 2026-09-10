@@ -151,8 +151,8 @@ struct StudyView: View {
             if config.mode == .typing { inputFocused = true }
         }
         .onDisappear {
-            // save wrong answers even if user exits early (taps X)
-            if !sessionSaved && !vm.wrongCardIDs.isEmpty {
+            // Record a partial session when the user exits early (taps X).
+            if !sessionSaved && vm.hasAnswers {
                 save(vm.buildResult())
             }
         }

@@ -279,6 +279,12 @@ class StudyViewModel: ObservableObject {
     }
 
     var completedOfTotal: String { "\(completedCount) / \(deck.cards.count)" }
+
+    /// Whether anything was actually answered. An early exit is worth recording
+    /// on its own merit — the old condition saved a partial session only if it
+    /// contained a mistake, so answering twenty cards correctly and then closing
+    /// the screen threw away the stats, the SRS updates and the minutes.
+    var hasAnswers: Bool { totalAnswered > 0 }
 }
 
 extension SessionItem: Identifiable {
