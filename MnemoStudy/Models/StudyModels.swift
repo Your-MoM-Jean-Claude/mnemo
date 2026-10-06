@@ -73,6 +73,14 @@ struct UserTempoProfile: Codable {
     static let calibrationSessions = 5
     var isCalibrated: Bool { sessions >= UserTempoProfile.calibrationSessions }
 
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        samples  = try c.decodeIfPresent([Double].self, forKey: .samples) ?? []
+        sessions = try c.decodeIfPresent(Int.self, forKey: .sessions) ?? 0
+    }
+
     // Median of observed times — personal baseline
     var median: Double {
         guard !samples.isEmpty else { return 4.0 }
@@ -93,13 +101,31 @@ struct CardStats: Codable {
     var srsDueDate: Date?
     var srsEaseFactor: Double = 2.5
 
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        attempts           = try c.decodeIfPresent(Int.self, forKey: .attempts) ?? 0
+        correct            = try c.decodeIfPresent(Int.self, forKey: .correct) ?? 0
+        consecutiveCorrect = try c.decodeIfPresent(Int.self, forKey: .consecutiveCorrect) ?? 0
+        lastAnswered       = try c.decodeIfPresent(Date.self, forKey: .lastAnswered)
+        srsInterval        = try c.decodeIfPresent(Int.self, forKey: .srsInterval) ?? 1
+        srsDueDate         = try c.decodeIfPresent(Date.self, forKey: .srsDueDate)
+        srsEaseFactor      = try c.decodeIfPresent(Double.self, forKey: .srsEaseFactor) ?? 2.5
+    }
+
     var accuracy: Double {
         guard attempts > 0 else { return 0 }
         return Double(correct) / Double(attempts)
     }
 
+    /// A card counts as due only once SRS has actually scheduled it. Cards that
+    /// have never been studied are "new", not "due" — the daily review queue and
+    /// the deck badge must agree on that.
+    var isScheduled: Bool { srsDueDate != nil }
+
     var isDue: Bool {
-        guard let due = srsDueDate else { return true }
+        guard let due = srsDueDate else { return false }
         return due <= Date()
     }
 }
@@ -115,6 +141,27 @@ struct SessionRecord: Codable, Identifiable {
     var mode: StudyMode
     var deckID: UUID
 
+    init(date: Date, duration: TimeInterval, totalAnswered: Int,
+         totalCorrect: Int, mode: StudyMode, deckID: UUID) {
+        self.date = date
+        self.duration = duration
+        self.totalAnswered = totalAnswered
+        self.totalCorrect = totalCorrect
+        self.mode = mode
+        self.deckID = deckID
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        date          = try c.decodeIfPresent(Date.self, forKey: .date) ?? Date()
+        duration      = try c.decodeIfPresent(TimeInterval.self, forKey: .duration) ?? 0
+        totalAnswered = try c.decodeIfPresent(Int.self, forKey: .totalAnswered) ?? 0
+        totalCorrect  = try c.decodeIfPresent(Int.self, forKey: .totalCorrect) ?? 0
+        mode          = try c.decodeIfPresent(StudyMode.self, forKey: .mode) ?? .typing
+        deckID        = try c.decodeIfPresent(UUID.self, forKey: .deckID) ?? UUID()
+        id            = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+    }
+
     var accuracy: Double {
         guard totalAnswered > 0 else { return 0 }
         return Double(totalCorrect) / Double(totalAnswered)
@@ -128,10 +175,32 @@ struct DeckStats: Codable {
     var sessions: [SessionRecord] = []
     var cardStats: [UUID: CardStats] = [:]
 
-    var totalSessions: Int { sessions.count }
+    // Rolled-up totals for sessions that have aged out of `sessions`. The detail
+    // history is capped because the whole stats blob has to fit inside the
+    // iCloud key-value store's 1 MB budget; without a cap sync dies silently
+    // once a heavy user accumulates a few hundred sessions.
+    var archivedSessions: Int = 0
+    var archivedAnswers: Int = 0
+    var archivedCorrect: Int = 0
 
-    var totalAnswers: Int { sessions.reduce(0) { $0 + $1.totalAnswered } }
-    var totalCorrect: Int { sessions.reduce(0) { $0 + $1.totalCorrect } }
+    static let maxStoredSessions = 200
+
+    init(deckID: UUID) { self.deckID = deckID }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        deckID           = try c.decodeIfPresent(UUID.self, forKey: .deckID) ?? UUID()
+        sessions         = try c.decodeIfPresent([Failable<SessionRecord>].self, forKey: .sessions)?.compactMap { $0.value } ?? []
+        cardStats        = try c.decodeIfPresent([UUID: Failable<CardStats>].self, forKey: .cardStats)?.compactMapValues { $0.value } ?? [:]
+        archivedSessions = try c.decodeIfPresent(Int.self, forKey: .archivedSessions) ?? 0
+        archivedAnswers  = try c.decodeIfPresent(Int.self, forKey: .archivedAnswers) ?? 0
+        archivedCorrect  = try c.decodeIfPresent(Int.self, forKey: .archivedCorrect) ?? 0
+    }
+
+    var totalSessions: Int { sessions.count + archivedSessions }
+
+    var totalAnswers: Int { sessions.reduce(0) { $0 + $1.totalAnswered } + archivedAnswers }
+    var totalCorrect: Int { sessions.reduce(0) { $0 + $1.totalCorrect } + archivedCorrect }
 
     var overallAccuracy: Double {
         guard totalAnswers > 0 else { return 0 }
@@ -147,5 +216,19 @@ struct DeckStats: Codable {
             mode: result.mode,
             deckID: result.deckID
         ))
+        trimHistory()
+    }
+
+    /// Fold the oldest records into the archived totals so headline statistics
+    /// stay correct while the stored payload stays bounded.
+    mutating func trimHistory() {
+        let overflow = sessions.count - DeckStats.maxStoredSessions
+        guard overflow > 0 else { return }
+        for r in sessions.prefix(overflow) {
+            archivedSessions += 1
+            archivedAnswers  += r.totalAnswered
+            archivedCorrect  += r.totalCorrect
+        }
+        sessions.removeFirst(overflow)
     }
 }

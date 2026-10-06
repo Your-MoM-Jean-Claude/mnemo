@@ -29,13 +29,13 @@ struct StudySettingsView: View {
 
                         // Quick start presets
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("Quick start")
+                            Text(lang.presetQuickStart)
                                 .font(.subheadline).fontWeight(.semibold).foregroundStyle(.secondary)
                             HStack(spacing: 10) {
-                                presetButton("🎓", "Student",   .mnemoGold)   { applyPreset(mode: .typing, dir: .random,      sec: 20, req: 3) }
-                                presetButton("🌴", "Casual",    .mnemoGreen)  { applyPreset(mode: .show,   dir: .frontToBack,  sec: 10, req: 1) }
-                                presetButton("✈️", "Traveler",  .blue)        { applyPreset(mode: .show,   dir: .frontToBack,  sec: 5,  req: 1) }
-                                presetButton("🔥", "Intensive", .orange)      { applyPreset(mode: .typing, dir: .random,      sec: 20, req: 5) }
+                                presetButton("🎓", lang.presetStudent,   .mnemoGold)  { applyPreset(mode: .typing, dir: .random,     sec: 20, req: 3) }
+                                presetButton("🌴", lang.presetCasual,    .mnemoGreen) { applyPreset(mode: .show,   dir: .frontToBack, sec: 10, req: 1) }
+                                presetButton("✈️", lang.presetTraveler,  .blue)       { applyPreset(mode: .show,   dir: .frontToBack, sec: 5,  req: 1) }
+                                presetButton("🔥", lang.presetIntensive, .orange)     { applyPreset(mode: .typing, dir: .random,     sec: 20, req: 5) }
                             }
                         }
                         .padding(16).glassCard().padding(.horizontal)
@@ -54,16 +54,20 @@ struct StudySettingsView: View {
                         .padding(16).glassCard().padding(.horizontal)
 
                         settingsSection(title: lang.settingsMode) {
+                            // `.disabled` on a Picker item does nothing in the
+                            // segmented style, so a deck with fewer than 4 cards
+                            // could still be put into quiz mode. Drop the segment
+                            // instead of pretending it is disabled.
                             Picker(lang.settingsMode, selection: $mode) {
                                 Text(lang.settingsModeTyping).tag(StudyMode.typing)
                                 Text(lang.settingsModeShow).tag(StudyMode.show)
-                                Text(lang.settingsModeQuiz)
-                                    .tag(StudyMode.quiz)
-                                    .disabled(quizDisabled)
+                                if !quizDisabled {
+                                    Text(lang.settingsModeQuiz).tag(StudyMode.quiz)
+                                }
                             }
                             .pickerStyle(.segmented)
                             if quizDisabled {
-                                Text("Quiz requires at least 4 cards")
+                                Text(lang.settingsQuizNeedsCards)
                                     .font(.caption).foregroundStyle(.secondary)
                             }
                         }
@@ -132,6 +136,7 @@ struct StudySettingsView: View {
         }
         .onAppear {
             sectionSize = max(2, min(10, deck.cards.count))
+            if quizDisabled && mode == .quiz { mode = .typing }
         }
     }
 

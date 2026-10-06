@@ -110,16 +110,33 @@ struct StudyView: View {
                             .allowsHitTesting(false)
                         }
                     }
+                } else if !vm.isSessionFinished {
+                    // Belt-and-braces: the queue no longer hands back nil while
+                    // cards remain, but if it ever did the session must still
+                    // offer a way out rather than render a blank screen.
+                    VStack(spacing: 20) {
+                        ProgressView().tint(Color.mnemoGreen)
+                        PrimaryButton(title: lang.studyFinish) { vm.finishNow() }
+                            .padding(.horizontal, 32)
+                    }
                 }
 
                 Spacer()
             }
         }
         .onChange(of: vm.isSessionFinished) { finished in
-            if finished {
-                finalResult = vm.buildResult()
-                showResults = true
+            guard finished else { return }
+            // Record the session as soon as it ends. This used to happen in the
+            // results screen's onDisappear — which also fires when the results
+            // screen presents something on top of itself, so "Study again" saved
+            // and dismissed the run the user had just started.
+            let result = vm.buildResult()
+            finalResult = result
+            if !sessionSaved {
+                save(result)
+                sessionSaved = true
             }
+            showResults = true
         }
         .onChange(of: typingInput) { newValue in
             // While feedback is shown, a keystroke on the keyboard (which the
@@ -134,19 +151,27 @@ struct StudyView: View {
             if config.mode == .typing { inputFocused = true }
         }
         .onDisappear {
-            // save wrong answers even if user exits early (taps X)
-            if !sessionSaved && !vm.wrongCardIDs.isEmpty {
+            // Record a partial session when the user exits early (taps X).
+            if !sessionSaved && vm.hasAnswers {
                 save(vm.buildResult())
             }
         }
         .fullScreenCover(isPresented: $showResults) {
             if let result = finalResult {
-                ResultsView(result: result, deckName: deck.name, deck: deck, config: config)
-                    .onDisappear {
-                        save(result)
-                        sessionSaved = true
-                        dismiss()
-                    }
+                ResultsView(result: result, deckName: deck.name,
+                            onStudyAgain: {
+                                // Replay in place instead of stacking another
+                                // StudyView on top of the results screen.
+                                showResults  = false
+                                sessionSaved = false
+                                finalResult  = nil
+                                vm.restart()
+                                if config.mode == .typing { inputFocused = true }
+                            },
+                            onDone: {
+                                showResults = false
+                                dismiss()
+                            })
             }
         }
     }

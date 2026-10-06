@@ -34,7 +34,7 @@ struct ImportView: View {
 
                     // Optional custom name
                     VStack(alignment: .leading, spacing: 6) {
-                        Text(lang.editorDeckName + " (\(lang.commonOK.lowercased()) — optional)")
+                        Text("\(lang.editorDeckName) — \(lang.commonOptional)")
                             .font(.caption).foregroundStyle(.secondary)
                         TextField(lang.editorDeckName, text: $deckName)
                             .textFieldStyle(.plain).padding(14)
@@ -65,9 +65,11 @@ struct ImportView: View {
                 switch result {
                 case .success(let urls):
                     guard let url = urls.first else { return }
-                    let n = deckName.isEmpty ? nil : deckName
-                    library.importFromURL(url, name: n)
-                    if library.errorMessage == nil { dismiss() }
+                    let n = deckName.trimmingCharacters(in: .whitespaces)
+                    // Dismiss on the actual outcome. The old check read a stale
+                    // `errorMessage` that was never cleared, so after one failed
+                    // import the sheet stopped closing on success.
+                    if library.importFromURL(url, name: n.isEmpty ? nil : n) { dismiss() }
                 case .failure(let err):
                     library.errorMessage = err.localizedDescription
                     library.showError = true

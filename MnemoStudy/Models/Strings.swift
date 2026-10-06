@@ -181,6 +181,11 @@ extension AppLanguage {
     var paywallCancelAnytime: String { t("One-time purchase · yours forever", "Jednorázově · navždy vaše", "Pago único · tuyo para siempre") }
     var paywallFounder: String       { t("🚀 Launch price — going up soon", "🚀 Zaváděcí cena — brzy se zvýší", "🚀 Precio de lanzamiento — subirá pronto") }
     var paywallProActive: String     { t("Pro unlocked — thank you! 🎉", "Pro odemčeno — děkujeme! 🎉", "Pro desbloqueado — ¡gracias! 🎉") }
+    var paywallNothingToRestore: String {
+        t("No previous purchase found on this Apple ID.",
+          "K tomuto Apple ID nebyl nalezen žádný dřívější nákup.",
+          "No se encontró ninguna compra previa con este Apple ID.")
+    }
     var proRow: String               { t("Mnemo Study Pro", "Mnemo Study Pro", "Mnemo Study Pro") }
     var proTrialLeft: String         { t("sessions of full access left", "sezení s plným přístupem", "sesiones de acceso completo") }
     var gateDecksMsg: String         {
@@ -204,6 +209,50 @@ extension AppLanguage {
     var commonOK: String             { t("OK",    "OK",     "OK") }
     var commonAdd: String            { t("Add",   "Přidat", "Añadir") }
     var commonClose: String          { t("Close", "Zavřít", "Cerrar") }
+    var commonOptional: String       { t("optional", "nepovinné", "opcional") }
+
+    // MARK: - Library empty / search states
+    var libraryEmptyHint: String {
+        t("Tap + to add a deck or import a file",
+          "Klepnutím na + přidáte knihovnu nebo naimportujete soubor",
+          "Toca + para añadir un mazo o importar un archivo")
+    }
+    var librarySearchNoResults: String {
+        t("Nothing found", "Nic nenalezeno", "Sin resultados")
+    }
+    var librarySearchNoResultsHint: String {
+        t("No deck matches that name.",
+          "Žádná knihovna tomu názvu neodpovídá.",
+          "Ningún mazo coincide con ese nombre.")
+    }
+
+    // MARK: - Quick-start presets
+    var presetQuickStart: String { t("Quick start", "Rychlý start",  "Inicio rápido") }
+    var presetStudent: String    { t("Student",     "Student",       "Estudiante") }
+    var presetCasual: String     { t("Casual",      "Pohoda",        "Relajado") }
+    var presetTraveler: String   { t("Traveler",    "Cestovatel",    "Viajero") }
+    var presetIntensive: String  { t("Intensive",   "Intenzivní",    "Intensivo") }
+    var settingsQuizNeedsCards: String {
+        t("Quiz needs at least 4 cards",
+          "Kvíz potřebuje aspoň 4 kartičky",
+          "El cuestionario necesita al menos 4 tarjetas")
+    }
+
+    // MARK: - Statistics
+    var statsLast7Days: String { t("Last 7 days", "Posledních 7 dní", "Últimos 7 días") }
+
+    // MARK: - Restore starter decks
+    var settingsRestoreBundled: String {
+        t("Restore starter decks", "Obnovit vzorové knihovny", "Restaurar mazos iniciales")
+    }
+    var settingsRestoreBundledDesc: String {
+        t("Adds the built-in language decks back to your library. Your own decks are untouched.",
+          "Přidá vestavěné jazykové knihovny zpět do knihovny. Vlastních knihoven se to nedotkne.",
+          "Vuelve a añadir los mazos integrados. Tus propios mazos no se tocan.")
+    }
+    var settingsRestoreBundledDone: String {
+        t("Starter decks restored", "Vzorové knihovny obnoveny", "Mazos iniciales restaurados")
+    }
 
     // MARK: - Tabs (info + feedback)
     var tabInfo: String              { t("Info",     "Info",       "Info") }

@@ -1,7 +1,9 @@
 import SwiftUI
+import StoreKit
 
 struct FeedbackView: View {
     @EnvironmentObject var settings: SettingsViewModel
+    @Environment(\.requestReview) private var requestReview
     var lang: AppLanguage { settings.language }
 
     // Survey state
@@ -99,11 +101,11 @@ struct FeedbackView: View {
                             .font(.subheadline).foregroundStyle(Color.mnemoGreen)
                         }
 
-                        // Rate on App Store
+                        // Rate the app. The old link pointed at "id0", which is
+                        // not a real App Store listing — it just opened a dead
+                        // page. The system review sheet needs no ID.
                         Button {
-                            if let url = URL(string: "itms-apps://itunes.apple.com/app/id0") {
-                                UIApplication.shared.open(url)
-                            }
+                            requestReview()
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "star.fill").foregroundStyle(.yellow)
@@ -155,9 +157,12 @@ struct FeedbackView: View {
         if !freeComment.trimmingCharacters(in: .whitespaces).isEmpty {
             body += "\nComment:\n\(freeComment)\n"
         }
-        body += "\n---\nApp version: 1.0"
+        body += "\n---\nApp version: \(AppInfo.versionString)"
 
-        let encoded = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        // `.urlQueryAllowed` leaves &, + and = unescaped, so a comment containing
+        // any of them truncated the mail body at that character.
+        let allowed = CharacterSet.urlQueryAllowed.subtracting(CharacterSet(charactersIn: "&+=?#"))
+        let encoded = body.addingPercentEncoding(withAllowedCharacters: allowed) ?? ""
         let subject = "Mnemo%20Study%20Feature%20Survey"
         if let url = URL(string: "mailto:\(feedbackEmail)?subject=\(subject)&body=\(encoded)") {
             UIApplication.shared.open(url)

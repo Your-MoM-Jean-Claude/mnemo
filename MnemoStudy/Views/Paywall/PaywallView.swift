@@ -8,7 +8,7 @@ struct PaywallView: View {
     @State private var isPurchasing = false
     @State private var purchaseError: String?
 
-    static let productID = "com.jirifilipec.mnemoapp.pro"
+    static let productID = SettingsViewModel.productID
     var lang: AppLanguage { settings.language }
 
     var body: some View {
@@ -107,8 +107,11 @@ struct PaywallView: View {
             switch result {
             case .success(let v):
                 switch v {
-                case .verified:
+                case .verified(let transaction):
                     settings.isProUnlocked = true   // persisted to iCloud, survives reinstall
+                    // StoreKit redelivers a transaction that was never finished,
+                    // which makes the App Store re-present a purchase already paid for.
+                    await transaction.finish()
                     dismiss()
                 default: break
                 }
@@ -121,12 +124,22 @@ struct PaywallView: View {
     }
 
     private func restore() async {
+        purchaseError = nil
         try? await AppStore.sync()
+        var found = false
         for await result in Transaction.currentEntitlements {
-            if case .verified(let t) = result, t.productID == Self.productID {
-                settings.isProUnlocked = true
-                dismiss()
+            if case .verified(let t) = result,
+               t.productID == Self.productID,
+               t.revocationDate == nil {
+                found = true
             }
+        }
+        if found {
+            settings.isProUnlocked = true
+            dismiss()
+        } else {
+            // Silence here read as "restore failed for no reason".
+            purchaseError = lang.paywallNothingToRestore
         }
     }
 
