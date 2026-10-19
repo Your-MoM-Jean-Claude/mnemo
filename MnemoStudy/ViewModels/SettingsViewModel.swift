@@ -142,8 +142,15 @@ class SettingsViewModel: ObservableObject {
     var inTrial: Bool { trialSessionsUsed < SettingsViewModel.trialSessions }
     var trialSessionsRemaining: Int { max(0, SettingsViewModel.trialSessions - trialSessionsUsed) }
 
+    /// Free for everyone while the owner studies on TestFlight. Flip back to
+    /// false to restore the trial and the paywall; nothing else needs to change.
+    static let allAccess = true
+
     // Full access = purchased OR still within the value-based trial
-    var hasPro: Bool { isProUnlocked || inTrial }
+    var hasPro: Bool { Self.allAccess || isProUnlocked || inTrial }
+
+    // What the Pro row in Settings shows as active
+    var showsProActive: Bool { Self.allAccess || isProUnlocked }
 
     // SRS only actually runs when enabled AND the user has Pro access
     var srsActive: Bool { settings.srsEnabled && hasPro }

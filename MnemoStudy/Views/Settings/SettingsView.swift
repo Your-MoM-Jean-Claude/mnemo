@@ -99,16 +99,16 @@ struct SettingsView: View {
 
                         // Pro status / upsell
                         Button {
-                            if !settings.isProUnlocked { showPaywall = true }
+                            if !settings.showsProActive { showPaywall = true }
                         } label: {
                             settingsCard {
                                 HStack(spacing: 12) {
-                                    Image(systemName: settings.isProUnlocked ? "checkmark.seal.fill" : "crown.fill")
+                                    Image(systemName: settings.showsProActive ? "checkmark.seal.fill" : "crown.fill")
                                         .foregroundStyle(Color.mnemoGold)
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(lang.proRow)
                                             .font(.subheadline).fontWeight(.semibold).foregroundStyle(.white)
-                                        if settings.isProUnlocked {
+                                        if settings.showsProActive {
                                             Text(lang.paywallProActive)
                                                 .font(.caption).foregroundStyle(Color.mnemoGreen)
                                         } else if settings.inTrial {
@@ -120,7 +120,7 @@ struct SettingsView: View {
                                         }
                                     }
                                     Spacer()
-                                    if !settings.isProUnlocked {
+                                    if !settings.showsProActive {
                                         Image(systemName: "chevron.right").font(.caption).foregroundStyle(.secondary)
                                     }
                                 }
