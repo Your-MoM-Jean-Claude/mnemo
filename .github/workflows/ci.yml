@@ -1,0 +1,35 @@
+name: CI — build check
+
+# Compile-only gate. No signing, no provisioning, no App Store upload —
+# this exists purely to catch compile errors, which cannot be checked off macOS.
+# The release pipeline stays in main.yml and remains manual.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Select newest Xcode
+        run: |
+          XCODE=$(ls /Applications | grep "Xcode_" | sort -V | tail -1)
+          if [ -n "$XCODE" ]; then sudo xcode-select -s "/Applications/$XCODE"; fi
+          xcodebuild -version
+          swift --version
+
+      - name: Build (unsigned, simulator)
+        run: |
+          xcodebuild build \
+            -project MnemoStudy.xcodeproj \
+            -scheme MnemoStudy \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""

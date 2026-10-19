@@ -41,30 +41,80 @@ struct BundledLibraryLoader {
         BundledDeck(fileName: "ZH-AJ_5_Fraze",             folderName: "ZH → AJ", deckName: "短语 Fráze"),
     ]
 
-    static func loadInto(_ library: LibraryViewModel) {
-        guard library.decks.isEmpty else { return }
-
-        var folderMap: [String: UUID] = [:]
+    /// Reads and parses the bundled .txt files. Pure — touches no view model, so
+    /// it can run off the main actor. Parsing all 25 files used to happen inside
+    /// `App.init()` on the main thread, before the first frame was drawn.
+    static func buildContent(startingSortOrder: Int = 0) -> (decks: [Deck], folders: [DeckFolder]) {
+        var folderMap: [String: DeckFolder] = [:]
+        var folderOrder: [DeckFolder] = []
+        var loaded: [Deck] = []
 
         for entry in all {
-            // Create folder once
-            if folderMap[entry.folderName] == nil {
-                let folder = DeckFolder(name: entry.folderName, sortOrder: folderMap.count)
-                library.folders.append(folder)
-                folderMap[entry.folderName] = folder.id
-            }
-            let folderID = folderMap[entry.folderName]
-
             guard let url = Bundle.main.url(forResource: entry.fileName, withExtension: "txt"),
                   let cards = try? FileParser.parse(url: url) else { continue }
 
+            // Create the folder only once its content is known to have loaded —
+            // otherwise a missing resource left an empty folder behind.
+            if folderMap[entry.folderName] == nil {
+                let folder = DeckFolder(name: entry.folderName, sortOrder: folderMap.count)
+                folderMap[entry.folderName] = folder
+                folderOrder.append(folder)
+            }
+
             var deck = Deck(name: entry.deckName, cards: cards)
-            deck.folderID  = folderID
-            deck.sortOrder = library.decks.count
+            deck.folderID  = folderMap[entry.folderName]?.id
+            deck.sortOrder = startingSortOrder + loaded.count
             deck.isBundled = true
-            library.decks.append(deck)
+            loaded.append(deck)
+        }
+        return (loaded, folderOrder)
+    }
+
+    /// Seeds the built-in starter decks.
+    ///
+    /// Two guards matter here. `hasStoredLibrary` checks for saved bytes rather
+    /// than a decoded array, so a library we merely failed to read is never
+    /// mistaken for a new install and overwritten. And the seed is saved with
+    /// `pushToCloud: false` — pushing it stamped a fresh sync timestamp over a
+    /// real iCloud library that simply had not downloaded yet.
+    @discardableResult
+    static func apply(_ content: (decks: [Deck], folders: [DeckFolder]),
+                      to library: LibraryViewModel,
+                      force: Bool = false) -> Bool {
+        if !force {
+            guard library.decks.isEmpty, !library.hasStoredLibrary else { return false }
+        }
+        guard !content.decks.isEmpty else { return false }
+
+        // Reuse a folder that already carries the same name (Restore runs into
+        // this), remapping the incoming decks onto it — otherwise they would
+        // point at a folder that was never added and show up as standalone.
+        var idMap: [UUID: UUID] = [:]
+        for folder in content.folders {
+            if let existing = library.folders.first(where: { $0.name == folder.name }) {
+                idMap[folder.id] = existing.id
+            } else {
+                library.folders.append(folder)
+                idMap[folder.id] = folder.id
+            }
         }
 
-        library.save()
+        let base = library.decks.count
+        for (offset, deck) in content.decks.enumerated() {
+            var d = deck
+            if let old = d.folderID { d.folderID = idMap[old] ?? old }
+            d.sortOrder = base + offset
+            library.decks.append(d)
+        }
+        library.save(pushToCloud: force)
+        return true
+    }
+
+    @discardableResult
+    static func loadInto(_ library: LibraryViewModel, force: Bool = false) -> Bool {
+        if !force {
+            guard library.decks.isEmpty, !library.hasStoredLibrary else { return false }
+        }
+        return apply(buildContent(startingSortOrder: library.decks.count), to: library, force: force)
     }
 }

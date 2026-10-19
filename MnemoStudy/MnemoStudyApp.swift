@@ -2,16 +2,11 @@ import SwiftUI
 
 @main
 struct MnemoStudyApp: App {
-    @StateObject private var library: LibraryViewModel
+    @StateObject private var library  = LibraryViewModel()
     @StateObject private var settings = SettingsViewModel()
 
     @State private var showSplash = true
-
-    init() {
-        let lib = LibraryViewModel()
-        BundledLibraryLoader.loadInto(lib)
-        _library = StateObject(wrappedValue: lib)
-    }
+    @State private var didSeed    = false
 
     var body: some Scene {
         WindowGroup {
@@ -24,11 +19,12 @@ struct MnemoStudyApp: App {
                 } else if showSplash {
                     SplashView(lastDeck: library.lastStudiedEntry,
                                lang: settings.language,
-                               onDismiss: { withAnimation(.easeOut(duration: 0.4)) { showSplash = false } })
-                        .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
-                                withAnimation(.easeOut(duration: 0.4)) { showSplash = false }
-                            }
+                               onDismiss: dismissSplash)
+                        .task {
+                            // Auto-dismiss backstop. Cancelled automatically if the
+                            // view goes away first, unlike the old asyncAfter block.
+                            try? await Task.sleep(nanoseconds: 7 * 1_000_000_000)
+                            dismissSplash()
                         }
                 } else {
                     // No hard paywall — soft free tier + contextual Pro upsell
@@ -38,6 +34,25 @@ struct MnemoStudyApp: App {
                 }
             }
             .preferredColorScheme(.dark)
+            .task {
+                // Parsing the 25 bundled .txt files used to run inside App.init(),
+                // on the main thread, before the first frame could be drawn. Parse
+                // off the main actor and only hop back to publish the result.
+                guard !didSeed else { return }
+                didSeed = true
+                guard library.decks.isEmpty, !library.hasStoredLibrary else { return }
+
+                let content = await Task.detached(priority: .userInitiated) {
+                    BundledLibraryLoader.buildContent()
+                }.value
+
+                BundledLibraryLoader.apply(content, to: library)
+            }
         }
+    }
+
+    private func dismissSplash() {
+        guard showSplash else { return }
+        withAnimation(.easeOut(duration: 0.4)) { showSplash = false }
     }
 }

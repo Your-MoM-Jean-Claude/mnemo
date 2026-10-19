@@ -13,6 +13,8 @@
 		AA000004 /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100004 /* Deck.swift */; };
 		AA000005 /* FileParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100005 /* FileParser.swift */; };
 		AA000006 /* SRSEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100006 /* SRSEngine.swift */; };
+		AA000090 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100090 /* Persistence.swift */; };
+		AA000092 /* LibraryMerge.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100093 /* LibraryMerge.swift */; };
 		AA000007 /* Strings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100007 /* Strings.swift */; };
 		AA000008 /* StudyModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100008 /* StudyModels.swift */; };
 		AA000009 /* LibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100009 /* LibraryViewModel.swift */; };
@@ -35,6 +37,7 @@
 		AA000022 /* StudySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100022 /* StudySettingsView.swift */; };
 		AA000023 /* StudyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100023 /* StudyView.swift */; };
 		AA000024 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA100024 /* Assets.xcassets */; };
+		AA000091 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AA100091 /* PrivacyInfo.xcprivacy */; };
 		AA000025 /* BundledLibraryLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100025 /* BundledLibraryLoader.swift */; };
 		AE000001 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE100001 /* AudioPlayer.swift */; };
 		AB000001 /* CZ-AJ_1_Pozdravy.txt in Resources */ = {isa = PBXBuildFile; fileRef = AB100001 /* CZ-AJ_1_Pozdravy.txt */; };
@@ -71,6 +74,8 @@
 		AA100004 /* Deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deck.swift; sourceTree = "<group>"; };
 		AA100005 /* FileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileParser.swift; sourceTree = "<group>"; };
 		AA100006 /* SRSEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRSEngine.swift; sourceTree = "<group>"; };
+		AA100090 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		AA100093 /* LibraryMerge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryMerge.swift; sourceTree = "<group>"; };
 		AA100007 /* Strings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strings.swift; sourceTree = "<group>"; };
 		AA100008 /* StudyModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyModels.swift; sourceTree = "<group>"; };
 		AA100009 /* LibraryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewModel.swift; sourceTree = "<group>"; };
@@ -93,6 +98,8 @@
 		AA100022 /* StudySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudySettingsView.swift; sourceTree = "<group>"; };
 		AA100023 /* StudyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyView.swift; sourceTree = "<group>"; };
 		AA100024 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AA100091 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		AA100092 /* MnemoStudy.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MnemoStudy.entitlements; sourceTree = "<group>"; };
 		AA100025 /* BundledLibraryLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundledLibraryLoader.swift; sourceTree = "<group>"; };
 		AE100001 /* AudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
 		AB100001 /* CZ-AJ_1_Pozdravy.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CZ-AJ_1_Pozdravy.txt; sourceTree = "<group>"; };
@@ -150,6 +157,8 @@
 				AAGRP0003 /* ViewModels */,
 				AAGRP0004 /* Views */,
 				AA100024 /* Assets.xcassets */,
+				AA100091 /* PrivacyInfo.xcprivacy */,
+				AA100092 /* MnemoStudy.entitlements */,
 				ABGRP0001 /* Resources */,
 			);
 			path = MnemoStudy;
@@ -163,6 +172,8 @@
 				AA100004 /* Deck.swift */,
 				AA100005 /* FileParser.swift */,
 				AA100006 /* SRSEngine.swift */,
+				AA100090 /* Persistence.swift */,
+				AA100093 /* LibraryMerge.swift */,
 				AA100007 /* Strings.swift */,
 				AA100008 /* StudyModels.swift */,
 				AA100025 /* BundledLibraryLoader.swift */,
@@ -401,6 +412,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA000024 /* Assets.xcassets in Resources */,
+				AA000091 /* PrivacyInfo.xcprivacy in Resources */,
 				AB000001 /* CZ-AJ_1_Pozdravy.txt in Resources */,
 				AB000002 /* CZ-AJ_2_Slovesa.txt in Resources */,
 				AB000003 /* CZ-AJ_3_Pridavna_jmena.txt in Resources */,
@@ -442,6 +454,8 @@
 				AA000004 /* Deck.swift in Sources */,
 				AA000005 /* FileParser.swift in Sources */,
 				AA000006 /* SRSEngine.swift in Sources */,
+				AA000090 /* Persistence.swift in Sources */,
+				AA000092 /* LibraryMerge.swift in Sources */,
 				AA000007 /* Strings.swift in Sources */,
 				AA000008 /* StudyModels.swift in Sources */,
 				AA000009 /* LibraryViewModel.swift in Sources */,
@@ -557,11 +571,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MnemoStudy/MnemoStudy.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 46;
 				DEVELOPMENT_TEAM = 4SK4LT94PV;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mnemo Study";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "Mnemo Study uses notifications to remind you to study.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -585,11 +601,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MnemoStudy/MnemoStudy.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 46;
 				DEVELOPMENT_TEAM = 4SK4LT94PV;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mnemo Study";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "Mnemo Study uses notifications to remind you to study.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

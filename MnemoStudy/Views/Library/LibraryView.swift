@@ -32,6 +32,16 @@ struct LibraryView: View {
         return base.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
     }
 
+    var standalone: [Deck] { filteredDecks.filter { $0.folderID == nil } }
+
+    /// Folders worth drawing: all of them normally, only those holding a match
+    /// while a search is active.
+    var visibleFolders: [DeckFolder] {
+        guard !searchText.isEmpty else { return library.folders }
+        let matchedFolderIDs = Set(filteredDecks.compactMap { $0.folderID })
+        return library.folders.filter { matchedFolderIDs.contains($0.id) }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -66,14 +76,16 @@ struct LibraryView: View {
                         }
 
                         // Standalone decks (no folder)
-                        let standalone = filteredDecks.filter { $0.folderID == nil }
                         ForEach(standalone) { deck in
                             deckSection(deck: deck)
                         }
 
-                        // Folders
-                        ForEach(library.folders) { folder in
+                        // Folders. While searching, a folder is shown only if it
+                        // contains a match — searching previously ignored folder
+                        // contents entirely, which hid all 25 built-in decks.
+                        ForEach(visibleFolders) { folder in
                             FolderSection(folder: folder, lang: lang,
+                                          searchText: searchText,
                                           onTapDeck: tapDeck,
                                           onEdit: { editingDeck = $0 },
                                           onEditCards: { editingCardsDeck = $0 },
@@ -82,19 +94,16 @@ struct LibraryView: View {
                         }
 
                         // Empty state
-                        if filteredDecks.isEmpty && library.folders.isEmpty && searchText.isEmpty {
-                            VStack(spacing: 16) {
-                                Image(systemName: "books.vertical")
-                                    .font(.system(size: 52))
-                                    .foregroundStyle(Color.mnemoGreen.opacity(0.5))
-                                Text(lang.libraryEmpty)
-                                    .font(.title3).fontWeight(.semibold).foregroundStyle(.white)
-                                Text("Tap + to add a deck or import a file")
-                                    .font(.subheadline).foregroundStyle(.secondary)
-                                    .multilineTextAlignment(.center)
+                        if searchText.isEmpty {
+                            if filteredDecks.isEmpty && library.folders.isEmpty {
+                                emptyState(icon: "books.vertical",
+                                           title: lang.libraryEmpty,
+                                           subtitle: lang.libraryEmptyHint)
                             }
-                            .frame(maxWidth: .infinity)
-                            .padding(.top, 80)
+                        } else if standalone.isEmpty && visibleFolders.isEmpty {
+                            emptyState(icon: "magnifyingglass",
+                                       title: lang.librarySearchNoResults,
+                                       subtitle: lang.librarySearchNoResultsHint)
                         }
                     }
                     .padding(16)
@@ -186,6 +195,22 @@ struct LibraryView: View {
         }
     }
 
+    @ViewBuilder
+    private func emptyState(icon: String, title: String, subtitle: String) -> some View {
+        VStack(spacing: 16) {
+            Image(systemName: icon)
+                .font(.system(size: 52))
+                .foregroundStyle(Color.mnemoGreen.opacity(0.5))
+            Text(title)
+                .font(.title3).fontWeight(.semibold).foregroundStyle(.white)
+            Text(subtitle)
+                .font(.subheadline).foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 80)
+    }
+
     // MARK: - Deck row with its temporary sub-deck
 
     @ViewBuilder
@@ -265,7 +290,7 @@ struct DeckCardView: View {
 
     private var stats: DeckStats { library.stats(for: deck.id) }
     private var accuracy: Double { stats.overallAccuracy }
-    private var dueCount: Int    { library.srueDueCount(for: deck) }
+    private var dueCount: Int    { library.dueCount(for: deck) }
 
     var body: some View {
         Button(action: onTap) {
@@ -355,6 +380,7 @@ struct TempDeckCard: View {
 struct FolderSection: View {
     var folder: DeckFolder
     var lang: AppLanguage
+    var searchText: String = ""
     var onTapDeck: (Deck) -> Void
     var onEdit: (Deck) -> Void
     var onEditCards: (Deck) -> Void
@@ -367,7 +393,16 @@ struct FolderSection: View {
     @State private var showDeleteFolder = false
     @State private var renameText      = ""
 
-    var decks: [Deck] { library.decks.filter { $0.folderID == folder.id && !$0.isTemporary } }
+    private var allDecks: [Deck] { library.decks.filter { $0.folderID == folder.id && !$0.isTemporary } }
+
+    var decks: [Deck] {
+        guard !searchText.isEmpty else { return allDecks }
+        return allDecks.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+    }
+
+    /// A search should reveal its hits, not require another tap to open the folder.
+    private var showsContent: Bool { isExpanded || !searchText.isEmpty }
+
     var totalCards: Int { decks.reduce(0) { $0 + $1.cards.count } }
 
     var body: some View {
@@ -381,7 +416,7 @@ struct FolderSection: View {
                     Spacer()
                     Text("\(decks.count) · \(totalCards) \(lang.libraryCards)")
                         .font(.caption).foregroundStyle(.secondary)
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                    Image(systemName: showsContent ? "chevron.up" : "chevron.down")
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 .padding(.horizontal, 16).padding(.vertical, 12)
@@ -422,7 +457,7 @@ struct FolderSection: View {
                 Button(lang.editorCancel, role: .cancel) {}
             }
 
-            if isExpanded {
+            if showsContent {
                 ForEach(decks) { deck in
                     VStack(spacing: 6) {
                         DeckCardView(deck: deck, lang: lang,

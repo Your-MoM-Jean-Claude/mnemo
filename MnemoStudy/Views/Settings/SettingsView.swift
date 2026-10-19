@@ -2,12 +2,14 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var settings: SettingsViewModel
+    @EnvironmentObject var library: LibraryViewModel
 
     @State private var showTimePicker  = false
     @State private var pickerHour      = 8
     @State private var pickerMinute    = 0
     @State private var showPaywall     = false
     @State private var showSnoozed     = false
+    @State private var showRestored    = false
 
     var lang: AppLanguage { settings.language }
 
@@ -97,16 +99,16 @@ struct SettingsView: View {
 
                         // Pro status / upsell
                         Button {
-                            if !settings.isProUnlocked { showPaywall = true }
+                            if !settings.showsProActive { showPaywall = true }
                         } label: {
                             settingsCard {
                                 HStack(spacing: 12) {
-                                    Image(systemName: settings.isProUnlocked ? "checkmark.seal.fill" : "crown.fill")
+                                    Image(systemName: settings.showsProActive ? "checkmark.seal.fill" : "crown.fill")
                                         .foregroundStyle(Color.mnemoGold)
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(lang.proRow)
                                             .font(.subheadline).fontWeight(.semibold).foregroundStyle(.white)
-                                        if settings.isProUnlocked {
+                                        if settings.showsProActive {
                                             Text(lang.paywallProActive)
                                                 .font(.caption).foregroundStyle(Color.mnemoGreen)
                                         } else if settings.inTrial {
@@ -118,7 +120,7 @@ struct SettingsView: View {
                                         }
                                     }
                                     Spacer()
-                                    if !settings.isProUnlocked {
+                                    if !settings.showsProActive {
                                         Image(systemName: "chevron.right").font(.caption).foregroundStyle(.secondary)
                                     }
                                 }
@@ -161,8 +163,27 @@ struct SettingsView: View {
                             }
                         }
 
+                        // Restore starter decks — deleting them all used to be a
+                        // one-way door, since seeding only ever ran once.
+                        Button {
+                            if BundledLibraryLoader.loadInto(library, force: true) {
+                                showRestored = true
+                            }
+                        } label: {
+                            settingsCard {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Label(lang.settingsRestoreBundled, systemImage: "arrow.clockwise")
+                                        .font(.subheadline).fontWeight(.semibold).foregroundStyle(.white)
+                                    Text(lang.settingsRestoreBundledDesc)
+                                        .font(.caption).foregroundStyle(.secondary)
+                                        .multilineTextAlignment(.leading)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                        }
+
                         // Version
-                        Text("Mnemo Study · \(lang.settingsVersion) 1.0")
+                        Text("Mnemo Study · \(lang.settingsVersion) \(AppInfo.versionString)")
                             .font(.caption).foregroundStyle(.secondary.opacity(0.5))
                             .padding(.bottom, 32)
                     }
@@ -180,6 +201,9 @@ struct SettingsView: View {
                 PaywallView().environmentObject(settings)
             }
             .alert(lang.settingsSnoozed, isPresented: $showSnoozed) {
+                Button(lang.commonOK, role: .cancel) {}
+            }
+            .alert(lang.settingsRestoreBundledDone, isPresented: $showRestored) {
                 Button(lang.commonOK, role: .cancel) {}
             }
         }
